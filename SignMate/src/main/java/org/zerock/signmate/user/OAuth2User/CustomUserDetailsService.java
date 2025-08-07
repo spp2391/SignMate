@@ -20,13 +20,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
 
-        if (user.getRole() == null) {
+        if (user.getUserType() == null) {
             throw new UsernameNotFoundException("❌ 권한이 설정되지 않은 사용자입니다: " + email);
         }
 
         System.out.println("✅ 로그인한 사용자: " + user.getEmail());
-        System.out.println("✅ DB role 값: " + user.getRole());
-        System.out.println("✅ 최종 적용 권한: ROLE_" + user.getRole());
+        System.out.println("✅ DB role 값: " + user.getUserType());
+        System.out.println("✅ 최종 적용 권한: ROLE_" + user.getUserType());
 
         return new CustomOAuth2User(user);
     }

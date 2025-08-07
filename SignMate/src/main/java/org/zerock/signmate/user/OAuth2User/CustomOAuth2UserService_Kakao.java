@@ -35,9 +35,9 @@ public class CustomOAuth2UserService_Kakao extends DefaultOAuth2UserService {
                 .orElseGet(() -> userRepository.save(
                         User.builder()
                                 .kakaoId(kakaoId)
-                                .nickname(nickname)
+                                .name(nickname)
                                 .email(kakaoId.toString())  // 이메일은 없음
-                                .role("USER")
+                                .userType("USER")
                                 .build()
                 ));
 
