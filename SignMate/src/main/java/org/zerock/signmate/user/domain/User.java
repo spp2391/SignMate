@@ -28,26 +28,26 @@ public class User implements UserDetails {
     @Column(name = "name", length = 100)
     private String name;
 
+    @Column(name = "nickname", length = 100)
+    private String nickname;
+
     @Column(name = "email", length = 255)
     private String email;
 
     @Column(name = "password", length = 255)
     private String password;
 
-    @Column(name = "phone_number", length = 15)
-    private String phoneNumber;
+    @Column(name = "company_name", length = 200)
+    private String companyName;
 
-    @Column(name = "user_role", length = 10)
-    private String role;
+    @Column(name = "user_type", length = 10)
+    private String userType;
 
     @Column(name = "regdate")
     private LocalDateTime regdate;
 
     @Column(name = "moddate")
     private LocalDateTime moddate;
-
-    @Column(name = "nickname", length = 15)
-    private String nickname;
 
     @Builder.Default
     @Column(nullable = false)
@@ -60,7 +60,7 @@ public class User implements UserDetails {
     // ===== UserDetails 구현 =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + userType));
     }
 
     @Override
@@ -104,6 +104,10 @@ public class User implements UserDetails {
         this.moddate = LocalDateTime.now();
     }
 
+    public User update(String name) {
+        this.name = name;
+        return this;
+    }
 
 
 }

@@ -14,7 +14,7 @@ import org.zerock.signmate.config.jwt.TokenProvider;
 import org.zerock.signmate.user.domain.RefreshToken;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.RefreshTokenRepository;
-import org.zerock.signmate.user.sevice.UserService;
+import org.zerock.signmate.user.service.UserService;
 import org.zerock.signmate.util.CookieUtil;
 
 import java.io.IOException;

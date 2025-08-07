@@ -20,7 +20,7 @@ import org.zerock.signmate.config.oauth.OAuth2AuthorizationRequestBasedOnCookieR
 import org.zerock.signmate.config.oauth.OAuth2SuccessHandler;
 import org.zerock.signmate.config.oauth.OAuth2UserCustomService;
 import org.zerock.signmate.user.repository.RefreshTokenRepository;
-import org.zerock.signmate.user.sevice.UserService;
+import org.zerock.signmate.user.service.UserService;
 
 @RequiredArgsConstructor
 @Configuration

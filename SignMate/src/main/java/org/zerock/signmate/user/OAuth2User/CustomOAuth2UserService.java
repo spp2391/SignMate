@@ -40,8 +40,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                             .email(email)
                             .name(name != null ? name : nickname)
                             .nickname(nickname != null ? nickname : name)
-                            .phoneNumber(mobile)
-                            .role("USER") // 소셜 로그인 사용자도 USER
+                            .userType("USER") // 소셜 로그인 사용자도 USER
                             .password("") // 소셜 로그인은 비밀번호 없음
                             .build();
                     return userRepository.save(newUser);

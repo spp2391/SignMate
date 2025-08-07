@@ -1,4 +1,4 @@
-package org.zerock.signmate.user.sevice;
+package org.zerock.signmate.user.service;
 
 import lombok.RequiredArgsConstructor;
 
