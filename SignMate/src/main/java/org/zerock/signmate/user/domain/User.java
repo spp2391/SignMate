@@ -43,6 +43,9 @@ public class User implements UserDetails {
     @Column(name = "user_type", length = 10)
     private String userType;
 
+    @Column(name = "user_role", length = 10)
+    private String userRole;
+
     @Column(name = "regdate")
     private LocalDateTime regdate;
 
