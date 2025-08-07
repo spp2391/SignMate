@@ -38,7 +38,7 @@ public class CustomOAuth2User implements OAuth2User, UserDetails {
     // 권한 부여 (ROLE_USER 고정)
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(() -> "ROLE_" + user.getRole());
+        return Collections.singleton(() -> "ROLE_" + user.getUserType());
     }
 
     // UserDetails 구현부
