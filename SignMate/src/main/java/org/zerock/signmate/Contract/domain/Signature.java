@@ -1,6 +1,7 @@
 package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
+import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDateTime;
 

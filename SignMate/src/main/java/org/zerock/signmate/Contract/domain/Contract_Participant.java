@@ -1,10 +1,11 @@
 package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
+import org.zerock.signmate.user.domain.User;
 
 @Entity
 @Table(name = "contract_participants")
-public class ContractParticipant {
+    public class Contract_Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
