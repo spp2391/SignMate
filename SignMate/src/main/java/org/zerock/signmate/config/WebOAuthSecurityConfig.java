@@ -13,8 +13,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.zerock.signmate.config.jwt.TokenProvider;
 import org.zerock.signmate.config.oauth.OAuth2AuthorizationRequestBasedOnCookieRepository;
 import org.zerock.signmate.config.oauth.OAuth2SuccessHandler;
