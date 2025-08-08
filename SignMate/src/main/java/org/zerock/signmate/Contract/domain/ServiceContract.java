@@ -2,6 +2,7 @@ package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 @Entity
@@ -11,14 +12,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceContract {
+public class ServiceContract extends CommonEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)  // 자동 증가 PK
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contract_id", unique = true)  // FK 컬럼명, unique 제약도 걸어 1:1 보장
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
     private Contract contract;
 
     private String clientName;
@@ -48,7 +49,16 @@ public class ServiceContract {
     @Column(columnDefinition = "TEXT")
     private String otherNotes;
 
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status; // DRAFT, PENDING, SIGNED
+
+    private String pdfPath; // 최종 PDF 경로
+
     private LocalDate contractDate;
+
+    @Column(length = 255)
+    private String url;  // 계약서 고유 링크 URL 저장
+
 }
 
 

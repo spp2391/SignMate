@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.domain.Contract;
 import org.zerock.signmate.Contract.domain.ServiceContract;
+import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.Contract.dto.ServiceContractDto;
 
 import java.util.Optional;
@@ -18,11 +19,10 @@ public class ContractService {
 
     @Transactional
     public ServiceContractDto save(ServiceContractDto dto) {
-        Contract contract = contractRepository.findById(dto.getId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계약서 ID입니다: " + dto.getId()));
+        Contract contract = contractRepository.findById(dto.getContractId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계약서 ID입니다: " + dto.getContractId()));
 
         ServiceContract entity = ServiceContract.builder()
-
                 .contract(contract)
                 .clientName(dto.getClientName())
                 .projectName(dto.getProjectName())
@@ -45,8 +45,14 @@ public class ContractService {
 
         ServiceContract saved = serviceContractRepository.save(entity);
 
+        String generatedUrl = "http://localhost:3000/api/service-contracts/" + saved.getId();
+        saved.setUrl(generatedUrl);
+        serviceContractRepository.save(saved);
+
         return toDto(saved);
     }
+
+
 
     public ServiceContractDto findById(Long id) {
         Optional<ServiceContract> opt = serviceContractRepository.findById(id);

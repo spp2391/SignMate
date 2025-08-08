@@ -10,7 +10,7 @@ const sampleTemplateFields = [
 
 function ContractForm() {
   const [fields, setFields] = useState([]);
-  const [formData, setFormData] = useState({id:1,});
+  const [formData, setFormData] = useState({contractId:1,});
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ function ContractForm() {
       }
 
       alert("계약서가 정상 제출되었습니다!");
-      setFormData({});
+       window.location.reload();
     } catch (error) {
       alert("제출 실패: " + error.message);
     } finally {

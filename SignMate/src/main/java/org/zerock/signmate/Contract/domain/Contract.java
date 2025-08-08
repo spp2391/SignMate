@@ -1,13 +1,16 @@
 package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
-import org.zerock.signmate.user.domain.User;
+import lombok.*;
 
-import java.time.LocalDateTime;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "contract")
-public class Contract {
+public class Contract extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -15,12 +18,5 @@ public class Contract {
     @Enumerated(EnumType.STRING)
     private enums.ContractType contractType; // SERVICE, EMPLOYMENT 등
 
-    @Enumerated(EnumType.STRING)
-    private enums.ContractStatus status; // DRAFT, PENDING, SIGNED
-
-    private String pdfPath; // 최종 PDF 경로
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 }
 
