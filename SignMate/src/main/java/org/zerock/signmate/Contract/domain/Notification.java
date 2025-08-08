@@ -19,11 +19,6 @@ public class Notification {
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
-    @Enumerated(EnumType.STRING)
-    private enums.NotificationType type; // SIGN_REQUEST, SIGNED, REMINDER
-
-    private String message;
-    private Boolean isRead;
 
     private LocalDateTime createdAt;
 }

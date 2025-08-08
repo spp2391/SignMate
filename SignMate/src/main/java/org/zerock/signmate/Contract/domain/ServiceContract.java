@@ -59,6 +59,7 @@ public class ServiceContract extends CommonEntity{
     @Column(length = 255)
     private String url;  // 계약서 고유 링크 URL 저장
 
+
 }
 
 
