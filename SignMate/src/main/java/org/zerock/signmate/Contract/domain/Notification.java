@@ -6,30 +6,25 @@ import org.zerock.signmate.user.domain.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "notifications")
+@Table(name = "notification")
 public class Notification {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long notificationId;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user; // 알림 수신자
 
     @ManyToOne
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
     @Enumerated(EnumType.STRING)
-    private NotificationType type; // SIGN_REQUEST, SIGNED, REMINDER
+    private enums.NotificationType type; // SIGN_REQUEST, SIGNED, REMINDER
 
-    @Column(length = 500)
     private String message;
-
-    private boolean isRead;
+    private Boolean isRead;
 
     private LocalDateTime createdAt;
-
-    public enum NotificationType { SIGN_REQUEST, SIGNED, REMINDER }
 }
+

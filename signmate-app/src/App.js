@@ -16,19 +16,11 @@ import React, { useState } from 'react';
 import SendContract from './SendContract';
 
 import SignContract from './SignContract';
+import ContractForm from './component/ContractForm';
 
 function App() {
-  const [page, setPage] = useState('send'); // 'send' or 'sign'
-
-  return (
-    <div>
-      <button onClick={() => setPage('send')}>계약서 보내기</button>
-      <button onClick={() => setPage('sign')}>서명하기</button>
-
-      {page === 'send' && <SendContract />}
-      {page === 'sign' && <SignContract />}
-    </div>
-  );
+  return <ContractForm />;
 }
+
 
 export default App;

@@ -6,29 +6,21 @@ import org.zerock.signmate.user.domain.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "contracts")
+@Table(name = "contract")
 public class Contract {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long contractId;
-
-    @ManyToOne
-    @JoinColumn(name = "template_id")
-    private Template template;
-
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Status status; // DRAFT, PENDING, SIGNED
+    private enums.ContractType contractType; // SERVICE, EMPLOYMENT 등
 
-    private String pdfPath;
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status; // DRAFT, PENDING, SIGNED
+
+    private String pdfPath; // 최종 PDF 경로
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
-    public enum Status { DRAFT, PENDING, SIGNED }
 }
 

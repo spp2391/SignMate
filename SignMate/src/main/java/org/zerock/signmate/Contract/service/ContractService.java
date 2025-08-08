@@ -1,25 +1,78 @@
 package org.zerock.signmate.Contract.service;
 
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.io.File;
+import org.zerock.signmate.Contract.domain.Contract;
+import org.zerock.signmate.Contract.domain.ServiceContract;
+import org.zerock.signmate.Contract.dto.ServiceContractDto;
+
+import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ContractService {
 
-    // 계약서 PDF 파일 저장 위치 (예: 로컬 경로)
-    private final String pdfBasePath = "/contracts/pdf/";
+    private final ServiceContractRepository serviceContractRepository;
+    private final ContractRepository contractRepository;
 
-    // 계약서 원본 PDF 불러오기
-    public File loadOriginalPdf(Long contractId) {
-        // 예시: contractId 기반으로 파일 경로 생성
-        String filePath = pdfBasePath + "contract_" + contractId + ".pdf";
-        return new File(filePath);
+    @Transactional
+    public ServiceContractDto save(ServiceContractDto dto) {
+        Contract contract = contractRepository.findById(dto.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 계약서 ID입니다: " + dto.getId()));
+
+        ServiceContract entity = ServiceContract.builder()
+
+                .contract(contract)
+                .clientName(dto.getClientName())
+                .projectName(dto.getProjectName())
+                .contractStartDate(dto.getContractStartDate())
+                .contractEndDate(dto.getContractEndDate())
+                .totalAmount(dto.getTotalAmount())
+                .advancePayment(dto.getAdvancePayment())
+                .interimPayment(dto.getInterimPayment())
+                .finalPayment(dto.getFinalPayment())
+                .paymentTerms(dto.getPaymentTerms())
+                .taxInvoice(dto.getTaxInvoice())
+                .paymentMethod(dto.getPaymentMethod())
+                .workDescription(dto.getWorkDescription())
+                .deliverOriginalFiles(dto.getDeliverOriginalFiles())
+                .revisionCount(dto.getRevisionCount())
+                .deliveryDeadline(dto.getDeliveryDeadline())
+                .otherNotes(dto.getOtherNotes())
+                .contractDate(dto.getContractDate())
+                .build();
+
+        ServiceContract saved = serviceContractRepository.save(entity);
+
+        return toDto(saved);
     }
 
-    // 계약서 서명 완료 상태로 DB 업데이트 (간단 예시)
-    public void markAsSigned(Long contractId, String signerName, String signerEmail) {
-        // TODO: 실제 DB 업데이트 로직 작성
-        System.out.println("Contract " + contractId + " signed by " + signerName + " (" + signerEmail + ")");
+    public ServiceContractDto findById(Long id) {
+        Optional<ServiceContract> opt = serviceContractRepository.findById(id);
+        return opt.map(this::toDto).orElse(null);
+    }
+
+    private ServiceContractDto toDto(ServiceContract entity) {
+        return ServiceContractDto.builder()
+                .id(entity.getId())
+                .clientName(entity.getClientName())
+                .projectName(entity.getProjectName())
+                .contractStartDate(entity.getContractStartDate())
+                .contractEndDate(entity.getContractEndDate())
+                .totalAmount(entity.getTotalAmount())
+                .advancePayment(entity.getAdvancePayment())
+                .interimPayment(entity.getInterimPayment())
+                .finalPayment(entity.getFinalPayment())
+                .paymentTerms(entity.getPaymentTerms())
+                .taxInvoice(entity.getTaxInvoice())
+                .paymentMethod(entity.getPaymentMethod())
+                .workDescription(entity.getWorkDescription())
+                .deliverOriginalFiles(entity.getDeliverOriginalFiles())
+                .revisionCount(entity.getRevisionCount())
+                .deliveryDeadline(entity.getDeliveryDeadline())
+                .otherNotes(entity.getOtherNotes())
+                .contractDate(entity.getContractDate())
+                .build();
     }
 }
-

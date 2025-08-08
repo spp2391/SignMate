@@ -1,63 +1,31 @@
 package org.zerock.signmate.Contract.controller;
-
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
+import org.zerock.signmate.Contract.dto.ServiceContractDto;
 import org.zerock.signmate.Contract.service.ContractService;
-import org.zerock.signmate.Contract.service.EmailService;
-import org.zerock.signmate.Contract.service.PdfSigner;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/contracts")
+@RequestMapping("/api/service-contracts")
+@RequiredArgsConstructor
 public class ContractController {
 
     private final ContractService contractService;
-    private final PdfSigner pdfSigner;
-    private final EmailService emailService;
 
-    public ContractController(ContractService contractService, PdfSigner pdfSigner, EmailService emailService) {
-        this.contractService = contractService;
-        this.pdfSigner = pdfSigner;
-        this.emailService = emailService;
-    }
-
-    @PostMapping("/submit")
-    public ResponseEntity<String> submitSignedContract(
-            @RequestParam("name") String name,
-            @RequestParam("email") String email,
-            @RequestParam("signature") MultipartFile signatureImage,
-            @RequestParam("contractId") Long contractId
-    ) {
+    @PostMapping
+    public ResponseEntity<?> saveContract(@RequestBody ServiceContractDto dto) {
         try {
-            // 1. 계약서 원본 PDF 불러오기
-            File pdfFile = contractService.loadOriginalPdf(contractId);
-
-            // 2. 서명 이미지 읽기
-            BufferedImage signature = ImageIO.read(signatureImage.getInputStream());
-
-            // 3. PDF에 서명 및 이름 삽입
-            File signedPdf = pdfSigner.insertSignature(pdfFile, signature, name);
-
-            // 4. DB 상태 업데이트 (서명 완료 처리)
-            contractService.markAsSigned(contractId, name, email);
-
-            // 5. 서명된 PDF 이메일 전송
-            emailService.sendSignedPdf(email, signedPdf);
-
-            return ResponseEntity.ok("서명 제출 완료");
-
+            ServiceContractDto savedDto = contractService.save(dto);
+            return ResponseEntity.ok(savedDto);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("서명 제출 중 오류가 발생했습니다.");
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
         }
     }
 }

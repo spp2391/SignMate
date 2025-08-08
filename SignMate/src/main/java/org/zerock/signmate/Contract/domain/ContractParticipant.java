@@ -4,11 +4,9 @@ import jakarta.persistence.*;
 import org.zerock.signmate.user.domain.User;
 
 @Entity
-@Table(name = "contract_participants")
-    public class Contract_Participant {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Table(name = "contract_participant")
+public class ContractParticipant {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long participantId;
 
     @ManyToOne
@@ -20,10 +18,8 @@ import org.zerock.signmate.user.domain.User;
     private User user;
 
     @Enumerated(EnumType.STRING)
-    private RoleInContract roleInContract; // 갑, 을
+    private enums.RoleInContract roleInContract; // 갑, 을, 병
 
-    private boolean canEdit;
-
-    public enum RoleInContract { 갑, 을 }
+    private Boolean canEdit;
 }
 
