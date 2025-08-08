@@ -40,9 +40,11 @@ public class User implements UserDetails {
     @Column(name = "company_name", length = 200)
     private String companyName;
 
+    // USER, ADMIN
     @Column(name = "user_type", length = 10)
     private String userType;
 
+    // PRIVATE, COMPANY
     @Column(name = "user_role", length = 10)
     private String userRole;
 

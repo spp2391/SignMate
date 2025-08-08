@@ -24,4 +24,6 @@ public class AddUserRequest {
     private String companyName;
     @NotBlank
     private String userType;
+    @NotBlank
+    private String userRole;
 }
