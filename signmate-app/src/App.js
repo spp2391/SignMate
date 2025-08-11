@@ -13,9 +13,9 @@ import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 export default function App() {
   return (
     <Router>
-      {/* < Header /> */}
-      {/* < Index /> */}
-      {/* < Footer /> */}
+      < Header />
+      < Index />
+      < Footer />
       <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Link to="/secret">비밀유지서약서</Link>
         <Link to="/employment">표준근로계약서</Link>

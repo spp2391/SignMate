@@ -346,26 +346,26 @@ const Index = () => {
                             </li>
                             <li className="item primary">
                                 <Link to="javascript:void(0)">
-                                    <img src="../../assets/icons/ico_branch.svg" alt="영업점 조회" />
-                                    <span>영업점 조회</span>
+                                    <img src={logo2} alt="내 문서 조회" />
+                                    <span>내 문서 조회</span>
                                 </Link>
                             </li>
                             <li className="item gray">
                                 <Link to="javascript:void(0)">
-                                    <img src="../../assets/icons/ico_security.svg" alt="보안센터" />
-                                    <span>보안센터</span>
+                                    <img src={logo7} alt="법적효력" />
+                                    <span>법적효력</span>
                                 </Link>
                             </li>
                             <li className="item secondary">
                                 <Link to="javascript:void(0)">
-                                    <img src="../../assets/icons/ico_guide.svg" alt="이용안내" />
+                                    <img src={logo19} alt="이용안내" />
                                     <span>이용안내</span>
                                 </Link>
                             </li>
                             <li className="item primary-alpha">
                                 <Link to="javascript:void(0)">
                                     <strong>고객센터</strong>
-                                    <span>070-8872-8874</span>
+                                    <span>070-2222-2222</span>
                                 </Link>
                             </li>
                         </ul>

@@ -4,6 +4,7 @@ import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
 import "../../assets/css/templatehouse.css";
 import logo from "../../assets/images/logo_small.png";
+import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
 
 const Header = () => {
     return (
@@ -97,7 +98,7 @@ const Header = () => {
                         <div className="fullmenu-head">
                             <h4 className="fullmenu-title">
                                 <Link to="javascript:void(0)">
-                                    <img src="../src/assets/images/logo_w.png" alt="TEMHA Bank" />
+                                     <img height="82" src={logo} alt="SIGN MATE" />
                                 </Link>
                             </h4>
                         </div>
@@ -165,7 +166,7 @@ const Header = () => {
                         </ul>
                     </div>
                     <button className="fullmenu-close">
-                        <img src="../src/assets/icons/ico_s20_close_white.svg" alt="닫기" />
+                        <img src={logo2} alt="닫기" />
                     </button>
                 </div>
             </div>
