@@ -6,11 +6,9 @@ import org.zerock.signmate.user.domain.User;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "signatures")
+@Table(name = "signature")
 public class Signature {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long signatureId;
 
     @ManyToOne
@@ -21,10 +19,11 @@ public class Signature {
     @JoinColumn(name = "signer_id")
     private User signer;
 
-    @Lob
-    private String signatureImage; // Base64 또는 URL
+    @Column(columnDefinition = "TEXT")
+    private String signatureImage; // Base64 or URL
 
-    private String signatureHash;
+    private String signatureHash; // 위변조 방지용
 
     private LocalDateTime signedAt;
 }
+

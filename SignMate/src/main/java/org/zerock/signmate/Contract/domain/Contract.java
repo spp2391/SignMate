@@ -1,34 +1,31 @@
 package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.zerock.signmate.user.domain.User;
 
-import java.time.LocalDateTime;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
-@Table(name = "contracts")
-public class Contract {
-
+@Table(name = "contract")
+public class Contract extends CommonEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long contractId;
-
-    @ManyToOne
-    @JoinColumn(name = "template_id")
-    private Template template;
-
-    @ManyToOne
-    @JoinColumn(name = "owner_id")
-    private User owner;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
-    private Status status; // DRAFT, PENDING, SIGNED
+    private enums.ContractType contractType; // SERVICE, EMPLOYMENT 등
 
-    private String pdfPath;
+    @ManyToOne
+    @JoinColumn(name = "writer_id")
+    private User writer;
 
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
-    public enum Status { DRAFT, PENDING, SIGNED }
 }
 
