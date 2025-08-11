@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+// src/App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
-function App() {
+import SecretPage from "./pages/SecretPage";
+import EmploymentContractPage from "./pages/EmploymentContractPage";
+import ServiceContractPage from "./pages/ServiceContractPage";
+import SupplyContractPage from "./pages/SupplyContractPage";
+import OutsourcingContractPage from "./pages/OutsourcingContractPage";
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Link to="/secret">비밀유지서약서</Link>
+        <Link to="/employment">표준근로계약서</Link>
+        <Link to="/service">용역계약서</Link>
+        <Link to="/supply">자재/물품 공급계약서</Link>
+        <Link to="/outsourcing">업무위탁 계약서</Link>
+      </nav>
+
+      <Routes>
+        <Route path="/secret" element={<SecretPage />} />
+        <Route path="/employment" element={<EmploymentContractPage />} />
+        <Route path="/service" element={<ServiceContractPage />} />
+        <Route path="/supply" element={<SupplyContractPage />} />
+        <Route path="/outsourcing" element={<OutsourcingContractPage />} />
+        {/* 기본 라우트 */}
+        <Route path="*" element={<SecretPage />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;
