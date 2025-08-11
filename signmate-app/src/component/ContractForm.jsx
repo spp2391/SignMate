@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-const sampleTemplateFields = [
+const templateFields = [
   { name: "clientName", label: "발주자", type: "text", required: true },
   { name: "projectName", label: "프로젝트명", type: "text", required: true },
   { name: "contractStartDate", label: "계약 시작일", type: "date", required: true },
@@ -9,22 +10,59 @@ const sampleTemplateFields = [
 ];
 
 function ContractForm() {
-  const [fields, setFields] = useState([]);
-  const [formData, setFormData] = useState({contractId:1,});
+  const { contractId } = useParams();
+
+  const [formData, setFormData] = useState({
+    id: "",  // 수정 시 필요한 고유 ID
+    writerName: "",
+    receiverName: "",
+    clientName: "",
+    projectName: "",
+    contractStartDate: "",
+    totalAmount: "",
+    paymentTerms: "",
+  });
   const [loading, setLoading] = useState(false);
+  const [loadingData, setLoadingData] = useState(false);
 
   useEffect(() => {
-    setFields(sampleTemplateFields);
-  }, []);
+    if (contractId) {
+      setLoadingData(true);
+      fetch(`/api/service-contracts/${contractId}`)
+        .then(res => {
+          if (!res.ok) throw new Error("데이터를 불러오는데 실패했습니다.");
+          return res.json();
+        })
+        .then(data => {
+          setFormData({
+            id: data.id || "",
+            writerName: data.writerName || "",
+            receiverName: data.receiverName || "",
+            clientName: data.clientName || "",
+            projectName: data.projectName || "",
+            contractStartDate: data.contractStartDate ? data.contractStartDate.substring(0, 10) : "",
+            totalAmount: data.totalAmount || "",
+            paymentTerms: data.paymentTerms || "",
+          });
+        })
+        .catch(err => alert(err.message))
+        .finally(() => setLoadingData(false));
+    }
+  }, [contractId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    for (const field of fields) {
+
+    if (!formData.writerName || !formData.receiverName) {
+      alert("계약자 이름과 받는 사람 이름은 필수입니다.");
+      return;
+    }
+    for (const field of templateFields) {
       if (field.required && !formData[field.name]) {
         alert(`${field.label}은(는) 필수 입력입니다.`);
         return;
@@ -32,9 +70,13 @@ function ContractForm() {
     }
 
     setLoading(true);
+
     try {
-      const response = await fetch("/api/service-contracts", {
-        method: "POST",
+      const method = formData.id ? "PUT" : "POST";
+      const url = formData.id ? `/api/service-contracts/${formData.id}` : "/api/service-contracts";
+
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
@@ -44,8 +86,8 @@ function ContractForm() {
         throw new Error(errorData.message || "서버 오류 발생");
       }
 
-      alert("계약서가 정상 제출되었습니다!");
-       window.location.reload();
+      alert(formData.id ? "계약서가 정상 수정되었습니다!" : "계약서가 정상 제출되었습니다!");
+      // 필요시 페이지 이동 등 처리 추가 가능
     } catch (error) {
       alert("제출 실패: " + error.message);
     } finally {
@@ -53,11 +95,43 @@ function ContractForm() {
     }
   };
 
+  if (loadingData) return <p>계약서 데이터를 불러오는 중...</p>;
+
   return (
-    <div style={{ maxWidth: 600, margin: "2rem auto", fontFamily: "Arial, sans-serif" }}>
-      <h2>계약서 작성 테스트 폼</h2>
+    <div style={{ maxWidth: 700, margin: "2rem auto", fontFamily: "Arial, sans-serif" }}>
+      <h2>{formData.id ? "계약서 수정" : "계약서 작성"}</h2>
+
+      <div style={{ display: "flex", gap: "1rem", marginBottom: 16 }}>
+        <div style={{ flex: 1 }}>
+          <label htmlFor="writerName" style={{ fontWeight: "bold" }}>
+            계약자 이름 <span style={{ color: "red" }}>*</span>
+          </label>
+          <input
+            id="writerName"
+            name="writerName"
+            type="text"
+            value={formData.writerName}
+            onChange={handleChange}
+            style={{ width: "100%", padding: 8 }}
+          />
+        </div>
+        <div style={{ flex: 1 }}>
+          <label htmlFor="receiverName" style={{ fontWeight: "bold" }}>
+            받는 사람 이름 <span style={{ color: "red" }}>*</span>
+          </label>
+          <input
+            id="receiverName"
+            name="receiverName"
+            type="text"
+            value={formData.receiverName}
+            onChange={handleChange}
+            style={{ width: "100%", padding: 8 }}
+          />
+        </div>
+      </div>
+
       <form onSubmit={handleSubmit}>
-        {fields.map(({ name, label, type, required }) => (
+        {templateFields.map(({ name, label, type, required }) => (
           <div key={name} style={{ marginBottom: 16 }}>
             <label htmlFor={name} style={{ display: "block", fontWeight: "bold", marginBottom: 4 }}>
               {label} {required && <span style={{ color: "red" }}>*</span>}
@@ -83,8 +157,12 @@ function ContractForm() {
             )}
           </div>
         ))}
-        <button type="submit" style={{ padding: "0.5rem 1.5rem", fontSize: 16 }} disabled={loading}>
-          {loading ? "제출 중..." : "제출하기"}
+        <button
+          type="submit"
+          disabled={loading}
+          style={{ padding: "0.5rem 1.5rem", fontSize: 16 }}
+        >
+          {loading ? (formData.id ? "수정 중..." : "제출 중...") : (formData.id ? "수정하기" : "제출하기")}
         </button>
       </form>
     </div>

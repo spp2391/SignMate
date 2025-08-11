@@ -32,7 +32,8 @@ public class enums {
     public enum ContractType {
         EMPLOYMENT,  // 근로 계약서
         SERVICE,     // 용역 계약서
-        SALES        // 매매 계약서
+        SALES,        // 매매 계약서
+        NDA
     }
 
 }

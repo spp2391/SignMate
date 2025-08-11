@@ -1,10 +1,16 @@
 package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "notification")
 public class Notification {
@@ -21,5 +27,10 @@ public class Notification {
 
 
     private LocalDateTime createdAt;
+
+
+
+
+
 }
 

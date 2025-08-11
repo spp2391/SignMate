@@ -2,6 +2,7 @@ package org.zerock.signmate.Contract.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.zerock.signmate.user.domain.User;
 
 @Getter
 @Setter
@@ -17,6 +18,14 @@ public class Contract extends CommonEntity{
 
     @Enumerated(EnumType.STRING)
     private enums.ContractType contractType; // SERVICE, EMPLOYMENT 등
+
+    @ManyToOne
+    @JoinColumn(name = "writer_id")
+    private User writer;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private User receiver;
 
 }
 
