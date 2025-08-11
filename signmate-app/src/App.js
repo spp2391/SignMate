@@ -1,7 +1,9 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
+import Header from "./component/header/Header.jsx"
+import Index from "./component/index/index.jsx"
+import Footer from "./component/footer/Footer.jsx"
 import SecretPage from "./pages/SecretPage";
 import EmploymentContractPage from "./pages/EmploymentContractPage";
 import ServiceContractPage from "./pages/ServiceContractPage";
@@ -11,6 +13,9 @@ import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 export default function App() {
   return (
     <Router>
+      {/* < Header /> */}
+      {/* < Index /> */}
+      {/* < Footer /> */}
       <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Link to="/secret">비밀유지서약서</Link>
         <Link to="/employment">표준근로계약서</Link>
