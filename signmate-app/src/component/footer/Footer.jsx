@@ -3,10 +3,6 @@ import "../../assets/css/style.css";
 import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
 import "../../assets/css/templatehouse.css";
-import "../../script/js/setting.js";
-import "../../script/js/plugin.js";
-import "../../script/js/templatehouse.js";
-import "../../script/js/style.js";
 
 const Footer = () => {
     return (

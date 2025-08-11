@@ -28,10 +28,6 @@ import logo22 from "../../assets/icons/ico_message.svg"
 import logo23 from "../../assets/icons/ico_person.svg"
 import logo24 from "../../assets/images/temhabank_N4_001.png"
 import logo25 from "../../assets/images/temhabank_N4_002.png"
-import "../../script/js/setting.js";
-import "../../script/js/plugin.js";
-import "../../script/js/templatehouse.js";
-import "../../script/js/style.js";
 
 
 const Index = () => {
