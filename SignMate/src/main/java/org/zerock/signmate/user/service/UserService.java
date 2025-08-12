@@ -39,8 +39,8 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public Optional<User> findUserByEmail(String email) {
-        return userRepository.findByEmail(email);
+    public Optional<User> findUserByEmailAndPassword(String email, String password) {
+        return userRepository.findByEmailAndPassword(email, password);
     }
 /*
     public Long save(AddUserRequest dto){

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.dto.AddUserRequest;
+import org.zerock.signmate.user.dto.LoginUserRequest;
 import org.zerock.signmate.user.service.UserService;
 
 @RestController
@@ -38,14 +39,14 @@ public class UserRestController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody AddUserRequest dto,
+    public ResponseEntity<String> login(@Valid @RequestBody LoginUserRequest dto,
                                         BindingResult bindingResult, HttpSession session) {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
             return ResponseEntity.badRequest().body("fail");
         }
         try {
-            User loginUser = userService.findUserByEmail(dto.getEmail())
+            User loginUser = userService.findUserByEmailAndPassword(dto.getEmail(), dto.getPassword())
                     .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             session.setAttribute("userId", loginUser.getUserId());
             return ResponseEntity.ok("success");
@@ -60,5 +61,4 @@ public class UserRestController {
     public void logout(HttpSession session) {
         session.invalidate();
     }
-
 }
