@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
+// 로그인 유저 Context — 실제 프로젝트에 맞게 교체하세요
+
+
 const templateFields = [
   { name: "clientName", label: "발주자", type: "text", required: true },
   { name: "projectName", label: "프로젝트명", type: "text", required: true },
@@ -10,10 +13,16 @@ const templateFields = [
 ];
 
 function ContractForm() {
-  const { contractId } = useParams();
+  const { id: contractIdFromUrl } = useParams();
+  const {signerId } = useState(null);
+
+  const [loadingData, setLoadingData] = useState(false);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const [uploadingSignature, setUploadingSignature] = useState(false);
 
   const [formData, setFormData] = useState({
-    id: "",  // 수정 시 필요한 고유 ID
+    id: "",
+    contractId: "",
     writerName: "",
     receiverName: "",
     clientName: "",
@@ -22,20 +31,22 @@ function ContractForm() {
     totalAmount: "",
     paymentTerms: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [loadingData, setLoadingData] = useState(false);
+
+  const [signatureFile, setSignatureFile] = useState(null);
+  const [signatureRole, setSignatureRole] = useState("writer");
 
   useEffect(() => {
-    if (contractId) {
+    if (contractIdFromUrl) {
       setLoadingData(true);
-      fetch(`/api/service-contracts/${contractId}`)
-        .then(res => {
-          if (!res.ok) throw new Error("데이터를 불러오는데 실패했습니다.");
+      fetch(`/api/service-contracts/${contractIdFromUrl}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("계약서 데이터를 불러오는 데 실패했습니다.");
           return res.json();
         })
-        .then(data => {
+        .then((data) => {
           setFormData({
-            id: data.id || "",
+            id: data.id || contractIdFromUrl,
+            contractId: data.contractId || contractIdFromUrl,
             writerName: data.writerName || "",
             receiverName: data.receiverName || "",
             clientName: data.clientName || "",
@@ -43,16 +54,74 @@ function ContractForm() {
             contractStartDate: data.contractStartDate ? data.contractStartDate.substring(0, 10) : "",
             totalAmount: data.totalAmount || "",
             paymentTerms: data.paymentTerms || "",
+            signerId : data.writerId || "",
           });
         })
-        .catch(err => alert(err.message))
+        .catch((err) => alert(err.message))
         .finally(() => setLoadingData(false));
+    } else {
+      setFormData((prev) => ({ ...prev, id: "", contractId: "" }));
     }
-  }, [contractId]);
+  }, [contractIdFromUrl]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    setSignatureFile(e.target.files[0]);
+  };
+
+  const toBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
+  const handleSignatureUpload = async () => {
+    if (!signatureFile) {
+      alert("서명 파일을 선택하세요");
+      return;
+    }
+    if (!formData.id) {
+      alert("먼저 계약서를 저장해야 서명을 업로드할 수 있습니다.");
+      return;
+    }
+    
+
+    setUploadingSignature(true);
+
+    try {
+      const base64 = await toBase64(signatureFile);
+      const signatureHash = btoa(signatureFile.name + Date.now());
+
+      const response = await fetch("/api/signatures", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contractId: formData.id,
+          signerId : formData.signerId,
+          signatureImage: base64,
+          signatureHash,
+          role: signatureRole,
+        }),
+      });
+
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || "서명 업로드 실패");
+      }
+
+      alert("서명 업로드 성공!");
+      setSignatureFile(null);
+    } catch (error) {
+      alert("업로드 오류: " + error.message);
+    } finally {
+      setUploadingSignature(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -69,29 +138,53 @@ function ContractForm() {
       }
     }
 
-    setLoading(true);
+    setLoadingSubmit(true);
 
     try {
       const method = formData.id ? "PUT" : "POST";
-      const url = formData.id ? `/api/service-contracts/${formData.id}` : "/api/service-contracts";
+      const url = formData.id
+        ? `/api/service-contracts/${contractIdFromUrl}`
+        : "/api/service-contracts";
+
+      const payload = {
+        contractId: contractIdFromUrl ? Number(contractIdFromUrl) : formData.contractId || formData.id,
+        writerName: formData.writerName,
+        receiverName: formData.receiverName,
+        clientName: formData.clientName,
+        projectName: formData.projectName,
+        contractStartDate: formData.contractStartDate,
+        totalAmount: formData.totalAmount,
+        paymentTerms: formData.paymentTerms,
+      };
 
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "서버 오류 발생");
+        const errorText = await response.text();
+        throw new Error(errorText || "서버 오류 발생");
+      }
+
+      let result;
+      const contentType = response.headers.get("Content-Type");
+      if (contentType && contentType.includes("application/json")) {
+        result = await response.json();
+      } else {
+        result = await response.text();
       }
 
       alert(formData.id ? "계약서가 정상 수정되었습니다!" : "계약서가 정상 제출되었습니다!");
-      // 필요시 페이지 이동 등 처리 추가 가능
+
+      if (!formData.id && typeof result === "object" && result.id) {
+        setFormData((prev) => ({ ...prev, id: result.id, contractId: result.contractId || result.id }));
+      }
     } catch (error) {
       alert("제출 실패: " + error.message);
     } finally {
-      setLoading(false);
+      setLoadingSubmit(false);
     }
   };
 
@@ -130,6 +223,39 @@ function ContractForm() {
         </div>
       </div>
 
+      <div style={{ marginBottom: 20 }}>
+        <label htmlFor="signatureRole" style={{ fontWeight: "bold", display: "block", marginBottom: 4 }}>
+          서명 역할 선택
+        </label>
+        <select
+          id="signatureRole"
+          value={signatureRole}
+          onChange={(e) => setSignatureRole(e.target.value)}
+          style={{ padding: 8, marginBottom: 8, width: "100%" }}
+        >
+          <option value="writer">계약자 서명 (Writer)</option>
+          <option value="receiver">받는 사람 서명 (Receiver)</option>
+        </select>
+
+        <label htmlFor="signatureFile" style={{ fontWeight: "bold", display: "block", marginBottom: 4 }}>
+          서명 도장 파일 업로드
+        </label>
+        <input
+          id="signatureFile"
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          style={{ display: "block", margin: "8px 0" }}
+        />
+        <button
+          type="button"
+          onClick={handleSignatureUpload}
+          style={{ padding: "0.5rem 1.5rem", fontSize: 16 }}
+        >
+          {uploadingSignature ? "업로드 중..." : "서명 업로드"}
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit}>
         {templateFields.map(({ name, label, type, required }) => (
           <div key={name} style={{ marginBottom: 16 }}>
@@ -159,10 +285,9 @@ function ContractForm() {
         ))}
         <button
           type="submit"
-          disabled={loading}
           style={{ padding: "0.5rem 1.5rem", fontSize: 16 }}
         >
-          {loading ? (formData.id ? "수정 중..." : "제출 중...") : (formData.id ? "수정하기" : "제출하기")}
+          {loadingSubmit ? (formData.id ? "수정 중..." : "제출 중...") : formData.id ? "수정하기" : "제출하기"}
         </button>
       </form>
     </div>
