@@ -1,19 +1,112 @@
+// ContractBase.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
-/** {{key}} 치환 */
+/* ===== 경로 유틸 ===== */
+const pathToParts = (path) =>
+  String(path || "")
+    .replace(/\[(\d+)\]/g, ".$1")
+    .split(".")
+    .filter(Boolean);
+
+const getByPath = (obj, path) => {
+  if (!path) return obj;
+  return pathToParts(path).reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
+};
+
+const setByPath = (obj, path, val) => {
+  const parts = pathToParts(path);
+  if (!parts.length) return obj;
+  let cur = obj;
+  for (let i = 0; i < parts.length - 1; i++) {
+    const k = parts[i];
+    if (cur[k] == null || typeof cur[k] !== "object") {
+      cur[k] = /^\d+$/.test(parts[i + 1]) ? [] : {};
+    }
+    cur = cur[k];
+  }
+  cur[parts[parts.length - 1]] = val;
+  return obj;
+};
+
+/* ===== 표시 유틸 ===== */
+function pretty(v) {
+  if (typeof v === "boolean") return v ? "예" : "아니오";
+  if (v == null) return "";
+  return String(v);
+}
+const esc = (s) =>
+  String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/* ===== 본문 치환 (텍스트) ===== */
 function renderBody(template, data) {
-  return template.replace(/{{\s*([\w.]+)\s*}}/g, (_, key) => {
-    const v = key.split(".").reduce((acc, k) => (acc ? acc[k] : ""), data);
+  return template.replace(/{{\s*([\w.\[\]0-9]+)\s*}}/g, (_, key) => {
+    const parts = key.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
+    let v = data;
+    for (const p of parts) {
+      if (v == null) break;
+      v = v[p];
+    }
     if (v == null) return "";
-    if (Array.isArray(v)) return v.map(row => Object.values(row).join(" ")).join("\n");
-    return String(v);
+    if (Array.isArray(v)) {
+      return v
+        .map((row) =>
+          row && typeof row === "object"
+            ? Object.values(row ?? {}).map(pretty).join(" ")
+            : pretty(row)
+        )
+        .join("\n");
+    }
+    return pretty(v);
   });
 }
 
-/** 필드 렌더러 */
-function FieldInput({ field, value, onChange }) {
+/* ===== 본문 치환 (HTML + 앵커/하이라이트) ===== */
+function renderBodyHTML(template, data, activeKey) {
+  return template.replace(/{{\s*([\w.\[\]0-9]+)\s*}}/g, (_, rawKey) => {
+    const key = rawKey;
+    const parts = key.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
+    let v = data;
+    for (const p of parts) {
+      if (v == null) break;
+      v = v[p];
+    }
+    if (v == null) v = "";
+
+    let html;
+    if (Array.isArray(v)) {
+      html = v
+        .map((row) =>
+          row && typeof row === "object"
+            ? Object.values(row ?? {}).map(pretty).join(" ")
+            : pretty(row)
+        )
+        .map(esc)
+        .join("<br/>");
+    } else {
+      html = esc(pretty(v));
+    }
+
+    const isActive = activeKey && key === activeKey;
+    const content = html || "<span class='placeholder'>[입력]</span>";
+    return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${content}</span>`;
+  });
+}
+
+/* ===== 입력 컴포넌트 ===== */
+function FieldInput({ field, value, onChange, onFocusField }) {
+  if (field.type === "section") {
+    return (
+      <div className="mb">
+        <div className="sec">
+          <span className="sec-bullet" />
+          <span className="sec-title">{field.label}</span>
+        </div>
+      </div>
+    );
+  }
+
   if (field.type === "textarea") {
     return (
       <div className="mb">
@@ -22,11 +115,13 @@ function FieldInput({ field, value, onChange }) {
           className="ipt"
           rows={4}
           value={value || ""}
+          onFocus={() => onFocusField?.(field.name)}
           onChange={(e) => onChange(field.name, e.target.value)}
         />
       </div>
     );
   }
+
   if (field.type === "select") {
     return (
       <div className="mb">
@@ -34,6 +129,7 @@ function FieldInput({ field, value, onChange }) {
         <select
           className="ipt"
           value={value || ""}
+          onFocus={() => onFocusField?.(field.name)}
           onChange={(e) => onChange(field.name, e.target.value)}
         >
           <option value="">선택</option>
@@ -46,6 +142,7 @@ function FieldInput({ field, value, onChange }) {
       </div>
     );
   }
+
   if (field.type === "checkbox") {
     return (
       <div className="mb">
@@ -53,6 +150,7 @@ function FieldInput({ field, value, onChange }) {
           <input
             type="checkbox"
             checked={!!value}
+            onFocus={() => onFocusField?.(field.name)}
             onChange={(e) => onChange(field.name, e.target.checked)}
           />{" "}
           {field.label}
@@ -60,6 +158,7 @@ function FieldInput({ field, value, onChange }) {
       </div>
     );
   }
+
   if (field.type === "table") {
     const rows = value || [];
     const addRow = () => onChange(field.name, [...rows, {}]);
@@ -73,6 +172,8 @@ function FieldInput({ field, value, onChange }) {
       copy[i] = { ...copy[i], [key]: v };
       onChange(field.name, copy);
     };
+    const visibleRows =
+      rows.length > 0 ? rows : Array.from({ length: field.minRows || 0 }).map(() => ({}));
     return (
       <div className="mb">
         <div className="rowHead">
@@ -88,20 +189,19 @@ function FieldInput({ field, value, onChange }) {
                 {field.columns.map((c) => (
                   <th key={c.key}>{c.label}</th>
                 ))}
-                <th>삭제</th>
+                <th style={{ width: 64 }}>삭제</th>
               </tr>
             </thead>
             <tbody>
-              {(rows.length ? rows : Array.from({ length: field.minRows || 0 })).map((_, i) => (
+              {visibleRows.map((_, i) => (
                 <tr key={i}>
                   {field.columns.map((c) => (
                     <td key={c.key}>
                       <input
                         className="ipt"
-                        type={
-                          c.type === "number" ? "number" : c.type === "date" ? "date" : "text"
-                        }
+                        type={c.type === "number" ? "number" : c.type === "date" ? "date" : "text"}
                         value={(rows[i] || {})[c.key] || ""}
+                        onFocus={() => onFocusField?.(`${field.name}[${i}].${c.key}`)}
                         onChange={(e) => setCell(i, c.key, e.target.value)}
                       />
                     </td>
@@ -119,6 +219,7 @@ function FieldInput({ field, value, onChange }) {
       </div>
     );
   }
+
   // 기본 input
   return (
     <div className="mb">
@@ -127,138 +228,188 @@ function FieldInput({ field, value, onChange }) {
         className="ipt"
         type={field.type === "number" ? "number" : field.type === "date" ? "date" : "text"}
         value={value || ""}
+        onFocus={() => onFocusField?.(field.name)}
         onChange={(e) => onChange(field.name, e.target.value)}
       />
     </div>
   );
 }
 
-/** 공통 페이지 */
+/* ===== 메인 컴포넌트 ===== */
 export default function ContractBase({ template }) {
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState({});
-  const [fit, setFit] = useState(true);    // 한 페이지 맞춤
-  const [scale, setScale] = useState(0.92); // 배율(0.80~1.00 권장)
-  const pageRef = useRef(null);
+  const [activeKey, setActiveKey] = useState(null);
+  const previewRef = useRef(null);
 
+  // 수정 허용 목록 (없으면 전체 허용)
+  const editableSet = useMemo(() => {
+    const keys = Array.isArray(template.editable) ? template.editable : (template.fields || [])
+      .filter((f) => f.type !== "section")
+      .map((f) => f.name);
+    return new Set(keys);
+  }, [template.editable, template.fields]);
+
+  // 본문 등장 순서 맵
+  const docOrder = useMemo(() => {
+    const order = {};
+    const re = /{{\s*([\w.\[\]0-9]+)\s*}}/g;
+    let m, idx = 0;
+    while ((m = re.exec(template.body))) {
+      const key = m[1];
+      if (order[key] == null) order[key] = idx++;
+    }
+    return order;
+  }, [template.body]);
+
+  // 좌측 표시 필드(섹션 + 허용)
+  const visibleFields = useMemo(() => {
+    const all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
+    const sections = all.filter((f) => f.type === "section");
+    const inputs = all.filter((f) => f.type !== "section");
+    inputs.sort((a, b) => {
+      const ai = docOrder[a.name] ?? 1e9;
+      const bi = docOrder[b.name] ?? 1e9;
+      return ai - bi;
+    });
+    return [...sections, ...inputs];
+  }, [template.fields, editableSet, docOrder]);
+
+  // 초기값
   useEffect(() => {
-    const init = { ...(template.defaults || {}) };
+    const init = JSON.parse(JSON.stringify(template.defaults || {}));
     (template.fields || []).forEach((f) => {
+      if (f.type === "section") return;
+      const exists = getByPath(init, f.name);
+      if (exists !== undefined) return;
       if (f.type === "table") {
-        init[f.name] = Array.from({ length: f.minRows || 0 }).map(() => ({}));
+        setByPath(init, f.name, Array.from({ length: f.minRows || 0 }).map(() => ({})));
+      } else if (f.type === "checkbox") {
+        setByPath(init, f.name, false);
       } else {
-        init[f.name] = init[f.name] ?? "";
+        setByPath(init, f.name, "");
       }
     });
     setForm(init);
     setTitle(template.name);
   }, [template]);
 
-  const onChange = (name, value) => setForm((p) => ({ ...p, [name]: value }));
-  const previewBody = useMemo(() => renderBody(template.body, form), [template, form]);
+  // onChange: 허용된 키만 반영
+  const onChange = (name, value) => {
+    if (!editableSet.has(name)) return;
+    setForm((p) => {
+      const copy = JSON.parse(JSON.stringify(p || {}));
+      setByPath(copy, name, value);
+      return copy;
+    });
+  };
 
+  // 미리보기 텍스트/HTML
+  const previewBody = useMemo(() => renderBody(template.body, form), [template, form]);
+  const previewHtml = useMemo(
+    () => renderBodyHTML(template.body, form, activeKey),
+    [template, form, activeKey]
+  );
+
+  // 포커스 키 하이라이트 + 스크롤
+  useEffect(() => {
+    if (!activeKey || !previewRef.current) return;
+    const el = previewRef.current.querySelector(`[data-key="${CSS.escape(activeKey)}"]`);
+    if (el) {
+      el.classList.add("pulse");
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => el.classList.remove("pulse"), 800);
+    }
+  }, [activeKey, previewBody]);
+
+  // 보기용 테이블
+  const tableFields = (template.fields || []).filter((f) => f.type === "table");
+
+  // PDF 저장
   const savePDF = async () => {
-    const node = pageRef.current; // .page 전체를 캡쳐
+    const node = document.querySelector(".page");
     if (!node) return;
     const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: "#fff" });
     const img = canvas.toDataURL("image/png");
     const pdf = new jsPDF("p", "mm", "a4");
-    const pw = pdf.internal.pageSize.getWidth();
-    const ph = pdf.internal.pageSize.getHeight();
-    const iw = pw;
-    const ih = (canvas.height * iw) / canvas.width;
-
-    let left = ih;
-    let pos = 0;
-
-    pdf.addImage(img, "PNG", 0, pos, iw, ih);
-    left -= ph;
-
-    while (left > 0) {
-      pos = left - ih;
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const imgW = pageW;
+    const imgH = (canvas.height * imgW) / canvas.width;
+    pdf.addImage(img, "PNG", 0, 0, imgW, imgH);
+    let remaining = imgH - pageH;
+    let offsetY = -pageH;
+    while (remaining > 0) {
       pdf.addPage();
-      pdf.addImage(img, "PNG", 0, pos, iw, ih);
-      left -= ph;
+      pdf.addImage(img, "PNG", 0, offsetY, imgW, imgH);
+      remaining -= pageH;
+      offsetY -= pageH;
     }
     pdf.save(`${title || template.name}.pdf`);
   };
-
-  const tableFields = (template.fields || []).filter((f) => f.type === "table");
 
   return (
     <div className="wrap">
       <h1 className="ttl">{template.name}</h1>
       <div className="grid">
-        {/* 입력 */}
+        {/* 좌측 입력 */}
         <div>
           <div className="mb">
             <label className="lbl">문서 제목</label>
             <input className="ipt" value={title} onChange={(e) => setTitle(e.target.value)} />
           </div>
-          {(template.fields || []).map((f) => (
-            <FieldInput key={f.name} field={f} value={form[f.name]} onChange={onChange} />
+
+          {visibleFields.map((f, idx) => (
+            <div key={`${f.name || f.label}-${idx}`} onFocusCapture={() => f.name && setActiveKey(f.name)}>
+              {f.type !== "section" && (
+                <div className="badge">#{(docOrder[f.name] ?? 999) + 1}</div>
+              )}
+              <FieldInput
+                field={f}
+                value={getByPath(form, f.name)}
+                onChange={onChange}
+                onFocusField={setActiveKey}
+              />
+            </div>
           ))}
 
-          {/* 페이지 맞춤/배율/저장 */}
           <div className="mb" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <label className="lbl inline" style={{ marginBottom: 0 }}>
-              <input type="checkbox" checked={fit} onChange={(e) => setFit(e.target.checked)} />
-              한 페이지에 맞추기
-            </label>
-            {fit && (
-              <>
-                <span className="lbl" style={{ margin: 0 }}>
-                  배율
-                </span>
-                <input
-                  type="range"
-                  min={0.8}
-                  max={1.0}
-                  step={0.01}
-                  value={scale}
-                  onChange={(e) => setScale(parseFloat(e.target.value))}
-                />
-                <span className="lbl" style={{ margin: 0 }}>
-                  {Math.round(scale * 100)}%
-                </span>
-              </>
-            )}
-            <button className="btn primary" onClick={savePDF}>
-              PDF로 저장
-            </button>
+            <button className="btn primary" onClick={savePDF}>PDF로 저장</button>
           </div>
         </div>
 
-        {/* 미리보기 (A4 페이지) */}
+        {/* 우측 미리보기 */}
         <div className="preview">
-          <div
-            ref={pageRef}
-            className={`page ${fit ? "fit" : ""}`}
-            style={fit ? { "--scale": String(scale) } : undefined}
-          >
+          <div className="page">
             <div className="center">
               <div className="title">{title || template.name}</div>
               <div className="sub">{template.name}</div>
             </div>
 
-            <pre className="body">{previewBody}</pre>
+            {/* HTML 미리보기 (앵커/하이라이트 지원) */}
+            <div
+              ref={previewRef}
+              className="body"
+              dangerouslySetInnerHTML={{ __html: previewHtml }}
+            />
 
+            {/* 표가 있는 템플릿은 본문 하단에 표를 추가로 렌더 */}
             {tableFields.map((tf) => {
-              const rows = form[tf.name] || [];
+              const rows = getByPath(form, tf.name) || [];
               const viewRows = rows.filter((r) => Object.keys(r || {}).length > 0);
               if (!viewRows.length) return null;
               return (
                 <div key={tf.name} className="mb">
-                  <div className="lbl" style={{ marginBottom: 6 }}>
-                    {tf.label}
-                  </div>
+                  <div className="lbl" style={{ marginBottom: 6 }}>{tf.label}</div>
                   <table className="tbl">
                     <thead>
                       <tr>{tf.columns.map((c) => <th key={c.key}>{c.label}</th>)}</tr>
                     </thead>
                     <tbody>
                       {viewRows.map((r, i) => (
-                        <tr key={i}>{tf.columns.map((c) => <td key={c.key}>{r?.[c.key] ?? ""}</td>)}</tr>
+                        <tr key={i}>
+                          {tf.columns.map((c) => <td key={c.key}>{pretty(r?.[c.key])}</td>)}
+                        </tr>
                       ))}
                     </tbody>
                   </table>
@@ -271,7 +422,7 @@ export default function ContractBase({ template }) {
         </div>
       </div>
 
-      {/* 최소 스타일 + A4 페이지/스케일 */}
+      {/* 스타일 */}
       <style>{`
         .wrap{max-width:1100px;margin:0 auto;padding:16px}
         .ttl{font-size:22px;font-weight:700;margin-bottom:12px}
@@ -285,15 +436,19 @@ export default function ContractBase({ template }) {
         .btn.primary{background:#111;color:#fff}
         .preview{border:1px solid #e5e7eb;border-radius:10px;padding:0;background:#f9fafb}
 
-        /* A4 페이지 */
+        .sec{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px dashed #e5e7eb}
+        .sec-bullet{width:6px;height:6px;border-radius:50%;background:#111;display:inline-block}
+        .sec-title{font-weight:700;font-size:13px}
+
+        .badge{
+          display:inline-block;margin:0 0 4px 0;font-size:11px;
+          color:#555;background:#eef2ff;border:1px solid #c7d2fe;
+          border-radius:6px;padding:2px 6px;font-weight:600;
+        }
+
         .page{
           width:210mm; min-height:297mm; margin:0 auto; background:#fff; color:#000;
           padding:14mm; box-sizing:border-box; border-radius:10px; box-shadow:0 0 6px rgba(0,0,0,.08)
-        }
-        .page.fit{
-          transform:scale(var(--scale)); transform-origin:top left;
-          width:calc(210mm / var(--scale));
-          min-height:calc(297mm / var(--scale));
         }
         @page{ size:A4; margin:12mm }
         @media print{
@@ -306,13 +461,23 @@ export default function ContractBase({ template }) {
         .center{text-align:center}
         .title{font-size:18px;font-weight:700;margin-top:4px}
         .sub{font-size:12px;color:#666}
-        .body{white-space:pre-wrap;word-break:break-word;line-height:1.6;margin-top:8px}
+        .body{word-break:break-word;line-height:1.6;margin-top:8px;white-space:pre-wrap}
         .tbl{width:100%;border-collapse:collapse}
-        .tbl th,.tbl td{border:1px solid #e5e7eb;padding:6px;text-align:left}
+        .tbl th,.tbl td{border:1px solid #e5e7eb;padding:6px;text-align:left;vertical-align:top}
         .foot{margin-top:16px;color:#666;font-size:12px}
         .rowHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
         .scroll{overflow:auto}
-        .center{text-align:center}
+
+        .anchor{background:transparent;transition:background .2s, box-shadow .2s}
+        .placeholder{color:#999}
+        .hit{background:#fff7cc}
+        .pulse{
+          animation: pulse 0.8s ease;
+        }
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, .6); }
+          100% { box-shadow: 0 0 0 8px rgba(250, 204, 21, 0); }
+        }
       `}</style>
     </div>
   );
