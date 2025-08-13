@@ -1,20 +1,41 @@
+// ServiceContractPage.jsx
 import React from "react";
 import ContractBase from "./ContractBase";
 
+/** 용역계약서
+ *  - 좌측 입력: 당사자, 과업기간, 금액, 범위/산출물, 지급, 하자/지체, 서명일
+ *  - 서명: sign.client(갑/발주자), sign.vendor(을/수행자) → 서명패드
+ */
 const serviceTemplate = {
   name: "용역계약서",
+
+  editable: [
+    "client.name","client.address","client.rep",
+    "vendor.name","vendor.address","vendor.rep",
+    "proj.name","proj.start","proj.end",
+    "amount.total","amount.krw",
+    "scope","deliverables",
+    "pay.down","pay.mid","pay.finalDays",
+    "warrantyMonths","delayRate",
+    "signDate"
+  ],
+
   defaults: {
     client: { name: "", address: "", rep: "" }, // 갑
     vendor: { name: "", address: "", rep: "" }, // 을
     proj: { name: "", start: "", end: "" },
     amount: { total: "", krw: "" },
+    scope: "",
+    deliverables: "",
     pay: { down: "", mid: "", finalDays: "" },
     warrantyMonths: "",
     delayRate: "",
-    scope: "",
-    deliverables: "",
+    signDate: "",
+    sign: { client: "", vendor: "" } // 서명 이미지(dataURL)
   },
+
   fields: [
+    { type: "section", label: "당사자/프로젝트" },
     { type: "text", name: "client.name",    label: "갑(발주자)" },
     { type: "text", name: "client.address", label: "갑 주소" },
     { type: "text", name: "client.rep",     label: "갑 대표자" },
@@ -27,6 +48,7 @@ const serviceTemplate = {
     { type: "date", name: "proj.start", label: "계약(과업) 시작일" },
     { type: "date", name: "proj.end",   label: "계약(과업) 종료일" },
 
+    { type: "section", label: "금액/지급/검수" },
     { type: "text", name: "amount.total", label: "계약금액(원정 표기)" },
     { type: "text", name: "amount.krw",   label: "계약금액(숫자, ￦)" },
 
@@ -37,9 +59,14 @@ const serviceTemplate = {
     { type: "text", name: "pay.mid",       label: "중도금" },
     { type: "text", name: "pay.finalDays", label: "잔금 지급기한(검수 후 n일)" },
 
+    { type: "section", label: "하자/지체" },
     { type: "text", name: "warrantyMonths", label: "하자보수 기간(개월)" },
-    { type: "text", name: "delayRate",      label: "지체상금률(예: 1/100)" },
+    { type: "text", name: "delayRate",      label: "지체상금률(예: 1/1000(일))" },
+
+    { type: "section", label: "서명" },
+    { type: "date", name: "signDate", label: "서명일" },
   ],
+
   body: `
 용역계약서
 
@@ -62,9 +89,15 @@ const serviceTemplate = {
 12. 기타: 미정 사항은 민법 및 관계 법령에 따름
 
 [서명]
+서명일: {{signDate}}
+
 (갑) {{client.name}}  대표자: {{client.rep}} (서명)
+{{sign.client}}
+
 (을) {{vendor.name}}  대표자: {{vendor.rep}} (서명)
+{{sign.vendor}}
   `,
+
   footerNote: "※ 과업 범위/검수 기준을 구체적으로 기재하세요.",
 };
 

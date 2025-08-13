@@ -1,8 +1,22 @@
+// SupplyContractPage.jsx
 import React from "react";
 import ContractBase from "./ContractBase";
 
+/** 자재/물품 공급계약서
+ *  - 좌측 입력: 당사자, 계약일/장소, 조건/조항, 품목표
+ *  - 서명: sign.supplier(갑/공급자), sign.buyer(을/수요자) → 서명패드
+ */
 const supplyTemplate = {
   name: "자재/물품 공급계약서",
+
+  editable: [
+    "supplier.name","supplier.rep",
+    "buyer.name","buyer.rep",
+    "contractDate","place",
+    "deliveryTerms","inspectTerms","paymentTerms","warrantyTerms","etcTerms",
+    "items"
+  ],
+
   defaults: {
     supplier: { name: "", rep: "" }, // 갑
     buyer:    { name: "", rep: "" }, // 을
@@ -14,16 +28,21 @@ const supplyTemplate = {
     warrantyTerms: "",
     etcTerms: "",
     items: Array.from({ length: 5 }).map(() => ({})),
+    sign: { supplier: "", buyer: "" } // 서명 이미지(dataURL)
   },
+
   fields: [
+    { type: "section", label: "당사자" },
     { type: "text", name: "supplier.name", label: "공급자(갑)" },
     { type: "text", name: "supplier.rep",  label: "갑 대표자" },
     { type: "text", name: "buyer.name",    label: "수요자(을)" },
     { type: "text", name: "buyer.rep",     label: "을 대표자" },
 
+    { type: "section", label: "계약/인도" },
     { type: "date", name: "contractDate",  label: "계약일자" },
     { type: "text", name: "place",         label: "인도 장소" },
 
+    { type: "section", label: "조건/조항" },
     { type: "textarea", name: "deliveryTerms", label: "인도 조건(운반/포장 등)" },
     { type: "textarea", name: "inspectTerms",  label: "검수·하자보수 조건" },
     { type: "textarea", name: "paymentTerms",  label: "대금지급 조건" },
@@ -46,6 +65,7 @@ const supplyTemplate = {
       ],
     },
   ],
+
   body: `
 자재/물품 공급계약서
 
@@ -62,8 +82,13 @@ const supplyTemplate = {
 제7조(기타) {{etcTerms}}
 
 [서명]
-갑: {{supplier.name}} (서명)   /   을: {{buyer.name}} (서명)
+(갑) {{supplier.name}} (서명)
+{{sign.supplier}}
+
+(을) {{buyer.name}} (서명)
+{{sign.buyer}}
   `,
+
   footerNote: "※ 납기/검수/대금 조건을 구체적으로 기재하세요.",
 };
 

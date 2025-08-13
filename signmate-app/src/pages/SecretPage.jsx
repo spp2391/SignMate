@@ -1,8 +1,21 @@
+// SecretPage.jsx
 import React from "react";
 import ContractBase from "./ContractBase";
 
+/** 비밀유지계약서(NDA)
+ *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
+ *  - 서명: sign.discloser(공개자/갑), sign.recipient(수신자/을) → 서명패드
+ */
 const ndaTemplate = {
   name: "비밀유지계약서(NDA)",
+
+  // 서명은 패드에서 처리되므로 editable에 굳이 넣지 않아도 ContractBase가 본문에서 자동 감지
+  editable: [
+    "discloser.name","discloser.rep","discloser.address",
+    "recipient.name","recipient.rep","recipient.address",
+    "effective","purpose","termMonths","survivalYears","law"
+  ],
+
   defaults: {
     discloser: { name: "", rep: "", address: "" }, // 갑
     recipient: { name: "", rep: "", address: "" }, // 을
@@ -11,8 +24,11 @@ const ndaTemplate = {
     termMonths: "",
     survivalYears: "",
     law: "대한민국 법",
+    sign: { discloser: "", recipient: "" } // 서명 이미지(dataURL)
   },
+
   fields: [
+    { type: "section", label: "당사자" },
     { type: "text", name: "discloser.name",    label: "공개자(갑)" },
     { type: "text", name: "discloser.rep",     label: "갑 대표자" },
     { type: "text", name: "discloser.address", label: "갑 주소" },
@@ -21,12 +37,14 @@ const ndaTemplate = {
     { type: "text", name: "recipient.rep",     label: "을 대표자" },
     { type: "text", name: "recipient.address", label: "을 주소" },
 
+    { type: "section", label: "기간/목적" },
     { type: "date", name: "effective",   label: "발효일" },
     { type: "textarea", name: "purpose", label: "정보 제공 목적" },
     { type: "text", name: "termMonths",    label: "계약기간(개월)" },
     { type: "text", name: "survivalYears", label: "비밀유지 존속기간(년)" },
     { type: "text", name: "law",           label: "준거법" },
   ],
+
   body: `
 비밀유지계약서(NDA)
 
@@ -45,8 +63,13 @@ const ndaTemplate = {
 10. 준거법 및 관할: {{law}}
 
 [서명]
-갑: {{discloser.name}} (서명)  /  을: {{recipient.name}} (서명)
+갑: {{discloser.name}} (서명)
+{{sign.discloser}}
+
+을: {{recipient.name}} (서명)
+{{sign.recipient}}
   `,
+
   footerNote: "※ 필요 시 제재 조항·계약금액 연동 조항을 추가하세요.",
 };
 
