@@ -20,12 +20,42 @@ const InputArea = () => {
             pw: event.target.value,
         })
     }
-    const handleLogin = () => {
+    const handleJoin = (event) => {
+        event.preventDefault();
+        const joinRequest = {
+            email: state.id,
+            password: state.password,
+            name: state.id,
+            nickname: state.id,
+            companyName: "ABC",
+            userType: "USER",
+            userRole: "COMPANY"
+        }
+        fetch("http://localhost:8080/api/user/join", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(joinRequest),
+        })
+        .then((response) => response.json())
+        .then((data) => setState({
+            status: data
+        }))
+    }
+    const handleLogin = (event) => {
+        event.preventDefault();
         const loginRequest = {
             email: state.id,
             password: state.password
         }
-        fetch("/api/user/login", loginRequest)
+        fetch("http://localhost:8080/api/user/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(loginRequest),
+        })
         .then((response) => response.json())
         .then((data) => setState({
             status: data
@@ -47,6 +77,7 @@ const InputArea = () => {
             />
             <p>{state.status}</p>
             <p>{state.id}, {state.pw}</p>
+            <button onClick={handleJoin}>Join</button>
             <button onClick={handleLogin}>Submit</button>
         </div>
     )

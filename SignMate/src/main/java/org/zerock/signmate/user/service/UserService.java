@@ -16,11 +16,11 @@ import java.util.Optional;
 @Service
 public class UserService {
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     // 회원가입
     @Transactional
     public User register(AddUserRequest dto) throws Exception {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         if (userRepository.findByEmail(dto.getEmail()).isPresent()) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
         }
