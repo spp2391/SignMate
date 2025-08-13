@@ -1,36 +1,33 @@
+// src/App.js
+import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import ContractForm from "./component/ContractForm";
 
-import MyPage from "./component/MyPage";        // 철수 마이페이지
-import MyPage2 from "./component/MyPage2";      // 영희 마이페이지
-import Mailbox from "./component/Mailbox";
-import Mailbox2 from "./component/Mailbox2";
-import ReceiverSignPage from "./component/ReceiverSignPage";
+import SecretPage from "./pages/SecretPage";
+import EmploymentContractPage from "./pages/EmploymentContractPage";
+import ServiceContractPage from "./pages/ServiceContractPage";
+import SupplyContractPage from "./pages/SupplyContractPage";
+import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 
-function App() {
+export default function App() {
   return (
     <Router>
-      <nav style={{ padding: "1rem", borderBottom: "1px solid #ddd" }}>
-        <Link to="/contract-form" style={{ marginRight: "1rem" }}>계약 작성</Link>
-        <Link to="/mypage1" style={{ marginRight: "1rem" }}>철수 마이페이지</Link>
-        <Link to="/mypage2" style={{ marginRight: "1rem" }}>영희 마이페이지</Link>
-        <Link to="/mailbox" style={{ marginRight: "1rem" }}>메일함</Link>
-        <Link to="/mailbox2">영희메일함</Link>
+      <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <Link to="/secret">비밀유지서약서</Link>
+        <Link to="/employment">표준근로계약서</Link>
+        <Link to="/service">용역계약서</Link>
+        <Link to="/supply">자재/물품 공급계약서</Link>
+        <Link to="/outsourcing">업무위탁 계약서</Link>
       </nav>
 
       <Routes>
-        {/* 계약 작성 */}
-        <Route path="/contract-form" element={<ContractForm />} />
-        {/* 계약 수정 */}
-        <Route path="/contract-form/:id" element={<ContractForm />} />
-        <Route path="/mypage1" element={<MyPage />} />
-        <Route path="/mypage2" element={<MyPage2 />} />
-        <Route path="/mailbox" element={<Mailbox />} />
-        <Route path="/mailbox2" element={<Mailbox2 />} />
-        <Route path="/receiver-sign/:contractId" element={<ReceiverSignPage />} />
+        <Route path="/secret" element={<SecretPage />} />
+        <Route path="/employment" element={<EmploymentContractPage />} />
+        <Route path="/service" element={<ServiceContractPage />} />
+        <Route path="/supply" element={<SupplyContractPage />} />
+        <Route path="/outsourcing" element={<OutsourcingContractPage />} />
+        {/* 기본 라우트 */}
+        <Route path="*" element={<SecretPage />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
