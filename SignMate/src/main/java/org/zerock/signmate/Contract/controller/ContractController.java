@@ -22,13 +22,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ContractController {
 
-    private final ContractService contractService;
+
     private final ServiceContractRepository serviceContractRepository;
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
     private final NotificationRepository notificationRepository;
+    private final ContractService contractService;
 
-//    @PostMapping
+    //    @PostMapping
 //    public ResponseEntity<?> saveContract(@RequestBody ServiceContractDto dto) {
 //        try {
 //            ServiceContractDto savedDto = contractService.save(dto);

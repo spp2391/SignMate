@@ -1,6 +1,7 @@
 // SecretPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import ContractBase from "./ContractBase";
+import { useParams } from "react-router-dom";
 
 /** 비밀유지계약서(NDA)
  *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
@@ -17,8 +18,8 @@ const ndaTemplate = {
   ],
 
   defaults: {
-    discloser: { name: "", rep: "", address: "" }, // 갑
-    recipient: { name: "", rep: "", address: "" }, // 을
+    discloser: { name: "김철수", rep: "", address: "" }, // 갑
+    recipient: { name: "이영희", rep: "", address: "" }, // 을
     effective: "",
     purpose: "",
     termMonths: "",
@@ -44,6 +45,7 @@ const ndaTemplate = {
     { type: "text", name: "survivalYears", label: "비밀유지 존속기간(년)" },
     { type: "text", name: "law",           label: "준거법" },
   ],
+  
 
   body: `
 비밀유지계약서(NDA)
@@ -73,6 +75,93 @@ const ndaTemplate = {
   footerNote: "※ 필요 시 제재 조항·계약금액 연동 조항을 추가하세요.",
 };
 
-export default function SecretPage() {
-  return <ContractBase template={ndaTemplate} />;
+
+// export default function SecretPage() {
+//   return <ContractBase template={ndaTemplate} />;
+// }
+
+export default function SecretPage({ signerId }) {
+  const [formData, setFormData] = useState(ndaTemplate.defaults);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const handleChange = (data) => {
+    // ContractBase에서 실시간 반영
+    setFormData(prev => ({ ...prev, ...data }));
+  };
+
+  const handleSave = async () => {
+    if (!formData.discloser.name || !formData.recipient.name) {
+      alert("공개자와 수신자 이름은 필수입니다.");
+      return;
+    }
+    setLoadingSubmit(true);
+
+    try {
+      // payload 생성: DTO 필드명과 정확히 매칭
+      const payload = {
+        id: formData.id || null,
+        contractId: formData.contractId || null,
+        writerName: signerId,
+        receiverName: formData.recipient.name || "",
+        discloserRepresentative: formData.discloser.rep || "",
+        discloserAddress: formData.discloser.address || "",
+        receiverRepresentative: formData.recipient.rep || "",
+        receiverAddress: formData.recipient.address || "",
+        purpose: formData.purpose || "",
+        effectiveDate: formData.effective ? formData.effective : null,
+        contractDurationMonths: formData.termMonths ? Number(formData.termMonths) : null,
+        confidentialityDurationYears: formData.survivalYears ? Number(formData.survivalYears) : null,
+        governingLaw: formData.law || "",
+        writerSignature: formData.sign.discloser || "",
+        receiverSignature: formData.sign.recipient || ""
+      };
+
+      const isUpdate = formData.id && formData.id > 0;
+      const url = isUpdate ? `/api/secrets/${formData.id}` : "/api/secrets";
+
+      const res = await fetch(url, {
+        method: isUpdate ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(errText || "서버 오류");
+      }
+
+      const result = await res.json();
+      setFormData(prev => ({ ...prev, id: result.id, contractId: result.contractId || prev.contractId }));
+
+      alert(isUpdate ? "계약서가 수정되었습니다!" : "계약서가 제출되었습니다!");
+    } catch (err) {
+      alert("저장 실패: " + err.message);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <ContractBase template={ndaTemplate} data={formData} onChange={handleChange} />
+      <button
+        onClick={handleSave}
+        disabled={loadingSubmit}
+        style={{
+          marginTop: 20,
+          padding: "10px 20px",
+          fontSize: "18px",
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer",
+          display: "block"
+        }}
+      >
+        {loadingSubmit ? "제출 중..." : formData.id ? "수정하기" : "제출하기"}
+      </button>
+    </div>
+  );
 }
+

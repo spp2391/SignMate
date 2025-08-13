@@ -10,6 +10,7 @@ import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 
 export default function App() {
   return (
+    
     <Router>
       <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
         <Link to="/secret">비밀유지서약서</Link>
@@ -20,13 +21,14 @@ export default function App() {
       </nav>
 
       <Routes>
-        <Route path="/secret" element={<SecretPage />} />
+     <Route path="/secret" element={<SecretPage signerId="김철수" />} />
         <Route path="/employment" element={<EmploymentContractPage />} />
         <Route path="/service" element={<ServiceContractPage />} />
         <Route path="/supply" element={<SupplyContractPage />} />
         <Route path="/outsourcing" element={<OutsourcingContractPage />} />
         {/* 기본 라우트 */}
-        <Route path="*" element={<SecretPage />} />
+        
+        <Route path="*" element={<SecretPage signerId="김철수" />} />
       </Routes>
     </Router>
   );
