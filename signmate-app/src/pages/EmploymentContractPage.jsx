@@ -1,8 +1,16 @@
+// EmploymentContractPage.jsx
 import React from "react";
 import ContractBase from "./ContractBase";
 
+/** 표준근로계약서(기간의 정함이 없는 경우)
+ *  - 좌측 입력: 사업주/근로자, 근로개시/근무, 임금/지급, 사회보험
+ *  - 고정값: 법정수당, 수습, 해지예고일 등 회사 표준 문구
+ *  - 서명: sign.employer(사업주), sign.employee(근로자) → 서명패드에서 입력
+ */
 const employmentTemplate = {
   name: "표준근로계약서(기간의 정함이 없는 경우)",
+
+  // 좌측 폼에서 수정 가능한 키 목록(서명 제외: 패드에서 입력)
   editable: [
     "employer.name","employer.address","employer.ceo",
     "employee.name","employee.address","employee.phone",
@@ -14,6 +22,8 @@ const employmentTemplate = {
     "payday","paymethod",
     "ins.nps","ins.nhi","ins.ei","ins.aci"
   ],
+
+  // 기본값(회사 표준 문구 포함)
   defaults: {
     employer: { name: "", address: "", ceo: "" },
     employee: { name: "", address: "", phone: "" },
@@ -24,13 +34,16 @@ const employmentTemplate = {
     wage: { base: "", bonus: "", extra: "" },
     payday: "", paymethod: "통장입금",
     ins: { nps: false, nhi: false, ei: false, aci: false },
-    // 고정(회사 표준)
+    // 회사 고정 안내 문구
     rates: { overtime: "통상임금의 1.5배", night: "통상임금의 1.5배", holiday: "통상임금의 1.5배" },
     probationMonths: "3",
     noticeDays: "30",
     privacy: "업무 수행 및 인사‧급여 목적 범위 내",
     rulesUrl: "(회사 내규 위치)",
+    sign: { employer: "", employee: "" } // 서명 이미지(패드에서 세팅)
   },
+
+  // 좌측 입력 폼(본문 등장 순서 기준으로 정렬됨)
   fields: [
     { type: "section", label: "사업주/근로자" },
     { type: "text", name: "employer.name",    label: "사업주(회사명)" },
@@ -66,6 +79,8 @@ const employmentTemplate = {
     { type: "checkbox", name: "ins.ei",  label: "고용보험" },
     { type: "checkbox", name: "ins.aci", label: "산재보험" },
   ],
+
+  // 본문 (미리보기/인쇄)
   body: `
 (이하 "사업주") {{employer.name}} 과(와) (이하 "근로자") {{employee.name}} 은 다음과 같이 근로계약을 체결한다.
 
@@ -112,8 +127,12 @@ const employmentTemplate = {
 
 [서명]
 (사업주) {{employer.name}} / 대표자: {{employer.ceo}} (서명) / 주소: {{employer.address}}
+{{sign.employer}}
+
 (근로자) 성명: {{employee.name}} (서명) / 주소: {{employee.address}} / 연락처: {{employee.phone}}
+{{sign.employee}}
   `,
+
   footerNote: "※ 취업규칙·인사규정과 함께 운영하면 좋습니다.",
 };
 

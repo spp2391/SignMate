@@ -1,24 +1,34 @@
+// OutsourcingContractPage.jsx
 import React from "react";
 import ContractBase from "./ContractBase";
 
+/** 업무위탁 계약서
+ *  - 좌측 입력: 당사자, 기간, 정산표, 합계, 서명일
+ *  - 고정: 준거법(대한민국 법)
+ *  - 서명: sign.principal(갑), sign.agent(을) → 서명패드
+ */
 const outsourcingTemplate = {
   name: "업무위탁 계약서",
+
   editable: [
     "principal.name","principal.rep","principal.address","principal.contact",
     "agent.name","agent.rep","agent.address","agent.contact",
     "periodStart","periodEnd",
     "items","totalPay","signDate"
   ],
+
   defaults: {
-    principal: { name: "", rep: "", address: "", contact: "" },
-    agent:     { name: "", rep: "", address: "", contact: "" },
+    principal: { name: "", rep: "", address: "", contact: "" }, // 갑
+    agent:     { name: "", rep: "", address: "", contact: "" }, // 을
     periodStart: "",
-    periodEnd: "",
-    totalPay: "",
-    law: "대한민국 법",            // 고정
-    signDate: "",
+    periodEnd:   "",
     items: Array.from({ length: 5 }).map(() => ({})),
+    totalPay: "",
+    signDate: "",
+    law: "대한민국 법", // 고정
+    sign: { principal: "", agent: "" }
   },
+
   fields: [
     { type: "section", label: "당사자 정보(갑)" },
     { type: "text",  name: "principal.name",    label: "갑 상호(명)" },
@@ -57,6 +67,7 @@ const outsourcingTemplate = {
     { type: "section", label: "서명" },
     { type: "date", name: "signDate", label: "서명일" },
   ],
+
   body: `
 업무위탁 계약서
 
@@ -95,11 +106,12 @@ const outsourcingTemplate = {
 서명일: {{signDate}}
 
 (갑) {{principal.name}} / 대표자: {{principal.rep}} (서명)
-주소: {{principal.address}} / 연락처: {{principal.contact}}
+{{sign.principal}}
 
 (을) {{agent.name}} / 대표자: {{agent.rep}} (서명)
-주소: {{agent.address}} / 연락처: {{agent.contact}}
+{{sign.agent}}
   `,
+
   footerNote: "※ 과업명세서, 검수기준, 지연배상·하자보수 등 특약을 필요 시 추가하세요.",
 };
 
