@@ -6,11 +6,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.zerock.signmate.Contract.Repository.NotificationRepository;
 import org.zerock.signmate.Contract.domain.Notification;
 import org.zerock.signmate.Contract.domain.ServiceContract;
 import org.zerock.signmate.Contract.dto.NotificationDTO;
 import org.zerock.signmate.Contract.dto.ServiceContractDto;
-import org.zerock.signmate.Contract.service.ServiceContractRepository;
+import org.zerock.signmate.Contract.Repository.ServiceContractRepository;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
 

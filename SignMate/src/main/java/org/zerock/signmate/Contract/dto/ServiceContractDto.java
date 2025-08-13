@@ -45,6 +45,10 @@ public class ServiceContractDto {
 
     private String status; // enum을 String으로 변환해서 전달
 
+    private Long writerId;
+
+    private Long receiverId;
+
     public static ServiceContractDto fromEntity(ServiceContract entity) {
         return ServiceContractDto.builder()
                 .id(entity.getId())

@@ -32,6 +32,15 @@ public class Contract extends CommonEntity {
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
+    @Lob
+    @Column(name = "writer_signature")
+    private String writerSignature;  // base64
+
+    @Lob
+    @Column(name = "receiver_signature")
+    private String receiverSignature; // base64
+
+
 }
 
 
