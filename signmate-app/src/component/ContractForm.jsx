@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
-// 로그인 유저 Context — 실제 프로젝트에 맞게 교체하세요
-
+// 로그인 유저 Context 등에서 signerId 받아와서 적용하세요!
 
 const templateFields = [
   { name: "clientName", label: "발주자", type: "text", required: true },
@@ -12,9 +11,8 @@ const templateFields = [
   { name: "paymentTerms", label: "지급 조건", type: "textarea", required: false },
 ];
 
-function ContractForm() {
+function ContractForm({ signerId /* 로그인 유저 ID */ }) {
   const { id: contractIdFromUrl } = useParams();
-  const {signerId } = useState(null);
 
   const [loadingData, setLoadingData] = useState(false);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
@@ -33,7 +31,6 @@ function ContractForm() {
   });
 
   const [signatureFile, setSignatureFile] = useState(null);
-  const [signatureRole, setSignatureRole] = useState("writer");
 
   useEffect(() => {
     if (contractIdFromUrl) {
@@ -54,7 +51,6 @@ function ContractForm() {
             contractStartDate: data.contractStartDate ? data.contractStartDate.substring(0, 10) : "",
             totalAmount: data.totalAmount || "",
             paymentTerms: data.paymentTerms || "",
-            signerId : data.writerId || "",
           });
         })
         .catch((err) => alert(err.message))
@@ -90,7 +86,10 @@ function ContractForm() {
       alert("먼저 계약서를 저장해야 서명을 업로드할 수 있습니다.");
       return;
     }
-    
+    if (!signerId) {
+      alert("로그인 정보가 필요합니다.");
+      return;
+    }
 
     setUploadingSignature(true);
 
@@ -103,10 +102,10 @@ function ContractForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contractId: formData.id,
-          signerId : formData.signerId,
+          signerId,
           signatureImage: base64,
           signatureHash,
-          role: signatureRole,
+          role: "writer",  // 작성자 서명 고정
         }),
       });
 
@@ -224,21 +223,8 @@ function ContractForm() {
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <label htmlFor="signatureRole" style={{ fontWeight: "bold", display: "block", marginBottom: 4 }}>
-          서명 역할 선택
-        </label>
-        <select
-          id="signatureRole"
-          value={signatureRole}
-          onChange={(e) => setSignatureRole(e.target.value)}
-          style={{ padding: 8, marginBottom: 8, width: "100%" }}
-        >
-          <option value="writer">계약자 서명 (Writer)</option>
-          <option value="receiver">받는 사람 서명 (Receiver)</option>
-        </select>
-
         <label htmlFor="signatureFile" style={{ fontWeight: "bold", display: "block", marginBottom: 4 }}>
-          서명 도장 파일 업로드
+          서명 도장 파일 업로드 (작성자 전용)
         </label>
         <input
           id="signatureFile"
@@ -251,6 +237,7 @@ function ContractForm() {
           type="button"
           onClick={handleSignatureUpload}
           style={{ padding: "0.5rem 1.5rem", fontSize: 16 }}
+          disabled={uploadingSignature}
         >
           {uploadingSignature ? "업로드 중..." : "서명 업로드"}
         </button>
@@ -286,6 +273,7 @@ function ContractForm() {
         <button
           type="submit"
           style={{ padding: "0.5rem 1.5rem", fontSize: 16 }}
+          disabled={loadingSubmit}
         >
           {loadingSubmit ? (formData.id ? "수정 중..." : "제출 중...") : formData.id ? "수정하기" : "제출하기"}
         </button>

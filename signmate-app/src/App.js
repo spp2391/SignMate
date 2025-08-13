@@ -5,6 +5,7 @@ import MyPage from "./component/MyPage";        // 철수 마이페이지
 import MyPage2 from "./component/MyPage2";      // 영희 마이페이지
 import Mailbox from "./component/Mailbox";
 import Mailbox2 from "./component/Mailbox2";
+import ReceiverSignPage from "./component/ReceiverSignPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/mypage2" element={<MyPage2 />} />
         <Route path="/mailbox" element={<Mailbox />} />
         <Route path="/mailbox2" element={<Mailbox2 />} />
+        <Route path="/receiver-sign/:contractId" element={<ReceiverSignPage />} />
       </Routes>
     </Router>
   );

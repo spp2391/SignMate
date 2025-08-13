@@ -14,8 +14,7 @@ function Mailbox() {
 
   const goToWriteContract = (contractId) => {
     // 예: 계약서 작성/수정 페이지로 이동 (contractId를 쿼리나 path로 넘김)
-    navigate(`/contract-form/${contractId}`);
-  };
+   navigate(`/receiver-sign/${contractId}`);  };
 
   return (
     <div style={{ maxWidth: 600, margin: "2rem auto" }}>
