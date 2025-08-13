@@ -1,58 +1,45 @@
-// src/pages/ContractList.jsx
+// ContractList.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const contracts = [
-  {
-    id: 1,
-    title: "시공계약",
-    description: "내부 시스템에서 즉시 계약서, 확인서를 발송하고 처리합니다.",
-    tag: "API 연동형",
-    company: "삼성전자",
-    bgColor: "bg-blue-100",
-    textColor: "text-blue-800"
-  },
-  {
-    id: 2,
-    title: "근로계약 · 약정서 · 동의서",
-    description: "불필요한 행정 소모와 시간을 크게 줄일 수 있었습니다.",
-    tag: "플랫폼형",
-    company: "한국국제협력단",
-    bgColor: "bg-blue-200",
-    textColor: "text-blue-900"
-  },
-  {
-    id: 3,
-    title: "택배 대리점 계약",
-    description: "맞춤형 전자계약 API 연동으로 계약 체결과 관리가 상당히 편리해졌습니다.",
-    tag: "API 연동형",
-    company: "롯데글로벌로지스",
-    bgColor: "bg-red-100",
-    textColor: "text-red-800"
-  },
+  { title: "비밀유지서약서", desc: "기업/기관용 비밀유지 서약서", path: "/secret", color: "#f8d7da" },
+  { title: "표준근로계약서", desc: "근로계약서 작성용", path: "/employment", color: "#cfe2ff" },
+  { title: "용역계약서", desc: "서비스/용역 계약용", path: "/service", color: "#d1e7dd" },
+  { title: "자재/물품 공급계약서", desc: "물품/자재 공급 계약", path: "/supply", color: "#fff3cd" },
+  { title: "업무위탁 계약서", desc: "업무 위탁 계약용", path: "/outsourcing", color: "#e2e3e5" },
 ];
 
 export default function ContractList() {
-  const navigate = useNavigate();
-
   return (
-    <div className="container mx-auto p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-      {contracts.map((contract) => (
-        <div key={contract.id} className={`p-6 rounded-lg shadow ${contract.bgColor}`}>
-          <h2 className={`text-xl font-bold mb-2 ${contract.textColor}`}>{contract.title}</h2>
-          <p className="mb-3 text-gray-700">{contract.description}</p>
-          <div className="flex justify-between items-center text-sm text-gray-600 mb-4">
-            <span className="border rounded px-2 py-1">{contract.tag}</span>
-            <span>{contract.company}</span>
-          </div>
-          <button
-            className="w-full bg-yellow-400 hover:bg-yellow-500 text-white font-semibold py-2 rounded"
-            onClick={() => navigate(`/contracts/${contract.id}`)}
+    <div style={{ maxWidth: 1200, margin: "0 auto", padding: 16 }}>
+      <h1 style={{ marginBottom: 24 }}>계약서 목록</h1>
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+        gap: 16
+      }}>
+        {contracts.map((c, idx) => (
+          <Link
+            to={c.path}
+            key={idx}
+            style={{
+              display: "block",
+              textDecoration: "none",
+              borderRadius: 12,
+              padding: 16,
+              backgroundColor: c.color,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+              transition: "transform 0.2s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.transform = "translateY(-4px)"}
+            onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
           >
-            작성하기
-          </button>
-        </div>
-      ))}
+            <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8 }}>{c.title}</div>
+            <div style={{ fontSize: 13, color: "#555" }}>{c.desc}</div>
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }
