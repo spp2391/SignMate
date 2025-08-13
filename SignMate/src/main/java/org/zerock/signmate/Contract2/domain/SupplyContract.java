@@ -3,8 +3,11 @@ package org.zerock.signmate.Contract2.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
+import org.zerock.signmate.Contract.domain.enums;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,32 +23,45 @@ public class SupplyContract extends CommonEntity {
     private Long id;
 
     // 공급자(갑)
-    private String supplierName;           // 공급자 명칭
-    private String supplierRepresentative; // 공급자 대표자명
+    private String supplierName;
+    private String supplierRepresentative;
 
     // 수요자(을)
-    private String demanderName;            // 수요자 명칭
-    private String demanderRepresentative; // 수요자 대표자명
+    private String demanderName;
+    private String demanderRepresentative;
 
-    private LocalDate contractDate;         // 계약일자
-    private String deliveryLocation;        // 인도 장소
-
-    @Column(columnDefinition = "TEXT")
-    private String itemListDescription;    // 품목 내역 표 요약 (실제로 품목별 상세는 별도 테이블 권장)
+    private LocalDate contractDate;
+    private String deliveryLocation;
 
     @Column(columnDefinition = "TEXT")
-    private String deliveryTerms;           // 인도조건
+    private String deliveryTerms;
 
     @Column(columnDefinition = "TEXT")
-    private String inspectionAndWarranty;  // 검수 및 하자보수 관련 조건
+    private String inspectionAndWarranty;
 
     @Column(columnDefinition = "TEXT")
-    private String paymentTerms;            // 대금 및 지급 조건
+    private String paymentTerms;
 
     @Column(columnDefinition = "TEXT")
-    private String qualityGuaranteeTerms;  // 품질보증 등 조건
+    private String qualityGuaranteeTerms;
 
     @Column(columnDefinition = "TEXT")
-    private String otherTerms;              // 기타 조항
+    private String otherTerms;
 
+    @Lob
+    @Column(name = "supplier_signature")
+    private String supplierSignature;
+
+    @Lob
+    @Column(name = "demander_signature")
+    private String demanderSignature;
+
+    @OneToMany(mappedBy = "supplyContract", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<SupplyItem> items = new ArrayList<>();
+
+    // 상태 및 이력
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
+    private Integer version;
 }

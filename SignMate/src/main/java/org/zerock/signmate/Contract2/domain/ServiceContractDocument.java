@@ -3,6 +3,7 @@ package org.zerock.signmate.Contract2.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
+import org.zerock.signmate.Contract.domain.enums;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,12 +21,12 @@ public class ServiceContractDocument extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 발주자(갑)
+    // 발주자(갑) 정보
     private String clientName;                // 발주자 명칭
     private String clientRepresentative;     // 발주자 대표자명
     private String clientAddress;             // 발주자 주소
 
-    // 수행자(을)
+    // 수행자(을) 정보
     private String contractorName;            // 수행자 명칭
     private String contractorRepresentative; // 수행자 대표자명
     private String contractorAddress;         // 수행자 주소
@@ -46,16 +47,28 @@ public class ServiceContractDocument extends CommonEntity {
     // 대금지급
     private BigDecimal depositAmount;         // 계약금
     private BigDecimal interimPaymentAmount;  // 중도금
-    private Integer finalPaymentDueDays;      // 잔금 지급기한(검수 완료 후 n일 이내 지급)
+    private Integer finalPaymentDueDays;      // 잔금 지급기한 (검수 완료 후 n일 이내 지급)
 
-    private Integer warrantyMonths;           // 하자보수 기간(개월)
+    private Integer warrantyMonths;           // 하자보수 기간 (개월)
 
-    private BigDecimal delayPenaltyRate;      // 지체상금 비율(계약금액 대비 %)
+    /**
+     * 지체상금 비율 (예: 0.05 = 5%)
+     */
+    private BigDecimal delayPenaltyRate;      // 지체상금 비율 (계약금액 대비 %)
 
-    @Column(columnDefinition = "TEXT")
-    private String confidentialityAndIPTerms; // 비밀유지 및 지재권 관련 특약
+    private LocalDate signatureDate;  // 서명일
 
-    @Column(columnDefinition = "TEXT")
-    private String otherTerms;                 // 기타 조항
+    // 전자서명 (Base64 인코딩 이미지)
+    @Lob
+    @Column(name = "client_signature")
+    private String clientSignature;           // 발주자 서명 (base64)
 
+    @Lob
+    @Column(name = "contractor_signature")
+    private String contractorSignature;       // 수행자 서명 (base64)
+
+    // 상태 및 이력
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
+    private Integer version;
 }

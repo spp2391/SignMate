@@ -40,10 +40,14 @@ public class NDAContract extends CommonEntity {
 //    private LocalDate confidentialityEndDate;  // 비밀유지 종료일
     private String governingLaw;               // 준거법
 
-    // 서명 정보
-    private String signatureMethod;            // 서명 방식(전자서명, 도장 등)
-    private LocalDate discloserSignDate;
-    private LocalDate recipientSignDate;
+    // 전자서명 - 사업주, 근로자 (Base64 문자열 저장)
+    @Lob
+    @Column(name = "employer_signature", columnDefinition = "TEXT")
+    private String employerSignature;        // 전자서명 - 사업주
+
+    @Lob
+    @Column(name = "employee_signature", columnDefinition = "TEXT")
+    private String employeeSignature;
 
     // 상태 및 이력
     @Enumerated(EnumType.STRING)

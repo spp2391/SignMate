@@ -3,7 +3,9 @@ package org.zerock.signmate.Contract2.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
+import org.zerock.signmate.Contract.domain.enums;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +23,13 @@ public class BusinessOutsourcingContract extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 갑 (발주자)
+    // 갑 (위탁자)
     private String clientName;             // “갑” 명칭
     private String clientAddress;          // 주소
     private String clientRepresentative;  // 대표자명
     private String clientContact;          // 연락처
 
-    // 을 (수행자)
+    // 을 (수탁자)
     private String contractorName;         // “을” 명칭
     private String contractorAddress;      // 주소
     private String contractorRepresentative; // 대표자명
@@ -37,28 +39,32 @@ public class BusinessOutsourcingContract extends CommonEntity {
     private LocalDate contractStartDate;   // 수행기간 시작일
     private LocalDate contractEndDate;     // 수행기간 종료일
 
-    // 업무 내용 (TEXT)
+    // 총 지급액 (합계)
+    private BigDecimal totalPaymentAmount;
+
+    // 업무 내용
     @Column(columnDefinition = "TEXT")
     private String taskDescription;
 
-    // 비밀유지 및 지식재산권 관련 조항
-    @Column(columnDefinition = "TEXT")
-    private String confidentialityAndIP;
+    private String governingLaw;  // 준거법 (예: "대한민국 법")
 
-    // 보고 및 관리 관련 조항
-    @Column(columnDefinition = "TEXT")
-    private String reportingAndManagement;
+    private LocalDate signatureDate;  // 서명일
 
-    // 계약 해지 조건
-    @Column(columnDefinition = "TEXT")
-    private String contractTermination;
+    @Lob
+    @Column(name = "client_signature")
+    private String clientSignature;  // 갑 서명 (Base64 인코딩된 이미지 또는 텍스트)
 
-    // 기타 조항
-    @Column(columnDefinition = "TEXT")
-    private String otherTerms;
+    @Lob
+    @Column(name = "contractor_signature")
+    private String contractorSignature;  // 을 서명 (Base64 인코딩된 이미지 또는 텍스트)
 
-    // 업무 내역 목록 (1:N 관계)
+    // 정산 내역 목록 (1:N 관계)
     @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<BusinessOutsourcingTask> tasks = new ArrayList<>();
+
+    // 상태 및 이력
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
+    private Integer version;
 }

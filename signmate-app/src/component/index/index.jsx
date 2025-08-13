@@ -73,7 +73,7 @@ const Index = () => {
                                 <div className="tab-cont">
                                     <div className="col-left active">
                                         <div className="menu-item primary">
-                                            <Link to="/SecretPage">
+                                            <Link to="/contracts">
                                                 <img src={logo1} alt="거래내역" />
                                                 <span className="h6">문서작성</span>
                                             </Link>

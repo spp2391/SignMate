@@ -25,6 +25,7 @@ export default function App() {
       </nav>
 
       <Routes>
+        <Route path="/contracts" element={<ContractList />} />
         <Route path="/secret" element={<SecretPage />} />
         <Route path="/employment" element={<EmploymentContractPage />} />
         <Route path="/service" element={<ServiceContractPage />} />
