@@ -2,75 +2,54 @@ package org.zerock.signmate.Contract2.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.Contract;
+import org.zerock.signmate.Contract.domain.enums;
 
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "nda_contract")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Entity
-@Table(name = "nda_contract")
-@EntityListeners(AuditingEntityListener.class)
 public class NDAContract extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 기본 계약 정보 연동 (필요 시)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "contract_id")
-    private Contract contract;
-
-    // 문서 제목
-    @Column(length = 255)
-    private String documentTitle;
-
-    // 공개자 (갑 대표자)
-    @Column(length = 100)
+    // 공개자(갑)
     private String discloserName;
-
-    @Column(length = 255)
+    private String discloserRepresentative;
     private String discloserAddress;
 
-    // 수신자 (을 대표자)
-    @Column(length = 100)
-    private String receiverName;
+    // 수신자(을)
+    private String recipientName;
+    private String recipientRepresentative;
+    private String recipientAddress;
 
-    @Column(length = 255)
-    private String receiverAddress;
-
-    // 발효일
-    private LocalDate effectiveDate;
-
-    // 정보 제공 목적
+    // 목적 및 법적 조건
     @Column(columnDefinition = "TEXT")
-    private String informationPurpose;
+    private String purpose;
+    private LocalDate effectiveDate;           // 발효일
+    private Integer contractPeriodMonths;      // 계약기간(개월)
+    private Integer confidentialityYears;      // 비밀유지 존속기간(년)
+//    private LocalDate contractEndDate;         // 계약 종료일
+//    private LocalDate confidentialityEndDate;  // 비밀유지 종료일
+    private String governingLaw;               // 준거법
 
-    // 계약기간(개월)
-    private Integer contractPeriodMonths;
+    // 서명 정보
+    private String signatureMethod;            // 서명 방식(전자서명, 도장 등)
+    private LocalDate discloserSignDate;
+    private LocalDate recipientSignDate;
 
-    // 비밀유지 준수기간(년)
-    private Integer confidentialityPeriodYears;
+    // 상태 및 이력
+    @Enumerated(EnumType.STRING)
+    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
+    private Integer version;                   // 계약 버전
 
-    // 준거법 (예: 대한민국 법)
-    @Column(length = 100)
-    private String governingLaw;
-
-    // 추가 조항
-    @Column(columnDefinition = "TEXT")
-    private String additionalClauses;
-
-    // 서명: 갑, 을 서명란
-    @Column(length = 100)
-    private String discloserSignature;
-
-    @Column(length = 100)
-    private String receiverSignature;
-
+    // 부가 정보
+    private String attachmentUrl;              // 서명본/원본 파일 경로
 }
