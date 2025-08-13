@@ -1,7 +1,6 @@
 package org.zerock.signmate.Contract.dto;
 
 import lombok.*;
-import org.zerock.signmate.Contract.domain.ServiceContract;
 
 import java.time.LocalDate;
 

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerock.signmate.Contract.Repository.NotificationRepository;
 import org.zerock.signmate.Contract.domain.Notification;
-import org.zerock.signmate.Contract.domain.ServiceContract;
 import org.zerock.signmate.Contract.dto.NotificationDTO;
 import org.zerock.signmate.Contract.dto.ServiceContractDto;
 import org.zerock.signmate.Contract.Repository.ServiceContractRepository;

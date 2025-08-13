@@ -5,15 +5,12 @@ import jsPDF from "jspdf";
 import SignaturePad from "signature_pad";
 
 /* ===== 경로 유틸 ===== */
-// "a.b[0].c" → ["a","b","0","c"]
 const pathToParts = (path) =>
   String(path || "").replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
 
-// 객체 경로 읽기
 const getByPath = (obj, path) =>
   !path ? obj : pathToParts(path).reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
 
-// 객체 경로 쓰기 (중간 경로 자동 생성)
 const setByPath = (obj, path, val) => {
   const parts = pathToParts(path);
   if (!parts.length) return obj;
@@ -32,7 +29,6 @@ const setByPath = (obj, path, val) => {
 const pretty = (v) => (typeof v === "boolean" ? (v ? "예" : "아니오") : v == null ? "" : String(v));
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/* ===== 본문 치환: {{key}} → 값 + 하이라이트/배지/서명 ===== */
 function renderBodyHTML(template, data, activeKey, orderMap) {
   return template.replace(/{{\s*([\w.\[\]0-9]+)\s*}}/g, (_, rawKey) => {
     const key = rawKey.trim();
@@ -44,7 +40,6 @@ function renderBodyHTML(template, data, activeKey, orderMap) {
     const badge = idx ? `<span class="idx-badge">#${idx}</span>` : "";
     const isActive = activeKey && key === activeKey;
 
-    // 서명: dataURL 이미지 또는 빈 박스
     if (key.startsWith("sign.")) {
       const hasSig = v && String(v).startsWith("data:image/");
       const node = hasSig
@@ -53,7 +48,6 @@ function renderBodyHTML(template, data, activeKey, orderMap) {
       return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${badge}${node}</span>`;
     }
 
-    // 일반 텍스트/배열
     let html = "";
     if (Array.isArray(v)) {
       html = (v || [])
@@ -146,7 +140,6 @@ function FieldInput({ field, value, onChange, onFocusField }) {
       </div>
     );
   }
-  // text/number/date
   return (
     <div className="mb">
       <label className="lbl">{field.label}</label>
@@ -158,17 +151,15 @@ function FieldInput({ field, value, onChange, onFocusField }) {
 }
 
 /* ===== 메인 ===== */
-export default function ContractBase({ template }) {
+export default function ContractBase({ template, role = "sender" }) { // role prop 추가
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState({});
   const [activeKey, setActiveKey] = useState(null);
   const previewRef = useRef(null);
 
-  // 서명패드
   const sigCanvasRef = useRef(null);
   const sigPadRef = useRef(null);
 
-  // 본문에서 sign.* 키 자동 추출 (예: sign.principal, sign.agent ...)
   const signKeys = useMemo(() => {
     const keys = new Set();
     const re = /{{\s*(sign\.[\w.\[\]0-9]+)\s*}}/g;
@@ -177,13 +168,9 @@ export default function ContractBase({ template }) {
     return Array.from(keys);
   }, [template.body]);
 
-  // 서명 대상 (본문에 sign.*가 있으면 첫 번째를 기본값으로)
   const [sigTarget, setSigTarget] = useState(signKeys[0] || "sign.principal");
-
-  // PDF 내보내기 상태(배지/가이드 숨김용)
   const [exporting, setExporting] = useState(false);
 
-  // 수정 가능 키 (editable + signKeys 자동 포함)
   const editableSet = useMemo(() => {
     const base = Array.isArray(template.editable)
       ? template.editable
@@ -191,7 +178,6 @@ export default function ContractBase({ template }) {
     return new Set([...base, ...signKeys]);
   }, [template.editable, template.fields, signKeys]);
 
-  // 본문 등장 순서 → 왼쪽 입력 정렬/배지 번호
   const docOrder = useMemo(() => {
     const order = {};
     const re = /{{\s*([\w.\[\]0-9]+)\s*}}/g;
@@ -203,16 +189,22 @@ export default function ContractBase({ template }) {
     return order;
   }, [template.body]);
 
-  // 좌측 필드 (섹션 + 입력)
+  // role에 따른 visibleFields 필터링
   const visibleFields = useMemo(() => {
-    const all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
+    let all = [];
+    if (role === "receiver") {
+      // 서명 필드만 표시
+      all = (template.fields || []).filter((f) => f.name && f.name.startsWith("sign."));
+    } else {
+      // sender → 기존 로직
+      all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
+    }
     const sections = all.filter((f) => f.type === "section");
     const inputs = all.filter((f) => f.type !== "section");
     inputs.sort((a, b) => (docOrder[a.name] ?? 1e9) - (docOrder[b.name] ?? 1e9));
     return [...sections, ...inputs];
-  }, [template.fields, editableSet, docOrder]);
+  }, [template.fields, editableSet, docOrder, role]);
 
-  // 초기값
   useEffect(() => {
     const init = JSON.parse(JSON.stringify(template.defaults || {}));
     (template.fields || []).forEach((f) => {
@@ -225,12 +217,12 @@ export default function ContractBase({ template }) {
     });
     setForm(init);
     setTitle(template.name);
-    // 템플릿 교체 시 서명 대상 기본값 재설정
     setSigTarget((prev) => (signKeys.includes(prev) ? prev : (signKeys[0] || "sign.principal")));
   }, [template, signKeys]);
 
-  // 값 변경(허용 키만)
   const onChange = (name, value) => {
+    // receiver → 서명 필드만 변경 가능
+    if (role === "receiver" && !name.startsWith("sign.")) return;
     if (!editableSet.has(name)) return;
     setForm((p) => {
       const copy = JSON.parse(JSON.stringify(p || {}));
@@ -239,13 +231,11 @@ export default function ContractBase({ template }) {
     });
   };
 
-  // 미리보기 HTML
   const previewHtml = useMemo(
     () => renderBodyHTML(template.body, form, activeKey, docOrder),
     [template, form, activeKey, docOrder]
   );
 
-  // 포커스 시: 자동 스크롤 제거(하이라이트만)
   useEffect(() => {
     if (!activeKey || !previewRef.current) return;
     const el = previewRef.current.querySelector(`[data-key="${CSS.escape(activeKey)}"]`);
@@ -255,31 +245,24 @@ export default function ContractBase({ template }) {
     return () => clearTimeout(t);
   }, [activeKey, previewHtml]);
 
-  // PDF 저장: 배지/가이드 숨기고 A4 한 장에 맞춰 저장
   const savePDF = async () => {
     const node = document.querySelector(".page");
     if (!node) return;
     try {
       setExporting(true);
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
-
       const canvas = await html2canvas(node, { scale: 2, useCORS: true, backgroundColor: "#fff" });
       const img = canvas.toDataURL("image/png");
-
       const pdf = new jsPDF("p", "mm", "a4");
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
-
       const cw = canvas.width, ch = canvas.height;
       const ratio = ch / cw;
-
       let imgW = pageW;
       let imgH = imgW * ratio;
       if (imgH > pageH) { imgH = pageH; imgW = imgH / ratio; }
-
       const x = (pageW - imgW) / 2;
       const y = (pageH - imgH) / 2;
-
       pdf.addImage(img, "PNG", x, y, imgW, imgH);
       pdf.save(`${title || template.name}.pdf`);
     } finally {
@@ -287,7 +270,6 @@ export default function ContractBase({ template }) {
     }
   };
 
-  // 서명패드 초기화/리사이즈
   useLayoutEffect(() => {
     if (!sigCanvasRef.current) return;
     if (!sigPadRef.current) {
@@ -309,7 +291,6 @@ export default function ContractBase({ template }) {
     return () => window.removeEventListener("resize", resize);
   }, []);
 
-  // 서명패드: 버튼들
   const clearSignature = () => sigPadRef.current?.clear();
   const applySignature = () => {
     if (!sigPadRef.current) return;
@@ -325,10 +306,12 @@ export default function ContractBase({ template }) {
       <div className="grid">
         {/* 좌측: 입력영역 */}
         <div>
-          <div className="mb">
-            <label className="lbl">문서 제목</label>
-            <input className="ipt" value={title} onChange={(e) => setTitle(e.target.value)} />
-          </div>
+          {role === "sender" && (
+            <div className="mb">
+              <label className="lbl">문서 제목</label>
+              <input className="ipt" value={title} onChange={(e) => setTitle(e.target.value)} />
+            </div>
+          )}
 
           {visibleFields.map((f, idx) => (
             <div key={`${f.name || f.label}-${idx}`} onFocusCapture={() => f.name && setActiveKey(f.name)}>
@@ -344,10 +327,7 @@ export default function ContractBase({ template }) {
             <select className="ipt" value={sigTarget} onChange={(e)=>setSigTarget(e.target.value)}>
               {signKeys.length
                 ? signKeys.map((k) => <option key={k} value={k}>{k.replace("sign.","")} 서명</option>)
-                : <>
-                    <option value="sign.principal">principal 서명</option>
-                    <option value="sign.agent">agent 서명</option>
-                  </>
+                : <><option value="sign.principal">principal 서명</option><option value="sign.agent">agent 서명</option></>
               }
             </select>
             <div className="sigpad"><canvas ref={sigCanvasRef} className="sig-canvas" /></div>
@@ -358,11 +338,11 @@ export default function ContractBase({ template }) {
           </div>
 
           <div className="mb" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <button className="btn primary" onClick={savePDF}>PDF로 저장</button>
+            {role === "sender" && <button className="btn primary" onClick={savePDF}>PDF로 저장</button>}
           </div>
         </div>
 
-        {/* 우측: 미리보기 (A4) */}
+        {/* 우측: 미리보기 */}
         <div className="preview">
           <div className={`page ${exporting ? "export" : ""}`}>
             <div className="center">
@@ -374,7 +354,6 @@ export default function ContractBase({ template }) {
           </div>
         </div>
       </div>
-
       {/* 스타일 */}
       <style>{`
         .wrap{max-width:1100px;margin:0 auto;padding:16px}
