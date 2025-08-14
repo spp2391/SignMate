@@ -13,7 +13,7 @@ const Header = () => {
                 <div className="header-container container-md">
                     <div className="header-left">
                         <h2 className="header-title">
-                            <Link to="javascript:void(0)">
+                            <Link to="/">
                                 <img height="82" src={logo} alt="SIGN MATE" />
                             </Link>
                         </h2>

@@ -1306,7 +1306,7 @@ body:has(.fullmenu-active) .temhabank-N6 {
 /* temhabank-N2 */
 .temhabank-N2 {
   position: relative;
-  background: #111111;
+  background: #2f6488;
   padding-top: 4rem;
   padding-bottom: 4rem;
   overflow: hidden;
@@ -1415,7 +1415,7 @@ body:has(.fullmenu-active) .temhabank-N6 {
 
 .temhabank-N2 .footer-txt p {
   margin-bottom: 0;
-  color: var(--text-color3);
+  color: #000;
 }
 
 .temhabank-N2 .footer-txt p+p {
@@ -1427,7 +1427,10 @@ body:has(.fullmenu-active) .temhabank-N6 {
 }
 
 .temhabank-N2 .footer-txt span {
-  color: var(--text-color3);
+  color: #000;
+}
+.temhabank-N1 .header-gnblink span {
+  color: #195180;
 }
 
 .temhabank-N2 .footer-modal {
