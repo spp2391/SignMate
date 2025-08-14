@@ -29,8 +29,46 @@ const setByPath = (obj, path, val) => {
 const pretty = (v) => (typeof v === "boolean" ? (v ? "예" : "아니오") : v == null ? "" : String(v));
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-function renderBodyHTML(template, data, activeKey, orderMap) {
-  return template.replace(/{{\s*([\w.\[\]0-9]+)\s*}}/g, (_, rawKey) => {
+/* === NEW: 테이블 HTML 렌더러 (미리보기에서 표로 보이게) === */
+function renderTableHTML(tableFieldDef, rows = []) {
+  const cols = tableFieldDef.columns || [];
+  const safe = (x) => esc(pretty(x ?? ""));
+
+  const header = `
+    <thead>
+      <tr>
+        ${cols.map((c) => `<th>${esc(c.label || c.key)}</th>`).join("")}
+      </tr>
+    </thead>`;
+
+  const body = `
+    <tbody>
+      ${rows.length
+        ? rows
+            .map((row) => `
+              <tr>
+                ${cols
+                  .map((c) => `<td>${safe((row || {})[c.key])}</td>`)
+                  .join("")}
+              </tr>`)
+            .join("")
+        : `<tr><td colspan="${cols.length}" class="empty">입력된 항목이 없습니다.</td></tr>`
+      }
+    </tbody>`;
+
+  return `
+    <div class="table-preview">
+      <div class="table-title">${esc(tableFieldDef.label || tableFieldDef.name)}</div>
+      <table class="tbl print">
+        ${header}
+        ${body}
+      </table>
+    </div>`;
+}
+
+/* === CHANGED: 본문 치환 — table인 경우 표로 렌더 === */
+function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName) {
+  return template.replace(/{{\s*([\w.[\]0-9]+)\s*}}/g, (_, rawKey) => {
     const key = rawKey.trim();
     const parts = key.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
     let v = data;
@@ -40,6 +78,7 @@ function renderBodyHTML(template, data, activeKey, orderMap) {
     const badge = idx ? `<span class="idx-badge">#${idx}</span>` : "";
     const isActive = activeKey && key === activeKey;
 
+    // 서명
     if (key.startsWith("sign.")) {
       const hasSig = v && String(v).startsWith("data:image/");
       const node = hasSig
@@ -48,6 +87,14 @@ function renderBodyHTML(template, data, activeKey, orderMap) {
       return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${badge}${node}</span>`;
     }
 
+    // === NEW: table 필드면 표 형태로 렌더 ===
+    const fieldDef = fieldsByName[key];
+    if (fieldDef && fieldDef.type === "table") {
+      const html = renderTableHTML(fieldDef, Array.isArray(v) ? v : []);
+      return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${html}</span>`;
+    }
+
+    // 일반 값
     let html = "";
     if (Array.isArray(v)) {
       html = (v || [])
@@ -75,7 +122,7 @@ function FieldInput({ field, value, onChange, onFocusField }) {
     return (
       <div className="mb">
         <label className="lbl">{field.label}</label>
-        <textarea className="ipt" rows={4} value={value || ""} onFocus={() => onFocusField?.(field.name)}
+        <textarea className="ipt" rows={5} value={value || ""} onFocus={() => onFocusField?.(field.name)}
           onChange={(e) => onChange(field.name, e.target.value)} />
       </div>
     );
@@ -114,11 +161,11 @@ function FieldInput({ field, value, onChange, onFocusField }) {
       <div className="mb">
         <div className="rowHead"><label className="lbl">{field.label}</label><button type="button" className="btn" onClick={addRow}>+ 행 추가</button></div>
         <div className="scroll">
-          <table className="tbl">
+          <table className="tbl edit">
             <thead>
               <tr>
                 {field.columns.map((c) => <th key={c.key}>{c.label}</th>)}
-                <th style={{ width: 64 }}>삭제</th>
+                <th style={{ width: 80 }}>삭제</th>
               </tr>
             </thead>
             <tbody>
@@ -126,9 +173,13 @@ function FieldInput({ field, value, onChange, onFocusField }) {
                 <tr key={i}>
                   {field.columns.map((c) => (
                     <td key={c.key}>
-                      <input className="ipt" type={c.type === "number" ? "number" : c.type === "date" ? "date" : "text"}
-                        value={(rows[i] || {})[c.key] || ""} onFocus={() => onFocusField?.(`${field.name}[${i}].${c.key}`)}
-                        onChange={(e) => setCell(i, c.key, e.target.value)} />
+                      <input
+                        className="ipt cell"
+                        type={c.type === "number" ? "number" : c.type === "date" ? "date" : "text"}
+                        value={(rows[i] || {})[c.key] || ""}
+                        onFocus={() => onFocusField?.(`${field.name}[${i}].${c.key}`)}
+                        onChange={(e) => setCell(i, c.key, e.target.value)}
+                      />
                     </td>
                   ))}
                   <td className="center"><button type="button" className="btn" onClick={() => removeRow(i)}>삭제</button></td>
@@ -140,6 +191,7 @@ function FieldInput({ field, value, onChange, onFocusField }) {
       </div>
     );
   }
+  // text/number/date
   return (
     <div className="mb">
       <label className="lbl">{field.label}</label>
@@ -151,18 +203,27 @@ function FieldInput({ field, value, onChange, onFocusField }) {
 }
 
 /* ===== 메인 ===== */
-export default function ContractBase({ template, role = "sender" }) { // role prop 추가
+export default function ContractBase({ template, role = "sender" }) {
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState({});
   const [activeKey, setActiveKey] = useState(null);
   const previewRef = useRef(null);
 
+  // 서명패드
   const sigCanvasRef = useRef(null);
   const sigPadRef = useRef(null);
 
+  // === NEW: 이름->필드정의 맵 (table 렌더에 사용)
+  const fieldsByName = useMemo(() => {
+    const map = {};
+    (template.fields || []).forEach((f) => { if (f.name) map[f.name] = f; });
+    return map;
+  }, [template.fields]);
+
+  // sign 키 자동 추출
   const signKeys = useMemo(() => {
     const keys = new Set();
-    const re = /{{\s*(sign\.[\w.\[\]0-9]+)\s*}}/g;
+    const re = /{{\s*(sign\.[\w.[\]0-9]+)\s*}}/g;
     let m;
     while ((m = re.exec(template.body))) keys.add(m[1]);
     return Array.from(keys);
@@ -180,7 +241,7 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
 
   const docOrder = useMemo(() => {
     const order = {};
-    const re = /{{\s*([\w.\[\]0-9]+)\s*}}/g;
+    const re = /{{\s*([\w.[\]0-9]+)\s*}}/g;
     let m, idx = 0;
     while ((m = re.exec(template.body))) {
       const key = m[1];
@@ -189,14 +250,12 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     return order;
   }, [template.body]);
 
-  // role에 따른 visibleFields 필터링
+  // role에 따른 visibleFields
   const visibleFields = useMemo(() => {
     let all = [];
     if (role === "receiver") {
-      // 서명 필드만 표시
       all = (template.fields || []).filter((f) => f.name && f.name.startsWith("sign."));
     } else {
-      // sender → 기존 로직
       all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
     }
     const sections = all.filter((f) => f.type === "section");
@@ -205,6 +264,7 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     return [...sections, ...inputs];
   }, [template.fields, editableSet, docOrder, role]);
 
+  // 초기값
   useEffect(() => {
     const init = JSON.parse(JSON.stringify(template.defaults || {}));
     (template.fields || []).forEach((f) => {
@@ -220,8 +280,8 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     setSigTarget((prev) => (signKeys.includes(prev) ? prev : (signKeys[0] || "sign.principal")));
   }, [template, signKeys]);
 
+  // 변경 핸들러 (receiver는 sign.*만)
   const onChange = (name, value) => {
-    // receiver → 서명 필드만 변경 가능
     if (role === "receiver" && !name.startsWith("sign.")) return;
     if (!editableSet.has(name)) return;
     setForm((p) => {
@@ -231,11 +291,25 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     });
   };
 
+  // === CHANGED: table 메타를 함께 전달
   const previewHtml = useMemo(
-    () => renderBodyHTML(template.body, form, activeKey, docOrder),
-    [template, form, activeKey, docOrder]
+    () => renderBodyHTML(template.body, form, activeKey, docOrder, fieldsByName),
+    [template, form, activeKey, docOrder, fieldsByName]
   );
 
+  // === NEW: 본문에 포함되지 않은 table을 하단에 자동 추가
+  const extraTablesHtml = useMemo(() => {
+    const bodyStr = template.body || "";
+    const tables = (template.fields || []).filter((f) => f.type === "table");
+    const missing = tables.filter((f) => !bodyStr.includes(`{{${f.name}}}`));
+    if (!missing.length) return "";
+    return missing
+      .map((f) => renderTableHTML(f, getByPath(form, f.name) || []))
+      .join("");
+  }, [template.fields, template.body, form]);
+
+  // 하이라이트 효과
+  // const previewRef = useRef(null);
   useEffect(() => {
     if (!activeKey || !previewRef.current) return;
     const el = previewRef.current.querySelector(`[data-key="${CSS.escape(activeKey)}"]`);
@@ -245,6 +319,7 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     return () => clearTimeout(t);
   }, [activeKey, previewHtml]);
 
+  // PDF 저장
   const savePDF = async () => {
     const node = document.querySelector(".page");
     if (!node) return;
@@ -270,6 +345,7 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
     }
   };
 
+  // 서명패드
   useLayoutEffect(() => {
     if (!sigCanvasRef.current) return;
     if (!sigPadRef.current) {
@@ -342,45 +418,56 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
           </div>
         </div>
 
-        {/* 우측: 미리보기 */}
-        <div className="preview">
+        {/* 우측: 미리보기 (sticky 적용) */}
+        <div className="preview sticky">
           <div className={`page ${exporting ? "export" : ""}`}>
             <div className="center">
               <div className="title">{title || template.name}</div>
               <div className="sub">{template.name}</div>
             </div>
             <div ref={previewRef} className="body" dangerouslySetInnerHTML={{ __html: previewHtml }} />
+            {/* 본문에 포함되지 않은 table은 하단에 자동 추가 */}
+            {extraTablesHtml && <div className="body" dangerouslySetInnerHTML={{ __html: extraTablesHtml }} />}
             {template.footerNote && <div className="foot">{template.footerNote}</div>}
           </div>
         </div>
       </div>
+
       {/* 스타일 */}
       <style>{`
-        .wrap{max-width:1100px;margin:0 auto;padding:16px}
+        .wrap{max-width:1200px;margin:0 auto;padding:16px}
         .ttl{font-size:22px;font-weight:700;margin-bottom:12px}
         .grid{display:grid;grid-template-columns:1fr;gap:24px}
-        @media(min-width:900px){.grid{grid-template-columns:1fr 1fr}}
-        .mb{margin-bottom:12px}
-        .lbl{display:block;font-size:13px;margin-bottom:6px;color:#333}
+        @media(min-width:1100px){.grid{grid-template-columns:1.05fr .95fr}}
+        .mb{margin-bottom:14px}
+        .lbl{display:block;font-size:14px;margin-bottom:6px;color:#333}
         .lbl.inline{display:inline-flex;align-items:center;gap:8px}
-        .ipt{width:100%;border:1px solid #ddd;border-radius:8px;padding:8px}
-        .btn{border:1px solid #222;border-radius:8px;padding:6px 10px;background:#fff;cursor:pointer}
+
+        /* === CHANGED: 입력 가독성 상승 === */
+        .ipt{width:100%;border:1px solid #ddd;border-radius:10px;padding:10px 12px;font-size:14px}
+        .ipt.cell{height:38px;font-size:14px;padding:8px 10px}
+        textarea.ipt{min-height:96px}
+
+        .btn{border:1px solid #222;border-radius:10px;padding:8px 12px;background:#fff;cursor:pointer}
         .btn.primary{background:#111;color:#fff}
-        .preview{border:1px solid #e5e7eb;border-radius:10px;padding:0;background:#f9fafb}
+
+        .preview{border:1px solid #e5e7eb;border-radius:12px;padding:0;background:#f9fafb}
+        /* === NEW: sticky preview === */
+        .sticky{position:sticky; top:12px; align-self:start; height:fit-content}
 
         .sec{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px dashed #e5e7eb}
         .sec-bullet{width:6px;height:6px;border-radius:50%;background:#111;display:inline-block}
         .sec-title{font-weight:700;font-size:13px}
         .badge{display:inline-block;margin:0 0 4px 0;font-size:11px;color:#555;background:#eef2ff;border:1px solid #c7d2fe;border-radius:6px;padding:2px 6px;font-weight:600;}
 
-        .page{width:210mm; min-height:297mm; margin:0 auto; background:#fff; color:#000; padding:14mm; box-sizing:border-box; border-radius:10px; box-shadow:0 0 6px rgba(0,0,0,.08)}
+        .page{width:210mm; min-height:297mm; margin:0 auto; background:#fff; color:#000; padding:14mm; box-sizing:border-box; border-radius:12px; box-shadow:0 0 6px rgba(0,0,0,.08)}
         @page{ size:A4; margin:12mm }
         @media print{ .wrap{padding:0} .grid{display:block} .preview{border:none;padding:0} .page{box-shadow:none;border-radius:0;margin:0;width:auto;min-height:auto;padding:12mm} }
 
         .center{text-align:center}
         .title{font-size:18px;font-weight:700;margin-top:4px}
         .sub{font-size:12px;color:#666}
-        .body{white-space:pre-wrap;word-break:break-word;line-height:1.6;margin-top:8px}
+        .body{white-space:pre-wrap;word-break:break-word;line-height:1.65;margin-top:8px}
         .idx-badge{display:inline-block;margin-right:4px;font-size:10px;color:#555;background:#eef2ff;border:1px solid #c7d2fe;border-radius:6px;padding:1px 4px;vertical-align:baseline}
 
         .anchor{background:transparent;transition:background .2s, box-shadow .2s}
@@ -395,17 +482,31 @@ export default function ContractBase({ template, role = "sender" }) { // role pr
         .page.export .hit,
         .page.export .pulse { display:none !important; box-shadow:none !important; background:transparent !important; }
 
-        .tbl{width:100%;border-collapse:collapse}
-        .tbl th,.tbl td{border:1px solid #e5e7eb;padding:6px;text-align:left}
+        /* === CHANGED: 표 편집/프린트 공용 스타일 개선 === */
+        .tbl{width:100%;border-collapse:collapse; table-layout:auto}
+        .tbl th,.tbl td{border:1px solid #e5e7eb;padding:8px;text-align:left;vertical-align:middle}
+        .tbl.edit th{position:sticky; top:0; background:#f8fafc; z-index:1}
+        .tbl .ipt{width:100%}
+        .tbl .ipt.cell{width:100%}
+        .tbl td.center{ text-align:center }
 
-        .sigpad{border:1px dashed #cbd5e1;border-radius:10px;background:#fff;height:140px;margin:6px 0 8px}
+        /* 테이블 영역 가로 스크롤 (열 넓어도 보기 좋게) */
+        .scroll{overflow:auto}
+        .tbl th{white-space:nowrap}
+        .tbl.edit{min-width:720px}
+
+        /* 미리보기 표 */
+        .tbl.print{margin-top:6px}
+        .table-preview{margin-top:12px}
+        .table-preview .table-title{font-weight:700; margin:10px 0 6px}
+
+        .sigpad{border:1px dashed #cbd5e1;border-radius:10px;background:#fff;height:160px;margin:6px 0 8px}
         .sig-canvas{width:100%;height:100%;display:block;border-radius:10px}
         .sign-img{display:block;margin:6px 0 10px;max-width:260px;max-height:100px;border-bottom:1px solid #111}
         .sign-box{display:inline-block;width:260px;height:60px;border-bottom:1px solid #111;background:transparent}
 
         .foot{margin-top:16px;color:#666;font-size:12px}
-        .rowHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
-        .scroll{overflow:auto}
+        .rowHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
       `}</style>
     </div>
   );
