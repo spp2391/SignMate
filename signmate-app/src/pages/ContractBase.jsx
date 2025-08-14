@@ -158,7 +158,7 @@ function FieldInput({ field, value, onChange, onFocusField }) {
 }
 
 /* ===== 메인 ===== */
-export default function ContractBase({ template, data, handleChange }) {
+export default function ContractBase({ template, data, handleChange = ()=>{} }) {
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState({...data});
   const [activeKey, setActiveKey] = useState(null);
