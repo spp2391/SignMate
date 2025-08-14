@@ -3,10 +3,10 @@ package org.zerock.signmate.Contract2.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.enums;
+import org.zerock.signmate.Contract.domain.enums.ContractStatus;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Setter
@@ -48,24 +48,24 @@ public class StandardEmploymentContract extends CommonEntity {
     private Integer workEndHour;             // #9 소정근로 종료 시 (정수시)
 
     // 휴게시간
-    private Integer breakHour;                // #10 휴게(시)
-    private Integer breakMinute;              // #11 휴게(분)
+    private Integer breakHour;               // #10 휴게(시)
+    private Integer breakMinute;             // #11 휴게(분)
 
     // 근무일 및 주휴일
-    private String workDays;                  // #12 근무일 (예: 월~금)
-    private String weeklyHoliday;             // #13 주휴일 (예: 일)
+    private String workDays;                 // #12 근무일 (예: 월~금)
+    private String weeklyHoliday;            // #13 주휴일 (예: 일)
 
     // 임금
-    private String wageAmount;                // #14 임금 (월/시급)
-    private String bonus;                     // #15 상여금 (있을 시 금액/율)
-    private String otherAllowance;            // #16 기타수당 (제수당 등)
-    private String wagePaymentDate;           // #17 임금지급일 (예: 매월 n일)
-    private String paymentMethod;             // #18 지급방법 (예: 통장입금)
+    private String wageAmount;               // #14 임금 (월/시급)
+    private String bonus;                    // #15 상여금 (있을 시 금액/율)
+    private String otherAllowance;           // #16 기타수당 (제수당 등)
+    private String wagePaymentDate;          // #17 임금지급일 (예: 매월 n일)
+    private String paymentMethod;            // #18 지급방법 (예: 통장입금)
 
     // 사회보험 적용 여부
-    private Boolean nationalPension;          // #23 국민연금
-    private Boolean healthInsurance;          // #24 건강보험
-    private Boolean employmentInsurance;      // #25 고용보험
+    private Boolean nationalPension;         // #23 국민연금
+    private Boolean healthInsurance;         // #24 건강보험
+    private Boolean employmentInsurance;     // #25 고용보험
     private Boolean industrialAccidentInsurance; // #26 산재보험
 
     // 전자서명 - 사업주, 근로자 (Base64 문자열 저장)
@@ -79,7 +79,48 @@ public class StandardEmploymentContract extends CommonEntity {
 
     // 상태 및 이력
     @Enumerated(EnumType.STRING)
-    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
+    private ContractStatus status;           // DRAFT, ACTIVE, TERMINATED
     private Integer version;
+
+    // 계약 진행 관련 날짜
+    private LocalDate proposalDate;          // 계약 제안일
+    private LocalDate signedDate;            // 계약 서명일
+    private LocalDate endDate;               // 계약 종료일 (예: 근로 종료일)
+
+    // =======================
+    // 편의 메서드
+    // =======================
+
+    // 근로 시작일
+    public LocalDate getWorkStartDate() {
+        if (workStartYear == null || workStartMonth == null || workStartDay == null) return null;
+        return LocalDate.of(workStartYear, workStartMonth, workStartDay);
+    }
+
+    // 근로 종료일 (endDate 필드 사용, 없으면 null 반환)
+    public LocalDate getWorkEndDate() {
+        return endDate;
+    }
+
+    // 계약 기간(일)
+    public long getContractDurationDays() {
+        LocalDate start = getWorkStartDate();
+        LocalDate end = getWorkEndDate();
+        if (start == null || end == null) return 0;
+        return ChronoUnit.DAYS.between(start, end);
+    }
+
+    // 계약 관계 지속 기간 (오늘 기준)
+    public long getRelationshipLengthDays() {
+        LocalDate start = getWorkStartDate();
+        if (start == null) return 0;
+        return ChronoUnit.DAYS.between(start, LocalDate.now());
+    }
+
+    // 계약 진행 속도 (제안 → 서명 일수)
+    public long getProposalToSignedDays() {
+        if (proposalDate == null || signedDate == null) return 0;
+        return ChronoUnit.DAYS.between(proposalDate, signedDate);
+    }
 
 }

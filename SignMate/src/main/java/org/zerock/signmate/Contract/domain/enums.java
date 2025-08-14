@@ -14,7 +14,7 @@ public class enums {
     public enum ContractStatus {
         DRAFT,    // 작성중
         PENDING,  // 서명 대기
-        SIGNED    // 서명 완료
+        ACTIVE, SIGNED    // 서명 완료
     }
 
     public enum RoleInContract {
