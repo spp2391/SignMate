@@ -61,7 +61,5 @@ public class SupplyContract extends CommonEntity {
     private List<SupplyItem> items = new ArrayList<>();
 
     // 상태 및 이력
-    @Enumerated(EnumType.STRING)
-    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
-    private Integer version;
+
 }

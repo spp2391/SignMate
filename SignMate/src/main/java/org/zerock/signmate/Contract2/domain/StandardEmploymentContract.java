@@ -78,8 +78,6 @@ public class StandardEmploymentContract extends CommonEntity {
     private String employeeSignature;        // 전자서명 - 근로자
 
     // 상태 및 이력
-    @Enumerated(EnumType.STRING)
-    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
-    private Integer version;
+
 
 }
