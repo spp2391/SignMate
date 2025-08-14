@@ -1,5 +1,6 @@
 package org.zerock.signmate.Contract.secret.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,55 +25,47 @@ public class SecretService {
 
     @Transactional
     public SecretDTO addOrUpdateSecret(SecretDTO dto) {
-
-        // 1) 작성자/수신자 조회
         User writer = userRepository.findByName(dto.getWriterName())
-                .orElseThrow(() -> new RuntimeException("작성자 유저가 없습니다: " + dto.getWriterName()));
+                .orElseThrow(() -> new EntityNotFoundException("작성자 유저가 없습니다: " + dto.getWriterName()));
 
         User receiver = null;
-        if (dto.getReceiverName() != null && !dto.getReceiverName().isEmpty()) {
+        if (dto.getReceiverName() != null && !dto.getReceiverName().isBlank()) {
             receiver = userRepository.findByName(dto.getReceiverName())
-                    .orElseThrow(() -> new RuntimeException("받는 사람 유저가 없습니다: " + dto.getReceiverName()));
+                    .orElseThrow(() -> new EntityNotFoundException("받는 사람 유저가 없습니다: " + dto.getReceiverName()));
         }
 
-        // 2) Contract 생성 또는 조회
-        Contract contract;
-        if (dto.getContractId() == null) {
-            contract = Contract.builder()
-                    .contractType(enums.ContractType.SERVICE)
-                    .writer(writer)
-                    .receiver(receiver)
-                    .build();
-            contractRepository.save(contract);
-        } else {
-            contract = contractRepository.findById(dto.getContractId())
-                    .orElseThrow(() -> new RuntimeException("존재하지 않는 계약서 ID: " + dto.getContractId()));
-            contract.setWriter(writer);
-            contract.setReceiver(receiver);
-        }
+        Contract contract = dto.getContractId() == null
+                ? Contract.builder()
+                .contractType(enums.ContractType.SERVICE)
+                .writer(writer)
+                .receiver(receiver)
+                .build()
+                : contractRepository.findById(dto.getContractId())
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
 
-        // 3) 기존 Secret 조회, 없으면 새 Secret 생성
+        contract.setWriter(writer);
+        contract.setReceiver(receiver);
+        contractRepository.save(contract);
+
         Secret secret = secretRepository.findByContract(contract)
-                .orElse(Secret.builder().contract(contract).build());
+                .orElseGet(() -> Secret.builder().contract(contract).build());
 
-        // 4) Secret 필드 업데이트
-        secret.setDiscloserRepresentative(dto.getDiscloserRepresentative() != null ? dto.getDiscloserRepresentative() : "");
-        secret.setDiscloserAddress(dto.getDiscloserAddress() != null ? dto.getDiscloserAddress() : "");
-        secret.setReceiverRepresentative(dto.getReceiverRepresentative() != null ? dto.getReceiverRepresentative() : "");
-        secret.setReceiverAddress(dto.getReceiverAddress() != null ? dto.getReceiverAddress() : "");
-        secret.setPurpose(dto.getPurpose() != null ? dto.getPurpose() : "");
+        // 필드 복사 (null 허용)
+        secret.setDiscloserRepresentative(dto.getDiscloserRepresentative());
+        secret.setDiscloserAddress(dto.getDiscloserAddress());
+        secret.setReceiverRepresentative(dto.getReceiverRepresentative());
+        secret.setReceiverAddress(dto.getReceiverAddress());
+        secret.setPurpose(dto.getPurpose());
         secret.setEffectiveDate(dto.getEffectiveDate());
-        secret.setContractDurationMonths(dto.getContractDurationMonths() != null ? dto.getContractDurationMonths() : 0);
-        secret.setConfidentialityDurationYears(dto.getConfidentialityDurationYears() != null ? dto.getConfidentialityDurationYears() : 0);
-        secret.setGoverningLaw(dto.getGoverningLaw() != null ? dto.getGoverningLaw() : "");
-        secret.setWriterSignature(dto.getWriterSignature() != null ? dto.getWriterSignature() : "");
-        secret.setReceiverSignature(dto.getReceiverSignature() != null ? dto.getReceiverSignature() : "");
+        secret.setContractDurationMonths(dto.getContractDurationMonths());
+        secret.setConfidentialityDurationYears(dto.getConfidentialityDurationYears());
+        secret.setGoverningLaw(dto.getGoverningLaw());
+        secret.setWriterSignature(dto.getWriterSignature());
+        secret.setReceiverSignature(dto.getReceiverSignature());
 
-        // 5) Secret 저장
-        Secret saved = secretRepository.save(secret);
-
-        return SecretDTO.fromEntity(saved);
+        return SecretDTO.fromEntity(secretRepository.save(secret));
     }
+
 
     public SecretDTO findById(Long id) {
         Optional<Secret> opt = secretRepository.findById(id);

@@ -84,10 +84,23 @@ export default function SecretPage({ signerId }) {
   const [formData, setFormData] = useState(ndaTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
-  const handleChange = (data) => {
-    // ContractBase에서 실시간 반영
-    setFormData(prev => ({ ...prev, ...data }));
-  };
+  // ContractBase에서 field 변경 시 호출
+  const handleChange = (updated) => {
+  setFormData(prev => {
+    const newState = { ...prev };
+
+    Object.entries(updated).forEach(([key, value]) => {
+      if (key.includes(".")) {
+        const [parent, child] = key.split(".");
+        newState[parent] = { ...newState[parent], [child]: value };
+      } else {
+        newState[key] = value;
+      }
+    });
+
+    return newState;
+  });
+};
 
   const handleSave = async () => {
     if (!formData.discloser.name || !formData.recipient.name) {
@@ -97,43 +110,36 @@ export default function SecretPage({ signerId }) {
     setLoadingSubmit(true);
 
     try {
-      // payload 생성: DTO 필드명과 정확히 매칭
+      // fields에 입력된 값을 기반으로 payload 생성
       const payload = {
-        id: formData.id || null,
-        contractId: formData.contractId || null,
-        writerName: signerId,
-        receiverName: formData.recipient.name || "",
-        discloserRepresentative: formData.discloser.rep || "",
-        discloserAddress: formData.discloser.address || "",
-        receiverRepresentative: formData.recipient.rep || "",
-        receiverAddress: formData.recipient.address || "",
-        purpose: formData.purpose || "",
-        effectiveDate: formData.effective ? formData.effective : null,
+        writerName: formData.discloser.name,
+        receiverName: formData.recipient.name,
+        discloserRepresentative: formData.discloser.rep,
+        discloserAddress: formData.discloser.address,
+        receiverRepresentative: formData.recipient.rep,
+        receiverAddress: formData.recipient.address,
+        purpose: formData.purpose,
+        effectiveDate: formData.effective || null,
         contractDurationMonths: formData.termMonths ? Number(formData.termMonths) : null,
         confidentialityDurationYears: formData.survivalYears ? Number(formData.survivalYears) : null,
-        governingLaw: formData.law || "",
-        writerSignature: formData.sign.discloser || "",
-        receiverSignature: formData.sign.recipient || ""
+        governingLaw: formData.law,
+        writerSignature: formData.sign.discloser,
+        receiverSignature: formData.sign.recipient
       };
 
-      const isUpdate = formData.id && formData.id > 0;
-      const url = isUpdate ? `/api/secrets/${formData.id}` : "/api/secrets";
+      console.log("보낼 payload:", payload);
 
-      const res = await fetch(url, {
-        method: isUpdate ? "PUT" : "POST",
+      const res = await fetch("/api/secrets", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
 
-      if (!res.ok) {
-        const errText = await res.text();
-        throw new Error(errText || "서버 오류");
-      }
-
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
       const result = await res.json();
-      setFormData(prev => ({ ...prev, id: result.id, contractId: result.contractId || prev.contractId }));
+      alert("계약서 제출 완료!");
+      console.log("서버 응답:", result);
 
-      alert(isUpdate ? "계약서가 수정되었습니다!" : "계약서가 제출되었습니다!");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -143,25 +149,27 @@ export default function SecretPage({ signerId }) {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} onChange={handleChange} />
+      <ContractBase
+        template={ndaTemplate}
+        data={formData}
+        handleChange={handleChange}  // fields 입력 시 formData 실시간 업데이트
+      />
       <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
           marginTop: 20,
           padding: "10px 20px",
-          fontSize: "18px",
+          fontSize: 18,
           backgroundColor: "#007bff",
           color: "white",
           border: "none",
           borderRadius: 4,
-          cursor: "pointer",
-          display: "block"
+          cursor: "pointer"
         }}
       >
-        {loadingSubmit ? "제출 중..." : formData.id ? "수정하기" : "제출하기"}
+        {loadingSubmit ? "제출 중..." : "제출하기"}
       </button>
     </div>
   );
 }
-

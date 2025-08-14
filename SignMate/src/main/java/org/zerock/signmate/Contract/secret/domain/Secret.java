@@ -25,18 +25,13 @@ public class Secret {
     private Contract contract;
 
     // 1. 당사자 정보
-    @ManyToOne
-    @JoinColumn(name = "writer_id")
-    private User writer;       // 공개자(갑) 이름 (#1)
 
 
 
     private String discloserRepresentative;  // 공개자 대표 (#2)
     private String discloserAddress;    // 공개자 주소 (#3)
 
-    @ManyToOne
-    @JoinColumn(name = "receiver_id")
-    private User receiver;        // 수신자(을) 이름 (#4)
+
 
 
     private String receiverRepresentative;    // 수신자 대표 (#5)
