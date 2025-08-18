@@ -70,13 +70,13 @@ public class WebOAuthSecurityConfig {
 //                        .failureUrl("/?error=true")
 //                        .permitAll()
 //                )
-//                .authorizeRequests(auth-> auth
-//                        //아무런 권한이 없어도 실행 가능한 Mapping설정
-//                        .requestMatchers(new AntPathRequestMatcher("/api/token")).permitAll()
-//                        //로그인을 해야만 실행 가능한 매핑
-//                        .requestMatchers(new AntPathRequestMatcher("/api/**")).authenticated()
-//                        //위 두개를 제외한 모든 mapping은 권한 없어도 실행가능하도록
-//                        .anyRequest().permitAll())
+                .authorizeRequests(auth-> auth
+                        //아무런 권한이 없어도 실행 가능한 Mapping설정
+                        .requestMatchers("/api/token","/api/user/**").permitAll()
+                        //로그인을 해야만 실행 가능한 매핑
+                        .requestMatchers("/api/**").authenticated()
+                        //위 두개를 제외한 모든 mapping은 권한 없어도 실행가능하도록
+                        .anyRequest().permitAll())
                 .oauth2Login(oauth2 -> oauth2.loginPage("/login")
                         //로그인 처리를 실행할 서비스를 설정
                         .authorizationEndpoint(authorizationEndpoint -> authorizationEndpoint.authorizationRequestRepository(
@@ -84,12 +84,12 @@ public class WebOAuthSecurityConfig {
                         .userInfoEndpoint(userInfoEndpoint ->userInfoEndpoint.userService(oAuth2UserCustomService))
                         .successHandler(oAuth2SuccessHandler())
                 )
-                        .exceptionHandling(exceptionHandling -> exceptionHandling
-                                .defaultAuthenticationEntryPointFor(
-                                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                        new AntPathRequestMatcher("/api/**")
-                                ))
-                        .build();
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .defaultAuthenticationEntryPointFor(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
+                                new AntPathRequestMatcher("/api/**")
+                        ))
+                .build();
     }
     @Bean
     public OAuth2SuccessHandler oAuth2SuccessHandler(){

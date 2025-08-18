@@ -179,7 +179,9 @@ export default function EmploymentContractPage() {
 
       const res = await fetch("/api/employment", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json",
+          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+         },
         body: JSON.stringify(dto)
       });
 

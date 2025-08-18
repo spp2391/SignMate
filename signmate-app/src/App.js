@@ -7,6 +7,7 @@ import EmploymentContractPage from "./pages/EmploymentContractPage";
 import ServiceContractPage from "./pages/ServiceContractPage";
 import SupplyContractPage from "./pages/SupplyContractPage";
 import OutsourcingContractPage from "./pages/OutsourcingContractPage";
+import Login from "./User/pages/Login";
 
 export default function App() {
   return (
@@ -21,7 +22,7 @@ export default function App() {
       </nav>
 
       <Routes>
-     <Route path="/secret" element={<SecretPage signerId="김철수" />} />
+        <Route path="/secret" element={<SecretPage signerId="김철수" />} />
         <Route path="/employment" element={<EmploymentContractPage />} />
         <Route path="/service" element={<ServiceContractPage />} />
         <Route path="/supply" element={<SupplyContractPage />} />
@@ -29,6 +30,7 @@ export default function App() {
         {/* 기본 라우트 */}
         
         <Route path="*" element={<SecretPage signerId="김철수" />} />
+        <Route path="/login" element={<Login />} />
       </Routes>
     </Router>
   );

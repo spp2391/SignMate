@@ -3,6 +3,8 @@ package org.zerock.signmate.Contract.standard.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
@@ -26,6 +28,10 @@ public class StandardService {
     @Transactional
     public StandardDTO addOrUpdateStandard(StandardDTO dto) {
         // 1. 작성자(사업주) 유저 조회
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginEmail = authentication.getName();
+
         User writer = userRepository.findByName(dto.getEmployerName())
                 .orElseThrow(() -> new EntityNotFoundException("작성자(사업주) 유저가 없습니다: " + dto.getEmployerName()));
 

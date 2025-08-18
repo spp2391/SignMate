@@ -1,7 +1,6 @@
 // SecretPage.jsx
-import React, { useState } from "react";
+import { useState } from "react";
 import ContractBase from "./ContractBase";
-import { useParams } from "react-router-dom";
 
 /** 비밀유지계약서(NDA)
  *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
@@ -80,7 +79,8 @@ const ndaTemplate = {
 //   return <ContractBase template={ndaTemplate} />;
 // }
 
-export default function SecretPage({ signerId }) {
+export default function SecretPage() {
+  // const {signerId} = props;
   const [formData, setFormData] = useState(ndaTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
 
@@ -131,7 +131,10 @@ export default function SecretPage({ signerId }) {
 
       const res = await fetch("/api/secrets", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json" ,
+          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+        },
         body: JSON.stringify(payload)
       });
 
