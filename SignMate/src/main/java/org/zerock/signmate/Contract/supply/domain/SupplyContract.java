@@ -1,9 +1,9 @@
-package org.zerock.signmate.Contract2.domain;
+package org.zerock.signmate.Contract.supply.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.enums;
+import org.zerock.signmate.Contract.domain.Contract;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,6 +21,10 @@ public class SupplyContract extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
 
     // 공급자(갑)
     private String supplierName;

@@ -1,9 +1,9 @@
-package org.zerock.signmate.Contract2.domain;
+package org.zerock.signmate.Contract.business.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.enums;
+import org.zerock.signmate.Contract.domain.Contract;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +22,10 @@ public class BusinessOutsourcingContract extends CommonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
 
     // 갑 (위탁자)
     private String clientName;             // “갑” 명칭
@@ -51,12 +55,12 @@ public class BusinessOutsourcingContract extends CommonEntity {
     private LocalDate signatureDate;  // 서명일
 
     @Lob
-    @Column(name = "client_signature")
-    private String clientSignature;  // 갑 서명 (Base64 인코딩된 이미지 또는 텍스트)
+    @Column(name = "writer_signature")
+    private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "contractor_signature")
-    private String contractorSignature;  // 을 서명 (Base64 인코딩된 이미지 또는 텍스트)
+    @Column(name = "receiver_signature")
+    private String receiverSignature; // base64
 
     // 정산 내역 목록 (1:N 관계)
     @OneToMany(mappedBy = "contract", cascade = CascadeType.ALL, orphanRemoval = true)

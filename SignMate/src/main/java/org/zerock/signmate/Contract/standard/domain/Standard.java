@@ -1,12 +1,9 @@
-package org.zerock.signmate.Contract2.domain;
+package org.zerock.signmate.Contract.standard.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.enums;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
+import org.zerock.signmate.Contract.domain.Contract;
 
 @Getter
 @Setter
@@ -15,11 +12,15 @@ import java.time.LocalTime;
 @Builder
 @Entity
 @Table(name = "standard_employment_contract")
-public class StandardEmploymentContract extends CommonEntity {
+public class Standard extends CommonEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
 
     // 사업주 / 회사명
     private String employerName;             // #1 사업주(회사명)
@@ -70,12 +71,12 @@ public class StandardEmploymentContract extends CommonEntity {
 
     // 전자서명 - 사업주, 근로자 (Base64 문자열 저장)
     @Lob
-    @Column(name = "employer_signature", columnDefinition = "TEXT")
-    private String employerSignature;        // 전자서명 - 사업주
+    @Column(name = "writer_signature")
+    private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "employee_signature", columnDefinition = "TEXT")
-    private String employeeSignature;        // 전자서명 - 근로자
+    @Column(name = "receiver_signature")
+    private String receiverSignature; // base64
 
     // 상태 및 이력
 
