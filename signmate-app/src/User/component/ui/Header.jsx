@@ -1,6 +1,7 @@
-import { useState } from "react";
+import "./Header.css";
+import { useEffect, useState } from "react";
 
-const Footer = () => {
+const Header = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginId, setLoginId] = useState("");
     // 페이지에 진입했을 때 로그인 상태 확인 및 아이디 조정
@@ -8,43 +9,39 @@ const Footer = () => {
     // 로그인 상태가 변경되었을 때 로그인 상태 확인 및 아이디 조정
     // 아이디가 변경되었을 때 로그인 상태 확인 및 아이디 조정
 
+    useEffect(() => {
+        checkLoggedIn();
+    },[])
+
     const checkLoggedIn = () => {
         fetch("http://localhost:8080/api/user/checklogin", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}` 
             }
         })
-        .then((response) => {    
-            if (response) {
+        .then((response) => response.text())
+        .then((data) => {    
+            if (data) {
                 setIsLoggedIn(true);
-                setLoginId(response);
+                setLoginId(data);
             }
         })
     }
 
     if (isLoggedIn) {
         return (
-            <div>
-                <table>
-                    <tr>
-                        <td>{loginId}</td>
-                        <td>logout</td>
-                    </tr>
-                </table>
+            <div className="container">
+                {loginId} logout
             </div>
         )
     } else {
         return (
-            <div>
-                <table>
-                    <tr>
-                        <td>join</td>
-                        <td>login</td>
-                    </tr>
-                </table>
+            <div className="container">
+                join login
             </div>
         )
     }
 }
-export default Footer;
+export default Header;

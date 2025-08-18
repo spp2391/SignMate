@@ -1,0 +1,193 @@
+/* login.css */
+@charset "utf-8";
+
+body.gradient-custom {
+    background: #ffffff;
+    font-family: 'Lato', sans-serif;
+    color: #fff;
+    margin: 0;
+    padding: 0;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 80px 20px;
+}
+
+.login-card {
+    background-color: #ffffff;
+    border-radius: 16px;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 400px;
+    border: 1px solid #cccccc;
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 30px;
+}
+.logo img {
+    width: 160px;
+}
+
+.tab-menu {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.tab-menu button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: none;
+    color: #aaa;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+    border-bottom: 2px solid transparent;
+}
+
+.tab-menu button.active {
+    color: #000000;
+    border-bottom: 2px solid #007aff;
+}
+.label-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.label-group input {
+    padding: 12px 16px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    border: none;
+}
+.label-group label {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    border: 1px solid #cccccc;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.input-group input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    border: 1px solid #cccccc;
+}
+.input-group2 input {
+    padding: 12px 16px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    color: #000000;
+    font-size: 14px;
+    border: 1px solid #cccccc;
+}
+
+
+.input-group input::placeholder {
+    color: #888;
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #ccc;
+    margin-bottom: 20px;
+}
+.options input[type="checkbox"] {
+    margin-right: 5px;
+}
+.security .on {
+    color: #007AFF;
+    margin-left: 4px;
+    font-weight: bold;
+}
+
+.login-btn, .kakao-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    color: #381e1f;
+    background: #feea00;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    /* align-items는 flex 컨테이너에서만 작동하므로 제거하거나 부모에 적용 */
+}
+.naver-btn {
+    background: #1ccb69;
+    color: #ffffff;
+    width: 100%;
+    padding: 12px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+}
+
+.login-btn {
+    background-color: #007aff;
+    color: white;
+    margin-bottom: 16px;
+}
+.login-btn:hover {
+    background-color: #005fcb;
+}
+
+.passkey-btn {
+    background-color: transparent;
+    border: 1px solid #aaa;
+    color: #aaa;
+}
+.passkey-btn:hover {
+    background-color: #444;
+    color: #fff;
+}
+
+.divider {
+    text-align: center;
+    font-size: 13px;
+    color: #aaa;
+    margin: 20px 0;
+}
+
+.helper-links {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+}
+.helper-links a {
+    color: #ccc;
+    text-decoration: none;
+    margin: 0 5px;
+}
+.helper-links a:hover {
+    color: #fff;
+    text-decoration: underline;
+}

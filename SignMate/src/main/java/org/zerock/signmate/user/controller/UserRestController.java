@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,12 +19,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerock.signmate.config.jwt.TokenProvider;
+import org.zerock.signmate.user.OAuth2User.CustomOAuth2User;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.dto.AddUserRequest;
 import org.zerock.signmate.user.dto.LoginUserRequest;
 import org.zerock.signmate.user.service.UserRegisterService;
 import org.zerock.signmate.user.service.UserService;
 
+import java.security.Principal;
 import java.time.Duration;
 
 @RestController
@@ -50,7 +54,7 @@ public class UserRestController {
         }
     }
 
-    @PostMapping("/login")
+    @PostMapping(value="/login",consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> login(@Valid @RequestBody LoginUserRequest dto,
                                         BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
@@ -81,5 +85,19 @@ public class UserRestController {
     @PostMapping("/logout")
     public void logout(HttpSession session) {
         session.invalidate();
+    }
+
+    @PostMapping("/checklogin")
+    public ResponseEntity<String> checkLogin(@AuthenticationPrincipal CustomOAuth2User user) {
+        if(user==null){
+            return ResponseEntity.badRequest().body("");
+        } else {
+            return ResponseEntity.ok(user.getUser().getUsername());
+        }
+    }
+
+    @PostMapping("/checkloginuser")
+    public ResponseEntity<User> checkLoginUser(@AuthenticationPrincipal CustomOAuth2User user) {
+        return ResponseEntity.ok(user.getUser());
     }
 }

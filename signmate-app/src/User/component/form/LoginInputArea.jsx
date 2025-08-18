@@ -51,19 +51,18 @@ const LoginInputArea = () => {
         }
         fetch("http://localhost:8080/api/user/login", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
-                "crossDomain": true,
-                "xhrFields":{
-                    "withCredentials": true
-                }
             },
             body: JSON.stringify(loginRequest),
         })
-        .then((response) => response.json())
-        .then((data) => setState({
-            status: data
-        }))
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
     }
     const handleKakaoLogin = () => {
 
