@@ -5,6 +5,8 @@ import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
 import org.zerock.signmate.Contract.domain.Contract;
 
+import java.time.temporal.ChronoUnit;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -77,6 +79,8 @@ public class Standard extends CommonEntity {
     @Lob
     @Column(name = "receiver_signature")
     private String receiverSignature; // base64
+
+
 
     // 상태 및 이력
 

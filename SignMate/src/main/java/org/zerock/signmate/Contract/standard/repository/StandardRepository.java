@@ -9,4 +9,6 @@ import java.util.Optional;
 
 public interface StandardRepository extends JpaRepository<Standard, Long> {
     Optional<Standard> findByContract(Contract contract);
+
+    Iterable<Object> findByWriterId(Long userId);
 }
