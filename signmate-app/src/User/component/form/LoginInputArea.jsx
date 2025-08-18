@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const InputArea = () => {
+const LoginInputArea = () => {
     const [state, setState] = useState(
         {
             id: "",
@@ -24,7 +24,7 @@ const InputArea = () => {
         event.preventDefault();
         const joinRequest = {
             email: state.id,
-            password: state.password,
+            password: state.pw,
             name: state.id,
             nickname: state.id,
             companyName: "ABC",
@@ -47,12 +47,16 @@ const InputArea = () => {
         event.preventDefault();
         const loginRequest = {
             email: state.id,
-            password: state.password
+            password: state.pw
         }
         fetch("http://localhost:8080/api/user/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "crossDomain": true,
+                "xhrFields":{
+                    "withCredentials": true
+                }
             },
             body: JSON.stringify(loginRequest),
         })
@@ -61,7 +65,12 @@ const InputArea = () => {
             status: data
         }))
     }
+    const handleKakaoLogin = () => {
 
+    }
+    const handleGoogleLogin = () => {
+
+    }
     return (
         <div>
             <h1>Login</h1>
@@ -79,7 +88,9 @@ const InputArea = () => {
             <p>{state.id}, {state.pw}</p>
             <button onClick={handleJoin}>Join</button>
             <button onClick={handleLogin}>Submit</button>
+            <button onClick={handleKakaoLogin}>Kakao</button>
+            <button onClick={handleGoogleLogin}>Google</button>
         </div>
     )
 }
-export default InputArea;
+export default LoginInputArea;
