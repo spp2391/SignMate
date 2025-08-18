@@ -1,9 +1,9 @@
-package org.zerock.signmate.Contract2.domain;
+package org.zerock.signmate.Contract.newservice.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
-import org.zerock.signmate.Contract.domain.enums;
+import org.zerock.signmate.Contract.domain.Contract;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -21,6 +21,9 @@ public class ServiceContractDocument extends CommonEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "contract_id")
+    private Contract contract;
     // 발주자(갑) 정보
     private String clientName;                // 발주자 명칭
     private String clientRepresentative;     // 발주자 대표자명
@@ -60,15 +63,12 @@ public class ServiceContractDocument extends CommonEntity {
 
     // 전자서명 (Base64 인코딩 이미지)
     @Lob
-    @Column(name = "client_signature")
-    private String clientSignature;           // 발주자 서명 (base64)
+    @Column(name = "writer_signature")
+    private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "contractor_signature")
-    private String contractorSignature;       // 수행자 서명 (base64)
+    @Column(name = "receiver_signature")
+    private String receiverSignature; // base64
 
-    // 상태 및 이력
-    @Enumerated(EnumType.STRING)
-    private enums.ContractStatus status;       // DRAFT, SIGNED, TERMINATED
-    private Integer version;
+
 }

@@ -1,16 +1,10 @@
 // EmploymentContractPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import ContractBase from "./ContractBase";
 
-/** 표준근로계약서(기간의 정함이 없는 경우)
- *  - 좌측 입력: 사업주/근로자, 근로개시/근무, 임금/지급, 사회보험
- *  - 고정값: 법정수당, 수습, 해지예고일 등 회사 표준 문구
- *  - 서명: sign.employer(사업주), sign.employee(근로자) → 서명패드에서 입력
- */
+// 표준근로계약서 템플릿 (원본 유지)
 const employmentTemplate = {
   name: "표준근로계약서(기간의 정함이 없는 경우)",
-
-  // 좌측 폼에서 수정 가능한 키 목록(서명 제외: 패드에서 입력)
   editable: [
     "employer.name","employer.address","employer.ceo",
     "employee.name","employee.address","employee.phone",
@@ -22,8 +16,6 @@ const employmentTemplate = {
     "payday","paymethod",
     "ins.nps","ins.nhi","ins.ei","ins.aci"
   ],
-
-  // 기본값(회사 표준 문구 포함)
   defaults: {
     employer: { name: "", address: "", ceo: "" },
     employee: { name: "", address: "", phone: "" },
@@ -34,16 +26,13 @@ const employmentTemplate = {
     wage: { base: "", bonus: "", extra: "" },
     payday: "", paymethod: "통장입금",
     ins: { nps: false, nhi: false, ei: false, aci: false },
-    // 회사 고정 안내 문구
     rates: { overtime: "통상임금의 1.5배", night: "통상임금의 1.5배", holiday: "통상임금의 1.5배" },
     probationMonths: "3",
     noticeDays: "30",
     privacy: "업무 수행 및 인사‧급여 목적 범위 내",
     rulesUrl: "(회사 내규 위치)",
-    sign: { employer: "", employee: "" } // 서명 이미지(패드에서 세팅)
+    sign: { employer: "", employee: "" }
   },
-
-  // 좌측 입력 폼(본문 등장 순서 기준으로 정렬됨)
   fields: [
     { type: "section", label: "사업주/근로자" },
     { type: "text", name: "employer.name",    label: "사업주(회사명)" },
@@ -52,7 +41,6 @@ const employmentTemplate = {
     { type: "text", name: "employee.name",    label: "근로자 성명" },
     { type: "text", name: "employee.address", label: "근로자 주소" },
     { type: "text", name: "employee.phone",   label: "근로자 연락처" },
-
     { type: "section", label: "근로개시/근무" },
     { type: "text", name: "start.year",  label: "근로개시(년)" },
     { type: "text", name: "start.month", label: "근로개시(월)" },
@@ -65,23 +53,19 @@ const employmentTemplate = {
     { type: "text", name: "time.breakM", label: "휴게(분)" },
     { type: "text", name: "weeklyWorkday", label: "근무일(예: 월~금)" },
     { type: "text", name: "weeklyHoliday", label: "주휴일(예: 일)" },
-
     { type: "section", label: "임금/지급" },
     { type: "text", name: "wage.base",  label: "임금(월/시급)" },
     { type: "text", name: "wage.bonus", label: "상여금(있음 시 금액/율)" },
     { type: "text", name: "wage.extra", label: "기타수당(제수당 등)" },
     { type: "text",   name: "payday",    label: "임금지급일(매월 n일 등)" },
     { type: "select", name: "paymethod", label: "지급방법", options: ["직접지급","통장입금"] },
-
     { type: "section", label: "사회보험" },
     { type: "checkbox", name: "ins.nps", label: "국민연금" },
     { type: "checkbox", name: "ins.nhi", label: "건강보험" },
     { type: "checkbox", name: "ins.ei",  label: "고용보험" },
     { type: "checkbox", name: "ins.aci", label: "산재보험" },
   ],
-
-  // 본문 (미리보기/인쇄)
-  body: `
+    body: `
 (이하 "사업주") {{employer.name}} 과(와) (이하 "근로자") {{employee.name}} 은 다음과 같이 근로계약을 체결한다.
 
 1. 근로개시일: {{start.year}}년 {{start.month}}월 {{start.day}}일 부터
@@ -132,10 +116,107 @@ const employmentTemplate = {
 (근로자) 성명: {{employee.name}} (서명) / 주소: {{employee.address}} / 연락처: {{employee.phone}}
 {{sign.employee}}
   `,
-
   footerNote: "※ 취업규칙·인사규정과 함께 운영하면 좋습니다.",
 };
 
 export default function EmploymentContractPage() {
-  return <ContractBase template={employmentTemplate} />;
+  const [formData, setFormData] = useState(employmentTemplate.defaults);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  // SecretPage처럼 handleChange 구현
+  const handleChange = (updated) => {
+    setFormData(prev => {
+      const newState = { ...prev };
+      Object.entries(updated).forEach(([key, value]) => {
+        if (key.includes(".")) {
+          const [parent, child] = key.split(".");
+          newState[parent] = { ...newState[parent], [child]: value };
+        } else {
+          newState[key] = value;
+        }
+      });
+      return newState;
+    });
+  };
+
+  // 저장 API 호출
+   const handleSave = async () => {
+    setLoadingSubmit(true);
+    try {
+      const dto = {
+        employerName: formData.employer.name,
+        employerRepresentative: formData.employer.ceo,
+        employerAddress: formData.employer.address,
+        employeeName: formData.employee.name,
+        employeeAddress: formData.employee.address,
+        employeeContact: formData.employee.phone,
+        workStartYear: parseInt(formData.start.year) || new Date().getFullYear(),
+        workStartMonth: parseInt(formData.start.month) || 1,
+        workStartDay: parseInt(formData.start.day) || 1,
+        workLocation: formData.work.place,
+        workDescription: formData.work.duty,
+        workStartHour: parseInt(formData.time.startH || 0),
+        workEndHour: parseInt(formData.time.endH || 0),
+        breakHour: parseInt(formData.time.breakH || 0),
+        breakMinute: parseInt(formData.time.breakM || 0),
+        workDays: formData.weeklyWorkday,
+        weeklyHoliday: formData.weeklyHoliday,
+        wageAmount: formData.wage.base,
+        bonus: formData.wage.bonus,
+        otherAllowance: formData.wage.extra,
+        wagePaymentDate: formData.payday,
+        paymentMethod: formData.paymethod,
+        nationalPension: formData.ins.nps,
+        healthInsurance: formData.ins.nhi,
+        employmentInsurance: formData.ins.ei,
+        industrialAccidentInsurance: formData.ins.aci,
+        writerSignature: formData.sign.employer,
+        receiverSignature: formData.sign.employee,
+        body: employmentTemplate.body
+      };
+
+      console.log("보낼 DTO:", dto);
+
+      const res = await fetch("/api/employment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dto)
+      });
+
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
+      const result = await res.json();
+      alert("계약서 제출 완료! ID = " + result.id);
+      console.log("서버 응답:", result);
+    } catch (err) {
+      alert("저장 실패: " + err.message);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <ContractBase
+        template={employmentTemplate}
+        data={formData}          // SecretPage와 동일
+        handleChange={handleChange} // SecretPage와 동일
+      />
+      <button
+        onClick={handleSave}
+        disabled={loadingSubmit}
+        style={{
+          marginTop: 20,
+          padding: "10px 20px",
+          fontSize: 18,
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer"
+        }}
+      >
+        {loadingSubmit ? "제출 중..." : "계약서 저장"}
+      </button>
+    </div>
+  );
 }

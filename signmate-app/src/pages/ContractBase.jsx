@@ -158,9 +158,9 @@ function FieldInput({ field, value, onChange, onFocusField }) {
 }
 
 /* ===== 메인 ===== */
-export default function ContractBase({ template }) {
+export default function ContractBase({ template, data, handleChange = ()=>{} }) {
   const [title, setTitle] = useState(template.name);
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState({...data});
   const [activeKey, setActiveKey] = useState(null);
   const previewRef = useRef(null);
 
@@ -228,6 +228,9 @@ export default function ContractBase({ template }) {
     // 템플릿 교체 시 서명 대상 기본값 재설정
     setSigTarget((prev) => (signKeys.includes(prev) ? prev : (signKeys[0] || "sign.principal")));
   }, [template, signKeys]);
+  useEffect(()=>{
+    handleChange(form);
+  },[form]);
 
   // 값 변경(허용 키만)
   const onChange = (name, value) => {
@@ -237,6 +240,7 @@ export default function ContractBase({ template }) {
       setByPath(copy, name, value);
       return copy;
     });
+
   };
 
   // 미리보기 HTML

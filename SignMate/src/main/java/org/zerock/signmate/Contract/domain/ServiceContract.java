@@ -21,6 +21,7 @@ public class ServiceContract extends CommonEntity{
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contract_id")
     private Contract contract;
+
     private String clientName;
     private String projectName;
     private LocalDate contractStartDate;

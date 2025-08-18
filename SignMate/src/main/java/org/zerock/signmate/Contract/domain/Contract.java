@@ -20,9 +20,9 @@ public class Contract extends CommonEntity {
     @Enumerated(EnumType.STRING)
     private enums.ContractType contractType; // SERVICE, EMPLOYMENT 등
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private enums.ContractStatus status; // 계약 상태
+//    @Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+//    private enums.ContractStatus status; // 계약 상태
 
     @ManyToOne
     @JoinColumn(name = "writer_id")

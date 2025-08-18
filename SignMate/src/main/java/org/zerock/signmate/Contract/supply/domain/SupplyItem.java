@@ -1,4 +1,4 @@
-package org.zerock.signmate.Contract2.domain;
+package org.zerock.signmate.Contract.supply.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
