@@ -24,14 +24,20 @@ public class CompanyFinancial {
     private Double revenue;            // 매출
     private Double cost;               // 비용
 
-    // 편의용, DB 계산 안 하고 바로 사용 가능
+    // ======================
+    // 편의 메서드
+    // ======================
     public Double getProfit() {
+        if (revenue == null || cost == null) return 0.0;
         return revenue - cost;
     }
 
     public Double getProfitMargin() {
-        if (revenue == 0) return 0.0;
+        if (revenue == null || revenue == 0) return 0.0;
         return (revenue - cost) / revenue * 100;
     }
-}
 
+    public double getTotalCost() {
+        return cost != null ? cost : 0.0;
+    }
+}
