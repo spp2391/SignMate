@@ -7,7 +7,7 @@ import org.zerock.signmate.Contract.domain.enums.ContractStatus;
 
 import java.util.List;
 
-public interface BusinessOutsourcingContractRepository
+public interface BusinessOutsourcingContractVizRepository
         extends JpaRepository<BusinessOutsourcingContract, Long> {
 
     List<BusinessOutsourcingContract> findByClientNameOrContractorName(String client, String contractor);

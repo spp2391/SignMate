@@ -3,6 +3,7 @@ package org.zerock.signmate.visualization.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.zerock.signmate.Contract.business.repository.BusinessOutsourcingContractRepository;
 import org.zerock.signmate.Contract.dto.UnifiedContractDto;
 import org.zerock.signmate.visualization.dto.UserDashboardDTO;
 import org.zerock.signmate.visualization.repository.*;
