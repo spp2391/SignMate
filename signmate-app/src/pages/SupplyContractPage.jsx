@@ -1,6 +1,6 @@
-// SupplyContractPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import ContractBase from "./ContractBase";
+
 
 /** 자재/물품 공급계약서
  *  - 좌측 입력: 당사자, 계약일/장소, 조건/조항, 품목표
@@ -55,13 +55,13 @@ const supplyTemplate = {
       label: "품목 내역",
       minRows: 5,
       columns: [
-        { key: "name",   label: "품명" },
-        { key: "spec",   label: "규격" },
-        { key: "unit",   label: "단위" },
-        { key: "qty",    label: "수량", type: "number" },
-        { key: "price",  label: "단가" },
-        { key: "amount", label: "금액" },
-        { key: "note",   label: "비고" },
+       { key: "itemName", label: "품명" },
+  { key: "specification", label: "규격" },
+  { key: "unit", label: "단위" },
+  { key: "quantity", label: "수량", type: "number" },
+  { key: "unitPrice", label: "단가" },
+  { key: "amount", label: "금액" },
+  { key: "remarks", label: "비고" },
       ],
     },
   ],
@@ -93,5 +93,102 @@ const supplyTemplate = {
 };
 
 export default function SupplyContractPage() {
-  return <ContractBase template={supplyTemplate} />;
+  const [formData, setFormData] = useState(supplyTemplate.defaults);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const handleChange = (updated) => {
+    setFormData(prev => {
+      const newState = { ...prev };
+      Object.entries(updated).forEach(([key, value]) => {
+        if (key.includes(".")) {
+          const [parent, child] = key.split(".");
+          newState[parent] = { ...newState[parent], [child]: value };
+        } else {
+          newState[key] = value;
+        }
+      });
+      return newState;
+    });
+  };
+
+  const handleSave = async () => {
+    if (!formData.supplier.name || !formData.buyer.name) {
+      alert("공급자와 수요자 이름은 필수입니다.");
+      return;
+    }
+
+    setLoadingSubmit(true);
+    try {
+      const payload = {
+        contractId: formData.contractId, // 추가
+        supplierName: formData.supplier.name,
+        supplierRepresentative: formData.supplier.rep,
+        demanderName: formData.buyer.name,
+        demanderRepresentative: formData.buyer.rep,
+        contractDate: formData.contractDate || null,
+        deliveryLocation: formData.place,
+        deliveryTerms: formData.deliveryTerms,
+        inspectionAndWarranty: formData.inspectTerms,
+        paymentTerms: formData.paymentTerms,
+        qualityGuaranteeTerms: formData.warrantyTerms,
+        otherTerms: formData.etcTerms,
+        items: formData.items.map(item => ({
+          itemName: item.itemName,
+          specification: item.specification,
+          unit: item.unit,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          amount: item.amount,
+          remarks: item.remarks
+        })),
+        supplierSignature: formData.sign.supplier,
+        demanderSignature: formData.sign.buyer
+      };
+
+      console.log("payload.items:", payload.items);
+
+      const res = await fetch("/api/supplies", {
+        method: "POST",
+        headers: { "Content-Type": "application/json",
+        "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+         },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
+      const result = await res.json();
+      alert("계약서 제출 완료!");
+      console.log("서버 응답:", result);
+    } catch (err) {
+      alert("저장 실패: " + err.message);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <ContractBase
+        template={supplyTemplate}
+        data={supplyTemplate.defaults}
+        handleChange={handleChange}
+      />
+      <button
+        onClick={handleSave}
+        disabled={loadingSubmit}
+        style={{
+          marginTop: 20,
+          padding: "10px 20px",
+          fontSize: 18,
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer"
+        }}
+      >
+        {loadingSubmit ? "제출 중..." : "제출하기"}
+      </button>
+    </div>
+  );
 }

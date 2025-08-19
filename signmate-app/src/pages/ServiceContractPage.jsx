@@ -1,5 +1,5 @@
 // ServiceContractPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import ContractBase from "./ContractBase";
 
 /** 용역계약서
@@ -102,5 +102,101 @@ const serviceTemplate = {
 };
 
 export default function ServiceContractPage() {
-  return <ContractBase template={serviceTemplate} />;
+  const [formData, setFormData] = useState(serviceTemplate.defaults);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  // ContractBase에서 field 변경 시 호출
+  const handleChange = (updated) => {
+    setFormData(prev => {
+      const newState = { ...prev };
+      Object.entries(updated).forEach(([key, value]) => {
+        if (key.includes(".")) {
+          const [parent, child] = key.split(".");
+          newState[parent] = { ...newState[parent], [child]: value };
+        } else {
+          newState[key] = value;
+        }
+      });
+      return newState;
+    });
+  };
+
+  const handleSave = async () => {
+    if (!formData.client.name || !formData.vendor.name) {
+      alert("발주자와 수행자 이름은 필수입니다.");
+      return;
+    }
+    setLoadingSubmit(true);
+
+    try {
+      const payload = {
+        clientName: formData.client.name,
+        clientRepresentative: formData.client.rep,
+        clientAddress: formData.client.address,
+        contractorName: formData.vendor.name,
+        contractorRepresentative: formData.vendor.rep,
+        contractorAddress: formData.vendor.address,
+        projectName: formData.proj.name,
+        contractStartDate: formData.proj.start || null,
+        contractEndDate: formData.proj.end || null,
+        contractAmount: formData.amount.krw ? Number(formData.amount.krw) : null,
+        scopeOfWork: formData.scope,
+        deliverablesAcceptanceCriteria: formData.deliverables,
+        depositAmount: formData.pay.down ? Number(formData.pay.down) : null,
+        interimPaymentAmount: formData.pay.mid ? Number(formData.pay.mid) : null,
+        finalPaymentDueDays: formData.pay.finalDays ? Number(formData.pay.finalDays) : null,
+        warrantyMonths: formData.warrantyMonths ? Number(formData.warrantyMonths) : null,
+        delayPenaltyRate: formData.delayRate ? Number(formData.delayRate) : null,
+        signatureDate: formData.signDate || null,
+        writerSignature: formData.sign.client,
+        receiverSignature: formData.sign.vendor
+      };
+
+      const res = await fetch("/api/new-services", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" ,
+          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+         },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
+      const result = await res.json();
+      alert("계약서 제출 완료!");
+      console.log("서버 응답:", result);
+
+    } catch (err) {
+      alert("저장 실패: " + err.message);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+// fields 입력 시 formData 실시간 업데이트
+
+  return (
+    <div style={{ padding: 20 }}>
+      <ContractBase
+        template={serviceTemplate}
+        data={serviceTemplate.defaults}
+        handleChange={handleChange}
+      />
+      <button
+        onClick={handleSave}
+        disabled={loadingSubmit}
+        style={{
+          marginTop: 20,
+          padding: "10px 20px",
+          fontSize: 18,
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer"
+        }}
+      >
+        {loadingSubmit ? "제출 중..." : "제출하기"}
+      </button>
+    </div>
+  );
 }

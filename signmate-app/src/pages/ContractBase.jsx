@@ -322,7 +322,7 @@ export default function ContractBase({
   handleChange = () => {},
 }) {
   const [title, setTitle] = useState(template.name);
-  const [form, setForm] = useState({});
+  const [form, setForm] = useState(() => JSON.parse(JSON.stringify(data || {})));
   const [activeKey, setActiveKey] = useState(null);
   const previewRef = useRef(null);
 
