@@ -12,8 +12,8 @@ public interface BusinessOutsourcingContractRepository
 
     List<BusinessOutsourcingContract> findByClientNameOrContractorName(String client, String contractor);
     long countByClientNameOrContractorName(String client, String contractor);
-    long countByClientNameAndStatusOrContractorNameAndStatus(
-            String client, ContractStatus s1,
-            String contractor, ContractStatus s2
-    );
+//    long countByClientNameAndStatusOrContractorNameAndStatus(
+//            String client, ContractStatus s1,
+//            String contractor, ContractStatus s2
+//    );
 }

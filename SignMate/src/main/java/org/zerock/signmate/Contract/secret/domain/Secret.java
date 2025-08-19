@@ -60,5 +60,9 @@ public class Secret {
     @Column(name = "receiver_signature")
     private String receiverSignature; // base64
 
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
 }
 

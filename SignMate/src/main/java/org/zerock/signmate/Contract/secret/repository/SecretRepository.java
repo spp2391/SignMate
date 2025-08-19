@@ -13,5 +13,5 @@ public interface SecretRepository extends JpaRepository<Secret, Long> {
 
     Optional<Secret> findByContract(Contract contract);
 
-    Iterable<Object> findByWriterId(Long userId);
+    Iterable<Object> findByContract_Writer_UserId(Long userId);
 }

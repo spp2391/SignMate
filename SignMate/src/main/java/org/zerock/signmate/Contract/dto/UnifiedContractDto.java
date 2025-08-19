@@ -39,4 +39,9 @@ public class UnifiedContractDto {
 
     private Long writerId;
     private Long receiverId;
+
+    // ===== getType() 추가 =====
+    public String getType() {
+        return contractType;
+    }
 }

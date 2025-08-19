@@ -9,8 +9,8 @@ public interface SupplyContractRepository
         extends JpaRepository<SupplyContract, Long> {
 
     long countBySupplierNameOrDemanderName(String supplier, String demander);
-    long countBySupplierNameAndStatusOrDemanderNameAndStatus(
-            String supplier, ContractStatus s1,
-            String demander, ContractStatus s2
-    );
+//    long countBySupplierNameAndStatusOrDemanderNameAndStatus(
+//            String supplier, ContractStatus s1,
+//            String demander, ContractStatus s2
+//    );
 }

@@ -7,9 +7,9 @@ import org.zerock.signmate.Contract.domain.enums.ContractStatus;
 
 public interface NDAContractRepository extends JpaRepository<Secret, Long> {
 
-    long countByDiscloserNameOrRecipientName(String discloser, String recipient);
-    long countByDiscloserNameAndStatusOrRecipientNameAndStatus(
-            String discloser, ContractStatus s1,
-            String recipient, ContractStatus s2
-    );
+//    long countByDiscloserNameOrRecipientName(String discloser, String recipient);
+//    long countByDiscloserNameAndStatusOrRecipientNameAndStatus(
+//            String discloser, ContractStatus s1,
+//            String recipient, ContractStatus s2
+//    );
 }

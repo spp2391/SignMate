@@ -51,6 +51,7 @@ public class UnifiedContractMapper {
                 .receiverName(entity.getContract() != null && entity.getContract().getReceiver() != null ? entity.getContract().getReceiver().getName() : null)
                 .workDescription(entity.getWorkDescription())
                 .contractStartDate(LocalDate.of(entity.getWorkStartYear(), entity.getWorkStartMonth(), entity.getWorkStartDay()))
+
                 .status(null)
                 .writerId(entity.getContract() != null && entity.getContract().getWriter() != null ? entity.getContract().getWriter().getUserId() : null)
                 .receiverId(entity.getContract() != null && entity.getContract().getReceiver() != null ? entity.getContract().getReceiver().getUserId() : null)
