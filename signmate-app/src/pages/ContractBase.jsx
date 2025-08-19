@@ -5,12 +5,15 @@ import jsPDF from "jspdf";
 import SignaturePad from "signature_pad";
 
 /* ===== 경로 유틸 ===== */
+// "a.b[0].c" → ["a","b","0","c"]
 const pathToParts = (path) =>
   String(path || "").replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
 
+// 객체 경로 읽기
 const getByPath = (obj, path) =>
   !path ? obj : pathToParts(path).reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
 
+// 객체 경로 쓰기 (중간 경로 자동 생성)
 const setByPath = (obj, path, val) => {
   const parts = pathToParts(path);
   if (!parts.length) return obj;
@@ -25,11 +28,26 @@ const setByPath = (obj, path, val) => {
   return obj;
 };
 
+// 깊은 병합(배열은 교체, 객체는 재귀 병합)
+function deepMerge(target = {}, source = {}) {
+  const out = Array.isArray(target) ? [...target] : { ...target };
+  Object.keys(source || {}).forEach((k) => {
+    const sv = source[k];
+    const tv = out[k];
+    if (sv && typeof sv === "object" && !Array.isArray(sv) && tv && typeof tv === "object" && !Array.isArray(tv)) {
+      out[k] = deepMerge(tv, sv);
+    } else {
+      out[k] = Array.isArray(sv) ? [...sv] : sv;
+    }
+  });
+  return out;
+}
+
 /* ===== 표시 유틸 ===== */
 const pretty = (v) => (typeof v === "boolean" ? (v ? "예" : "아니오") : v == null ? "" : String(v));
 const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/* === NEW: 테이블 HTML 렌더러 (미리보기에서 표로 보이게) === */
+/* === 테이블 HTML 렌더러 (미리보기에서 표로 보이게) === */
 function renderTableHTML(tableFieldDef, rows = []) {
   const cols = tableFieldDef.columns || [];
   const safe = (x) => esc(pretty(x ?? ""));
@@ -43,16 +61,17 @@ function renderTableHTML(tableFieldDef, rows = []) {
 
   const body = `
     <tbody>
-      ${rows.length
-        ? rows
-            .map((row) => `
+      ${
+        rows.length
+          ? rows
+              .map(
+                (row) => `
               <tr>
-                ${cols
-                  .map((c) => `<td>${safe((row || {})[c.key])}</td>`)
-                  .join("")}
-              </tr>`)
-            .join("")
-        : `<tr><td colspan="${cols.length}" class="empty">입력된 항목이 없습니다.</td></tr>`
+                ${cols.map((c) => `<td>${safe((row || {})[c.key])}</td>`).join("")}
+              </tr>`
+              )
+              .join("")
+          : `<tr><td colspan="${cols.length}" class="empty">입력된 항목이 없습니다.</td></tr>`
       }
     </tbody>`;
 
@@ -66,9 +85,10 @@ function renderTableHTML(tableFieldDef, rows = []) {
     </div>`;
 }
 
-/* === CHANGED: 본문 치환 — table인 경우 표로 렌더 === */
+/* === 본문 치환 — table인 경우 표로 렌더 === */
+/* 린트(no-useless-escape) 회피: 문자셋 명시 */
 function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName) {
-  return template.replace(/{{\s*([\w.[\]0-9]+)\s*}}/g, (_, rawKey) => {
+  return template.replace(/{{\s*([A-Za-z0-9_.[\]]+)\s*}}/g, (_, rawKey) => {
     const key = rawKey.trim();
     const parts = key.replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
     let v = data;
@@ -78,16 +98,12 @@ function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName) {
     const badge = idx ? `<span class="idx-badge">#${idx}</span>` : "";
     const isActive = activeKey && key === activeKey;
 
-    // 서명
+    // 서명: 인라인은 숨기고 위치 앵커만 유지(하단 섹션에서 출력)
     if (key.startsWith("sign.")) {
-      const hasSig = v && String(v).startsWith("data:image/");
-      const node = hasSig
-        ? `<img class="sign-img" src="${esc(String(v))}" alt="signature"/>`
-        : `<span class="sign-box"></span>`;
-      return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${badge}${node}</span>`;
+      return `<span class="anchor sig-inline ${isActive ? "hit" : ""}" data-key="${esc(key)}">${badge}</span>`;
     }
 
-    // === NEW: table 필드면 표 형태로 렌더 ===
+    // table 필드면 표 형태로 렌더
     const fieldDef = fieldsByName[key];
     if (fieldDef && fieldDef.type === "table") {
       const html = renderTableHTML(fieldDef, Array.isArray(v) ? v : []);
@@ -98,7 +114,11 @@ function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName) {
     let html = "";
     if (Array.isArray(v)) {
       html = (v || [])
-        .map((row) => (row && typeof row === "object" ? Object.values(row ?? {}).map(pretty).join(" ") : pretty(row)))
+        .map((row) =>
+          row && typeof row === "object"
+            ? Object.values(row ?? {}).map(pretty).join(" ")
+            : pretty(row)
+        )
         .map(esc)
         .join("<br/>");
     } else {
@@ -202,46 +222,173 @@ function FieldInput({ field, value, onChange, onFocusField }) {
   );
 }
 
+/* ===== 서명 키 도우미 ===== */
+const counterpartOf = (k) => {
+  const m = String(k || "");
+  if (m.endsWith(".sender")) return "sign.receiver";
+  if (m.endsWith(".receiver")) return "sign.sender";
+  if (m.endsWith(".discloser")) return "sign.recipient";
+  if (m.endsWith(".recipient")) return "sign.discloser";
+  if (m.endsWith(".employer")) return "sign.employee";
+  if (m.endsWith(".employee")) return "sign.employer";
+  if (m.endsWith(".client")) return "sign.vendor";
+  if (m.endsWith(".vendor")) return "sign.client";
+  if (m.endsWith(".buyer")) return "sign.supplier";
+  if (m.endsWith(".supplier")) return "sign.buyer";
+  if (m.endsWith(".principal")) return "sign.agent";
+  if (m.endsWith(".agent")) return "sign.principal";
+  return null;
+};
+
+/** 내 서명 경로 계산:
+ *  - template.signMap 우선
+ *  - 그 외 body에 등장하는 다양한 명칭 인식
+ *  - 최종 fallback: sender→sign.sender, receiver→sign.receiver
+ */
+function getMySignPath(role, template, signKeys) {
+  const map = template?.signMap;
+  if (map) {
+    if (role === "sender" && map.sender) return map.sender;
+    if (role === "receiver" && map.receiver) return map.receiver;
+  }
+  const has = (k) => signKeys.includes(k);
+  if (role === "sender") {
+    if (has("sign.sender")) return "sign.sender";
+    if (has("sign.discloser")) return "sign.discloser";
+    if (has("sign.employer")) return "sign.employer";
+    if (has("sign.client")) return "sign.client";
+    if (has("sign.buyer")) return "sign.buyer";
+    if (has("sign.principal")) return "sign.principal";
+  } else {
+    if (has("sign.receiver")) return "sign.receiver";
+    if (has("sign.recipient")) return "sign.recipient";
+    if (has("sign.employee")) return "sign.employee";
+    if (has("sign.vendor")) return "sign.vendor";
+    if (has("sign.supplier")) return "sign.supplier";
+    if (has("sign.agent")) return "sign.agent";
+  }
+  return role === "sender" ? "sign.sender" : "sign.receiver";
+}
+
+/* ===== 미리보기 하단 서명 섹션 ===== */
+const sigLabel = (k) => {
+  const n = (k || "").replace(/^sign\./, "");
+  const map = {
+    sender: "보내는 사람",
+    receiver: "받는 사람",
+    discloser: "공개자",
+    recipient: "수신자",
+    employer: "사업주",
+    employee: "근로자",
+    client: "발주자(갑)",
+    vendor: "수행자(을)",
+    buyer: "수요자(을)",
+    supplier: "공급자(갑)",
+    principal: "갑",
+    agent: "을",
+  };
+  return map[n] || n;
+};
+
+function SignatureFooter({ signKeys, form }) {
+  if (!signKeys?.length) return null;
+  // 보기 좋은 정렬
+  const order = ["sign.sender","sign.discloser","sign.employer","sign.client","sign.buyer","sign.principal","sign.receiver","sign.recipient","sign.employee","sign.vendor","sign.supplier","sign.agent"];
+  const uniq = Array.from(new Set(signKeys));
+  uniq.sort((a,b) => (order.indexOf(a) === -1 ? 999 : order.indexOf(a)) - (order.indexOf(b) === -1 ? 999 : order.indexOf(b)));
+  return (
+    <div className="sig-footer">
+      <div className="sec" style={{marginTop:16}}><span className="sec-bullet" /><span className="sec-title">전자서명</span></div>
+      <div className="sig-grid">
+        {uniq.map((k) => {
+          const v = getByPath(form, k);
+          return (
+            <div key={k} className="sig-cell">
+              <div className="sig-role">{sigLabel(k)}</div>
+              {v ? <img className="sign-img" src={v} alt="signature"/> : <span className="sign-box" />}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 /* ===== 메인 ===== */
-export default function ContractBase({ template, role = "sender" }) {
+export default function ContractBase({
+  template,
+  role = "sender",
+  data = {},
+  handleChange = () => {},
+}) {
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState({});
   const [activeKey, setActiveKey] = useState(null);
   const previewRef = useRef(null);
 
+  // 외부 data → 내부 form 병합(루프 방지)
+  const dataRef = useRef(JSON.stringify(data || {}));
+  useEffect(() => {
+    const now = JSON.stringify(data || {});
+    if (now !== dataRef.current) {
+      dataRef.current = now;
+      setForm((prev) => deepMerge(prev, data || {}));
+    }
+  }, [data]);
+
+  // 내부 form 변경 시 상위로 통지
+  useEffect(() => {
+    handleChange && handleChange(form);
+  }, [form, handleChange]);
+
   // 서명패드
   const sigCanvasRef = useRef(null);
   const sigPadRef = useRef(null);
 
-  // === NEW: 이름->필드정의 맵 (table 렌더에 사용)
+  // 이름->필드정의 맵 (table 렌더에 사용)
   const fieldsByName = useMemo(() => {
     const map = {};
     (template.fields || []).forEach((f) => { if (f.name) map[f.name] = f; });
     return map;
   }, [template.fields]);
 
-  // sign 키 자동 추출
-  const signKeys = useMemo(() => {
+  // 본문에서 sign.* 키 수집
+  const signKeysFromBody = useMemo(() => {
     const keys = new Set();
-    const re = /{{\s*(sign\.[\w.[\]0-9]+)\s*}}/g;
+    const re = /{{\s*(sign\.[A-Za-z0-9_.[\]]+)\s*}}/g;
     let m;
     while ((m = re.exec(template.body))) keys.add(m[1]);
     return Array.from(keys);
   }, [template.body]);
 
-  const [sigTarget, setSigTarget] = useState(signKeys[0] || "sign.principal");
+  // 내 서명 경로 계산
+  const mySignPath = useMemo(() => getMySignPath(role, template, signKeysFromBody), [role, template, signKeysFromBody]);
+
+  // 하단 섹션에서 표시할 전체 서명 키(본문 키 + 내 키 + 상대 키)
+  const allSignKeys = useMemo(() => {
+    const list = new Set([...(signKeysFromBody || [])]);
+    if (mySignPath) list.add(mySignPath);
+    const cp = counterpartOf(mySignPath);
+    if (cp) list.add(cp);
+    return Array.from(list);
+  }, [signKeysFromBody, mySignPath]);
+
+  // PDF 내보내기 상태(배지/가이드 숨김용)
   const [exporting, setExporting] = useState(false);
 
+  // 수정 가능 키 (editable + 서명키 + 내 서명/상대 서명 보강)
   const editableSet = useMemo(() => {
     const base = Array.isArray(template.editable)
       ? template.editable
       : (template.fields || []).filter((f) => f.type !== "section").map((f) => f.name);
-    return new Set([...base, ...signKeys]);
-  }, [template.editable, template.fields, signKeys]);
+    const extra = [mySignPath, counterpartOf(mySignPath)].filter(Boolean);
+    return new Set([...base, ...signKeysFromBody, ...extra]);
+  }, [template.editable, template.fields, signKeysFromBody, mySignPath]);
 
+  // 본문 등장 순서 → 왼쪽 입력 정렬/배지 번호
   const docOrder = useMemo(() => {
     const order = {};
-    const re = /{{\s*([\w.[\]0-9]+)\s*}}/g;
+    const re = /{{\s*([A-Za-z0-9_.[\]]+)\s*}}/g;
     let m, idx = 0;
     while ((m = re.exec(template.body))) {
       const key = m[1];
@@ -250,14 +397,10 @@ export default function ContractBase({ template, role = "sender" }) {
     return order;
   }, [template.body]);
 
-  // role에 따른 visibleFields
+  // 좌측 필드 (receiver는 입력 폼 숨김)
   const visibleFields = useMemo(() => {
-    let all = [];
-    if (role === "receiver") {
-      all = (template.fields || []).filter((f) => f.name && f.name.startsWith("sign."));
-    } else {
-      all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
-    }
+    if (role === "receiver") return [];
+    let all = (template.fields || []).filter((f) => f.type === "section" || editableSet.has(f.name));
     const sections = all.filter((f) => f.type === "section");
     const inputs = all.filter((f) => f.type !== "section");
     inputs.sort((a, b) => (docOrder[a.name] ?? 1e9) - (docOrder[b.name] ?? 1e9));
@@ -277,10 +420,9 @@ export default function ContractBase({ template, role = "sender" }) {
     });
     setForm(init);
     setTitle(template.name);
-    setSigTarget((prev) => (signKeys.includes(prev) ? prev : (signKeys[0] || "sign.principal")));
-  }, [template, signKeys]);
+  }, [template]);
 
-  // 변경 핸들러 (receiver는 sign.*만)
+  // 값 변경(허용 키만) — receiver는 sign.* 외 차단
   const onChange = (name, value) => {
     if (role === "receiver" && !name.startsWith("sign.")) return;
     if (!editableSet.has(name)) return;
@@ -291,13 +433,13 @@ export default function ContractBase({ template, role = "sender" }) {
     });
   };
 
-  // === CHANGED: table 메타를 함께 전달
+  // 미리보기 HTML
   const previewHtml = useMemo(
     () => renderBodyHTML(template.body, form, activeKey, docOrder, fieldsByName),
     [template, form, activeKey, docOrder, fieldsByName]
   );
 
-  // === NEW: 본문에 포함되지 않은 table을 하단에 자동 추가
+  // 본문에 포함되지 않은 table을 하단에 자동 추가
   const extraTablesHtml = useMemo(() => {
     const bodyStr = template.body || "";
     const tables = (template.fields || []).filter((f) => f.type === "table");
@@ -308,8 +450,7 @@ export default function ContractBase({ template, role = "sender" }) {
       .join("");
   }, [template.fields, template.body, form]);
 
-  // 하이라이트 효과
-  // const previewRef = useRef(null);
+  // 포커스 시 하이라이트
   useEffect(() => {
     if (!activeKey || !previewRef.current) return;
     const el = previewRef.current.querySelector(`[data-key="${CSS.escape(activeKey)}"]`);
@@ -319,7 +460,7 @@ export default function ContractBase({ template, role = "sender" }) {
     return () => clearTimeout(t);
   }, [activeKey, previewHtml]);
 
-  // PDF 저장
+  // PDF 저장 (sender/receiver 모두)
   const savePDF = async () => {
     const node = document.querySelector(".page");
     if (!node) return;
@@ -345,12 +486,13 @@ export default function ContractBase({ template, role = "sender" }) {
     }
   };
 
-  // 서명패드
+  // 서명패드 초기화 + 드로잉 끝나면 즉시 반영
   useLayoutEffect(() => {
     if (!sigCanvasRef.current) return;
     if (!sigPadRef.current) {
       sigPadRef.current = new SignaturePad(sigCanvasRef.current, { backgroundColor: "#fff" });
     }
+    // 리사이즈
     const resize = () => {
       const c = sigCanvasRef.current;
       if (!c) return;
@@ -364,17 +506,34 @@ export default function ContractBase({ template, role = "sender" }) {
     };
     resize();
     window.addEventListener("resize", resize);
-    return () => window.removeEventListener("resize", resize);
-  }, []);
+
+    // 드로잉 종료 시 즉시 반영
+    sigPadRef.current.onEnd = () => {
+      if (!sigPadRef.current) return;
+      if (sigPadRef.current.isEmpty()) return;
+      const dataURL = sigPadRef.current.toDataURL("image/png");
+      onChange(mySignPath, dataURL);
+      setActiveKey(mySignPath);
+    };
+
+    return () => {
+      window.removeEventListener("resize", resize);
+    };
+  }, [mySignPath]);
 
   const clearSignature = () => sigPadRef.current?.clear();
   const applySignature = () => {
     if (!sigPadRef.current) return;
     if (sigPadRef.current.isEmpty()) { alert("서명을 입력해 주세요."); return; }
     const dataURL = sigPadRef.current.toDataURL("image/png");
-    onChange(sigTarget, dataURL);
-    setActiveKey(sigTarget);
+    onChange(mySignPath, dataURL);
+    setActiveKey(mySignPath);
   };
+
+  const mySigLabel = useMemo(() => {
+    const key = mySignPath?.replace("sign.", "") || "my";
+    return `내 서명 (${key})`;
+  }, [mySignPath]);
 
   return (
     <div className="wrap">
@@ -382,6 +541,7 @@ export default function ContractBase({ template, role = "sender" }) {
       <div className="grid">
         {/* 좌측: 입력영역 */}
         <div>
+          {/* sender만 제목/입력폼 보임 */}
           {role === "sender" && (
             <div className="mb">
               <label className="lbl">문서 제목</label>
@@ -389,23 +549,17 @@ export default function ContractBase({ template, role = "sender" }) {
             </div>
           )}
 
-          {visibleFields.map((f, idx) => (
+          {role === "sender" && visibleFields.map((f, idx) => (
             <div key={`${f.name || f.label}-${idx}`} onFocusCapture={() => f.name && setActiveKey(f.name)}>
               {f.type !== "section" && (<div className="badge">#{(docOrder[f.name] ?? 999) + 1}</div>)}
               <FieldInput field={f} value={getByPath(form, f.name)} onChange={onChange} onFocusField={setActiveKey} />
             </div>
           ))}
 
-          {/* 전자서명 */}
+          {/* 전자서명 (좌측 영역) */}
           <div className="mb">
             <div className="sec"><span className="sec-bullet" /><span className="sec-title">전자서명</span></div>
-            <label className="lbl">서명 대상</label>
-            <select className="ipt" value={sigTarget} onChange={(e)=>setSigTarget(e.target.value)}>
-              {signKeys.length
-                ? signKeys.map((k) => <option key={k} value={k}>{k.replace("sign.","")} 서명</option>)
-                : <><option value="sign.principal">principal 서명</option><option value="sign.agent">agent 서명</option></>
-              }
-            </select>
+            <label className="lbl">{mySigLabel}</label>
             <div className="sigpad"><canvas ref={sigCanvasRef} className="sig-canvas" /></div>
             <div style={{display:"flex", gap:8}}>
               <button className="btn" onClick={clearSignature}>지우기</button>
@@ -413,21 +567,29 @@ export default function ContractBase({ template, role = "sender" }) {
             </div>
           </div>
 
+          {/* PDF 버튼 — sender/receiver 모두 표시 */}
           <div className="mb" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            {role === "sender" && <button className="btn primary" onClick={savePDF}>PDF로 저장</button>}
+            <button className="btn primary" onClick={savePDF}>PDF로 저장</button>
           </div>
         </div>
 
         {/* 우측: 미리보기 (sticky 적용) */}
         <div className="preview sticky">
-          <div className={`page ${exporting ? "export" : ""}`}>
+          {/* sig-bottom: 인라인 sign.* 숨기고 하단 전용 섹션만 노출 */}
+          <div className={`page ${exporting ? "export" : ""} sig-bottom`}>
             <div className="center">
               <div className="title">{title || template.name}</div>
               <div className="sub">{template.name}</div>
             </div>
+
             <div ref={previewRef} className="body" dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            {/* 본문에 포함되지 않은 table은 하단에 자동 추가 */}
+
+            {/* 본문에 포함되지 않은 표 자동 추가 */}
             {extraTablesHtml && <div className="body" dangerouslySetInnerHTML={{ __html: extraTablesHtml }} />}
+
+            {/* 미리보기 '맨 아래' 전자서명 섹션 */}
+            <SignatureFooter signKeys={allSignKeys} form={form} />
+
             {template.footerNote && <div className="foot">{template.footerNote}</div>}
           </div>
         </div>
@@ -437,13 +599,21 @@ export default function ContractBase({ template, role = "sender" }) {
       <style>{`
         .wrap{max-width:1200px;margin:0 auto;padding:16px}
         .ttl{font-size:22px;font-weight:700;margin-bottom:12px}
-        .grid{display:grid;grid-template-columns:1fr;gap:24px}
-        @media(min-width:1100px){.grid{grid-template-columns:1.05fr .95fr}}
+
+        .grid{display:grid; gap:24px}
+        @media (max-width:1099px){ .grid{grid-template-columns:1fr} }
+        @media (min-width:1100px){
+          .grid{
+            grid-template-columns: repeat(2, minmax(520px, 560px));
+            justify-content: center; align-items: start; column-gap: 32px;
+          }
+          .grid > div{ width: 100%; max-width: 560px; }
+        }
+
         .mb{margin-bottom:14px}
         .lbl{display:block;font-size:14px;margin-bottom:6px;color:#333}
         .lbl.inline{display:inline-flex;align-items:center;gap:8px}
 
-        /* === CHANGED: 입력 가독성 상승 === */
         .ipt{width:100%;border:1px solid #ddd;border-radius:10px;padding:10px 12px;font-size:14px}
         .ipt.cell{height:38px;font-size:14px;padding:8px 10px}
         textarea.ipt{min-height:96px}
@@ -452,7 +622,6 @@ export default function ContractBase({ template, role = "sender" }) {
         .btn.primary{background:#111;color:#fff}
 
         .preview{border:1px solid #e5e7eb;border-radius:12px;padding:0;background:#f9fafb}
-        /* === NEW: sticky preview === */
         .sticky{position:sticky; top:12px; align-self:start; height:fit-content}
 
         .sec{display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px dashed #e5e7eb}
@@ -482,7 +651,10 @@ export default function ContractBase({ template, role = "sender" }) {
         .page.export .hit,
         .page.export .pulse { display:none !important; box-shadow:none !important; background:transparent !important; }
 
-        /* === CHANGED: 표 편집/프린트 공용 스타일 개선 === */
+        /* 본문 내 sign.* 숨김 (footer로 이동) */
+        .page.sig-bottom .sig-inline { display:none !important; }
+
+        /* 표 편집/프린트 공용 스타일 */
         .tbl{width:100%;border-collapse:collapse; table-layout:auto}
         .tbl th,.tbl td{border:1px solid #e5e7eb;padding:8px;text-align:left;vertical-align:middle}
         .tbl.edit th{position:sticky; top:0; background:#f8fafc; z-index:1}
@@ -490,7 +662,6 @@ export default function ContractBase({ template, role = "sender" }) {
         .tbl .ipt.cell{width:100%}
         .tbl td.center{ text-align:center }
 
-        /* 테이블 영역 가로 스크롤 (열 넓어도 보기 좋게) */
         .scroll{overflow:auto}
         .tbl th{white-space:nowrap}
         .tbl.edit{min-width:720px}
@@ -505,6 +676,11 @@ export default function ContractBase({ template, role = "sender" }) {
         .sign-img{display:block;margin:6px 0 10px;max-width:260px;max-height:100px;border-bottom:1px solid #111}
         .sign-box{display:inline-block;width:260px;height:60px;border-bottom:1px solid #111;background:transparent}
 
+        /* 미리보기 하단 서명 레이아웃 */
+        .sig-footer{margin-top:18px}
+        .sig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:8px}
+        .sig-cell{display:flex;flex-direction:column;gap:6px}
+        .sig-role{font-size:13px;color:#333}
         .foot{margin-top:16px;color:#666;font-size:12px}
         .rowHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
       `}</style>
