@@ -204,7 +204,7 @@ if (res.status === 409) {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={outsourcingTemplate}
-        data={formData}
+        data={outsourcingTemplate.defaults}
         handleChange={handleChange}
       />
       <button

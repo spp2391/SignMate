@@ -8,6 +8,7 @@ import ServiceContractPage from "./pages/ServiceContractPage";
 import SupplyContractPage from "./pages/SupplyContractPage";
 import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 import Login from "./User/pages/Login";
+import Mailbox from "./component/Mailbox";
 
 export default function App() {
   return (
@@ -28,7 +29,7 @@ export default function App() {
         <Route path="/supply" element={<SupplyContractPage />} />
         <Route path="/outsourcing" element={<OutsourcingContractPage />} />
         {/* 기본 라우트 */}
-        
+        <Route path="/notifications" element={<Mailbox />} />
         <Route path="*" element={<SecretPage signerId="김철수" />} />
         <Route path="/login" element={<Login />} />
       </Routes>

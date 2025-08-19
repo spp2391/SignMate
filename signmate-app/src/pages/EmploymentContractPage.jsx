@@ -200,7 +200,7 @@ export default function EmploymentContractPage() {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={employmentTemplate}
-        data={formData}          // SecretPage와 동일
+        data={employmentTemplate.defaults}          // SecretPage와 동일
         handleChange={handleChange} // SecretPage와 동일
       />
       <button
