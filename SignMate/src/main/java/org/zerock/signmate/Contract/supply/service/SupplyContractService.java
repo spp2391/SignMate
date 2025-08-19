@@ -3,6 +3,8 @@ package org.zerock.signmate.Contract.supply.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
@@ -31,8 +33,11 @@ public class SupplyContractService {
     public SupplyContractDTO addOrUpdateContract(SupplyContractDTO dto) {
 
         // 작성자(공급자) User 조회
-        User writer = userRepository.findByName(dto.getSupplierName())
-                .orElseThrow(() -> new EntityNotFoundException("작성자 유저가 없습니다: " + dto.getSupplierName()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginUser = authentication.getName();
+
+        User writer = userRepository.findByName(loginUser)
+                .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
         // 수신자(수요자) User 조회
         User receiver = null;

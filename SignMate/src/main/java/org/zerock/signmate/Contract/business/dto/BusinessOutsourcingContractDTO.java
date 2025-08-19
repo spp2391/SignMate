@@ -1,6 +1,5 @@
 package org.zerock.signmate.Contract.business.dto;
 
-
 import lombok.*;
 import org.zerock.signmate.Contract.business.domain.BusinessOutsourcingContract;
 
@@ -18,20 +17,21 @@ import java.util.stream.Collectors;
 public class BusinessOutsourcingContractDTO {
 
     private Long id;
+    private Long contractId; // Contract 연동 ID
 
-    // 갑(위탁자)
+    // 갑 (위탁자)
     private String clientName;
     private String clientAddress;
     private String clientRepresentative;
     private String clientContact;
 
-    // 을(수탁자)
+    // 을 (수탁자)
     private String contractorName;
     private String contractorAddress;
     private String contractorRepresentative;
     private String contractorContact;
 
-    // 계약기간
+    // 계약 기간
     private LocalDate contractStartDate;
     private LocalDate contractEndDate;
 
@@ -49,15 +49,15 @@ public class BusinessOutsourcingContractDTO {
     // 업무 내역
     @Builder.Default
     private List<BusinessOutsourcingTaskDTO> tasks = new ArrayList<>();
-
     public static BusinessOutsourcingContractDTO fromEntity(BusinessOutsourcingContract entity) {
         return BusinessOutsourcingContractDTO.builder()
                 .id(entity.getId())
-                .clientName(entity.getClientName())
+                .contractId(entity.getContract() != null ? entity.getContract().getId() : null)
+                .clientName(entity.getContract().getWriter().getName())
                 .clientAddress(entity.getClientAddress())
                 .clientRepresentative(entity.getClientRepresentative())
                 .clientContact(entity.getClientContact())
-                .contractorName(entity.getContractorName())
+                .contractorName(entity.getContract().getReceiver()!= null ? entity.getContract().getReceiver().getName() : null)
                 .contractorAddress(entity.getContractorAddress())
                 .contractorRepresentative(entity.getContractorRepresentative())
                 .contractorContact(entity.getContractorContact())

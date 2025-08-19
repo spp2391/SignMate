@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.zerock.signmate.user.OAuth2User.CustomOAuth2User;
 import org.zerock.signmate.user.domain.User;
+import org.zerock.signmate.user.repository.UserRepository;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -20,6 +23,8 @@ import java.util.Set;
 @Service
 public class TokenProvider {
     private final JwtProperties jwtProperties;
+    private final UserRepository userRepository;
+
     public String generateToken(User user, Duration expiredAt){
         Date now = new Date();
         return makeToken(new Date(now.getTime() + expiredAt.toMillis()), user);
@@ -62,12 +67,14 @@ public class TokenProvider {
     public Authentication getAuthentication(String token){
         // Token안의 내용(claims)을 저장
         Claims claims = getClaims(token);
+        User user = userRepository.findByEmail(claims.getSubject()).orElseThrow(()->new UsernameNotFoundException("User not found"));
         // 권한을 ROLE_USER로 설정
         Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
         // Token을 이용하여 SpringSecurity 로그인 객체를 생성
         return new UsernamePasswordAuthenticationToken(
-                new org.springframework.security.core.userdetails.User(
-                        claims.getSubject(), "" , authorities), token, authorities);
+                new CustomOAuth2User(user), token, authorities);
+//                new org.springframework.security.core.userdetails.User(
+//                        claims.getSubject(), "" , authorities), token, authorities);
     }
     // Token에서 내용(claims)을 꺼내는 메서드
     private Claims getClaims(String token){

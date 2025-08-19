@@ -1,5 +1,4 @@
-// OutsourcingContractPage.jsx
-import React from "react";
+import React, { useState } from "react";
 import ContractBase from "./ContractBase";
 
 /** 업무위탁 계약서
@@ -116,5 +115,114 @@ const outsourcingTemplate = {
 };
 
 export default function OutsourcingContractPage() {
-  return <ContractBase template={outsourcingTemplate} />;
+  const [formData, setFormData] = useState(outsourcingTemplate.defaults);
+  const [loadingSubmit, setLoadingSubmit] = useState(false);
+
+  const handleChange = (updated) => {
+    setFormData(prev => {
+      const newState = { ...prev };
+      Object.entries(updated).forEach(([key, value]) => {
+        if (key.includes(".")) {
+          const [parent, child] = key.split(".");
+          newState[parent] = { ...newState[parent], [child]: value };
+        } else {
+          newState[key] = value;
+        }
+      });
+      return newState;
+    });
+  };
+
+  const handleSave = async (force = false) => {
+    if (!formData.principal.name || !formData.agent.name) {
+      alert("갑과 을 이름은 필수입니다.");
+      return;
+    }
+
+    setLoadingSubmit(true);
+    try {
+      const payload = {
+        contractId: formData.contractId,
+        clientName: formData.principal.name,
+        clientRepresentative: formData.principal.rep,
+        clientAddress: formData.principal.address,
+        clientContact: formData.principal.contact,
+        contractorName: formData.agent.name,
+        contractorRepresentative: formData.agent.rep,
+        contractorAddress: formData.agent.address,
+        contractorContact: formData.agent.contact,
+        contractStartDate: formData.periodStart || null,
+        contractEndDate: formData.periodEnd || null,
+        taskDescription: formData.taskDescription,
+        totalPaymentAmount: formData.totalPay,
+        signatureDate: formData.signDate,
+        tasks: formData.items.map(item => ({
+          category: item.category,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          perUnit: item.perUnit,
+          paymentAmount: item.pay,
+          taskType: item.taskType,
+          remarks: item.note
+        })),
+        writerSignature: formData.sign.principal,
+        receiverSignature: formData.sign.agent
+      };
+      const query = force ? "?force=true" : "";
+     const res = await fetch("/api/business" + query, {
+  method: "POST",
+  headers: { "Content-Type": "application/json",
+    "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+   },
+  body: JSON.stringify(payload)
+});
+
+// 409 체크를 최우선
+if (res.status === 409) {
+  const text = await res.text();
+  const confirmForce = window.confirm(text + "\n계속 진행하시겠습니까?");
+  if (confirmForce) {
+    // 재귀 호출 시 force=true
+    await handleSave(true);
+  }
+  return; // 여기서 바로 return해야 기존 alert("계약서 제출 완료") 안 뜸
+}
+
+
+      if (!res.ok) throw new Error(await res.text() || "서버 오류");
+      const result = await res.json();
+      alert("계약서 제출 완료!");
+      console.log("서버 응답:", result);
+    } catch (err) {
+      alert("저장 실패: " + err.message);
+    } finally {
+      setLoadingSubmit(false);
+    }
+  };
+
+  return (
+    <div style={{ padding: 20 }}>
+      <ContractBase
+        template={outsourcingTemplate}
+        data={formData}
+        handleChange={handleChange}
+      />
+      <button
+        onClick={handleSave}
+        disabled={loadingSubmit}
+        style={{
+          marginTop: 20,
+          padding: "10px 20px",
+          fontSize: 18,
+          backgroundColor: "#007bff",
+          color: "white",
+          border: "none",
+          borderRadius: 4,
+          cursor: "pointer"
+        }}
+      >
+        {loadingSubmit ? "제출 중..." : "제출하기"}
+      </button>
+    </div>
+  );
 }
