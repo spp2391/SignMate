@@ -17,7 +17,7 @@ export default function Mailbox() {
   }, []);
 
   const handleClick = (contractId) => {
-    navigate(`/contracts/${contractId}`);
+    navigate(`/secrets/${contractId}`);
   };
 
   return (

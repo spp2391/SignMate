@@ -22,6 +22,8 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user; // 알림 수신자
 
+
+
     @ManyToOne
     @JoinColumn(name = "contract_id")
     private Contract contract;

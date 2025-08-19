@@ -19,13 +19,27 @@ public class SecretController {
 
     // 비밀유지계약서 생성 및 수정 (POST/PUT 구분 없이 save 사용)
     @PostMapping
-    public ResponseEntity<?> saveOrUpdateSecret(@RequestBody SecretDTO dto) {
+    public ResponseEntity<?> createSecret(@RequestBody SecretDTO dto) {
         try {
-            // addOrUpdateSecret: Contract 존재 여부 확인 + Secret 존재 여부 확인 후 처리
+            if (dto.getId() != null) {
+                return ResponseEntity.badRequest().body(Map.of("message", "생성 시 ID는 없어야 합니다."));
+            }
             SecretDTO savedDto = secretService.addOrUpdateSecret(dto);
             return ResponseEntity.ok(savedDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+        }
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateSecret(@PathVariable Long id, @RequestBody SecretDTO dto) {
+        if (!id.equals(dto.getId())) {
+            return ResponseEntity.badRequest().body(Map.of("message", "URL ID와 요청 데이터 ID가 일치하지 않습니다."));
+        }
+
+        try {
+            SecretDTO updatedDto = secretService.addOrUpdateSecret(dto);
+            return ResponseEntity.ok(updatedDto);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
         }
@@ -58,6 +72,15 @@ public class SecretController {
         return ResponseEntity.ok(dto);
     }
 
+    @GetMapping("/contract/{contractId}")
+    public ResponseEntity<?> getSecretByContract(@PathVariable Long contractId) {
+        try {
+            SecretDTO dto = secretService.findByContractId(contractId);
+            return ResponseEntity.ok(dto);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
+        }
+    }
     // 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteSecret(@PathVariable Long id) {

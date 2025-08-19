@@ -112,6 +112,7 @@ export default function SecretPage() {
     try {
       // fields에 입력된 값을 기반으로 payload 생성
       const payload = {
+        contractId: formData.contractId || null,
         writerName: formData.discloser.name,
         receiverName: formData.recipient.name,
         discloserRepresentative: formData.discloser.rep,
