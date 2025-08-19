@@ -18,10 +18,14 @@ public class BusinessOutsourcingContractController {
 
     // 업무위탁 계약서 생성 및 수정
     @PostMapping
-    public ResponseEntity<?> saveOrUpdateContract(@RequestBody BusinessOutsourcingContractDTO dto) {
+    public ResponseEntity<?> saveOrUpdateContract(@RequestBody BusinessOutsourcingContractDTO dto,
+                                                  @RequestParam(defaultValue = "false") boolean force) {
         try {
-            BusinessOutsourcingContractDTO savedDto = service.addOrUpdateContract(dto);
+            BusinessOutsourcingContractDTO savedDto = service.addOrUpdateContract(dto,force);
             return ResponseEntity.ok(savedDto);
+        }catch (SecurityException e) {
+            // 작성자 불일치 경고용 409 반환
+            return ResponseEntity.status(409).body(e.getMessage());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {

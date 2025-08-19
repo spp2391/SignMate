@@ -7,7 +7,7 @@ import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.Repository.NotificationRepository;
 import org.zerock.signmate.Contract.Repository.ServiceContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
-import org.zerock.signmate.Contract.domain.Notification;
+import org.zerock.signmate.notification.domain.Notification;
 import org.zerock.signmate.Contract.domain.ServiceContract;
 import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.Contract.dto.ServiceContractDto;

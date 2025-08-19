@@ -1,7 +1,8 @@
-package org.zerock.signmate.Contract.domain;
+package org.zerock.signmate.notification.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.zerock.signmate.Contract.domain.Contract;
 import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class Notification {
     @JoinColumn(name = "contract_id")
     private Contract contract;
 
+    private String message; // 알림 메시지
 
     private LocalDateTime createdAt;
 

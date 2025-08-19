@@ -2,6 +2,8 @@ package org.zerock.signmate.Contract.newservice.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
@@ -24,8 +26,11 @@ public class NewServiceService {
 
     @Transactional
     public NewServiceDTO addOrUpdateDocument(NewServiceDTO dto) {
-        User writer = userRepository.findByName(dto.getClientName())
-                .orElseThrow(() -> new EntityNotFoundException("발주자(Writer) 유저가 없습니다: " + dto.getClientName()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginUser = authentication.getName();
+
+        User writer = userRepository.findByName(loginUser)
+                .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
         User receiver = null;
         if (dto.getContractorName() != null && !dto.getContractorName().isBlank()) {

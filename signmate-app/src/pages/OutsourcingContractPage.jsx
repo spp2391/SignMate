@@ -133,7 +133,7 @@ export default function OutsourcingContractPage() {
     });
   };
 
-  const handleSave = async () => {
+  const handleSave = async (force = false) => {
     if (!formData.principal.name || !formData.agent.name) {
       alert("갑과 을 이름은 필수입니다.");
       return;
@@ -168,12 +168,26 @@ export default function OutsourcingContractPage() {
         writerSignature: formData.sign.principal,
         receiverSignature: formData.sign.agent
       };
+      const query = force ? "?force=true" : "";
+     const res = await fetch("/api/business" + query, {
+  method: "POST",
+  headers: { "Content-Type": "application/json",
+    "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+   },
+  body: JSON.stringify(payload)
+});
 
-      const res = await fetch("/api/business", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
+// 409 체크를 최우선
+if (res.status === 409) {
+  const text = await res.text();
+  const confirmForce = window.confirm(text + "\n계속 진행하시겠습니까?");
+  if (confirmForce) {
+    // 재귀 호출 시 force=true
+    await handleSave(true);
+  }
+  return; // 여기서 바로 return해야 기존 alert("계약서 제출 완료") 안 뜸
+}
+
 
       if (!res.ok) throw new Error(await res.text() || "서버 오류");
       const result = await res.json();

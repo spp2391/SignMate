@@ -29,10 +29,10 @@ public class SecretService {
     public SecretDTO addOrUpdateSecret(SecretDTO dto) {
         // 로그인한 사용자 가져오기
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loginEmail = authentication.getName();
+        String loginUser = authentication.getName();
 
-        User writer = userRepository.findByEmail(loginEmail)
-                .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginEmail));
+        User writer = userRepository.findByName(loginUser)
+                .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
         // 수신자 (옵션)
         User receiver = null;

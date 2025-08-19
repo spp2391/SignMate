@@ -154,7 +154,9 @@ export default function ServiceContractPage() {
 
       const res = await fetch("/api/new-services", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+         },
         body: JSON.stringify(payload)
       });
 

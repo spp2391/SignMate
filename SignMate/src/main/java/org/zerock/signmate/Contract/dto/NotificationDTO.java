@@ -3,7 +3,7 @@ package org.zerock.signmate.Contract.dto;
 
 
 import lombok.*;
-import org.zerock.signmate.Contract.domain.Notification;
+import org.zerock.signmate.notification.domain.Notification;
 import org.zerock.signmate.Contract.domain.Contract;
 
 import java.time.LocalDateTime;

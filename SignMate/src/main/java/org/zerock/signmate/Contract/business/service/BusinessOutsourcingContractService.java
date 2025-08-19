@@ -3,6 +3,8 @@ package org.zerock.signmate.Contract.business.service;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.business.domain.BusinessOutsourcingContract;
@@ -29,12 +31,18 @@ public class BusinessOutsourcingContractService {
     private final UserRepository userRepository;
 
     @Transactional
-    public BusinessOutsourcingContractDTO addOrUpdateContract(BusinessOutsourcingContractDTO dto) {
+    public BusinessOutsourcingContractDTO addOrUpdateContract(BusinessOutsourcingContractDTO dto, boolean force) {
 
         // 작성자(갑) User 조회
-        User writer = userRepository.findByName(dto.getClientName())
-                .orElseThrow(() -> new EntityNotFoundException("작성자 유저가 없습니다: " + dto.getClientName()));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loginUser = authentication.getName();
 
+        User writer = userRepository.findByName(loginUser)
+                .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
+
+        if (!force && dto.getClientName() != null && !dto.getClientName().equals(writer.getName())) {
+            throw new SecurityException("작성자명이 로그인 계정과 다릅니다. 본인이 맞습니까?");
+        }
         // 수신자(을) User 조회
         User receiver = null;
         if (dto.getContractorName() != null && !dto.getContractorName().isBlank()) {

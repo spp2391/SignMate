@@ -30,10 +30,10 @@ public class StandardService {
         // 1. 작성자(사업주) 유저 조회
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String loginEmail = authentication.getName();
+        String loginUser = authentication.getName();
 
-        User writer = userRepository.findByName(dto.getEmployerName())
-                .orElseThrow(() -> new EntityNotFoundException("작성자(사업주) 유저가 없습니다: " + dto.getEmployerName()));
+        User writer = userRepository.findByName(loginUser)
+                .orElseThrow(() -> new EntityNotFoundException("작성자(사업주) 유저가 없습니다: " + loginUser));
 
         // 2. 수신자(근로자) 유저 조회
         User receiver = null;
