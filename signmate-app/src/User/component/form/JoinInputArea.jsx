@@ -61,14 +61,18 @@ const JoinInputArea = () => {
         }
         fetch("http://localhost:8080/api/user/join", {
             method: "POST",
+            credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(joinRequest),
         })
-        .then((data) => setState({
-            status: data
-        }))
+        .then((response) =>
+            response.text()
+        )
+        // .then(text=>{
+            
+        // })
     }
 
     return (
