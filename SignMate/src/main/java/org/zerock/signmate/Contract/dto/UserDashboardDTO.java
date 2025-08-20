@@ -15,4 +15,8 @@ public class UserDashboardDTO {
     // 차트용
     private Map<String, Long> countsByType;    // 타입별 개수: SERVICE/STANDARD/SUPPLY/SECRET/OUTSOURCING
     private Map<String, Double> amountsByType; // 타입별 금액 합 (있을 때만)
+    private Map<String, Long> weeklyCounts;   // 주차별 계약 수
+    private Map<String, Long> monthlyCounts;  // 년/월별 계약 수
+
+
 }

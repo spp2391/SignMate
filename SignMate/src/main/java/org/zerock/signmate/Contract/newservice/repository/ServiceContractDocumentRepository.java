@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository("visualizationServiceContractRepo")
 public interface ServiceContractDocumentRepository extends JpaRepository<ServiceContractDocument, Long> {
     Optional<ServiceContractDocument> findByContract(Contract contract);
+
+    Iterable<ServiceContractDocument> findByContract_Writer_UserId(Long userId);
 }
