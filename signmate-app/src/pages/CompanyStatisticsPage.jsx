@@ -22,7 +22,7 @@ function SingleBarChart({ title, data, isPercent, isLargeNumber }) {
             tickFormatter={val => isLargeNumber ? val.toLocaleString() : val}
           />
           <Tooltip 
-            formatter={(value, name, props) => {
+            formatter={(value, name) => {
               if (isPercent) return [value + "%", name];
               if (isLargeNumber) return [value.toLocaleString(), name];
               return [value, name];

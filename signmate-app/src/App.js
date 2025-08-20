@@ -1,16 +1,17 @@
 // src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Header from "./components/header/Header.jsx";
-import Footer from "./components/footer/Footer.jsx";
-import Index from "./components/index/index.jsx";
-import ContractList from "./pages/ContractList.jsx";
-import SecretPage from "./pages/SecretPage.jsx";
-import EmploymentContractPage from "./pages/EmploymentContractPage.jsx";
-import ServiceContractPage from "./pages/ServiceContractPage.jsx";
-import SupplyContractPage from "./pages/SupplyContractPage.jsx";
-import OutsourcingContractPage from "./pages/OutsourcingContractPage.jsx";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
+import Index from "./components/index/index";
+import ContractList from "./pages/ContractList";
+import SecretPage from "./pages/SecretPage";
+import EmploymentContractPage from "./pages/EmploymentContractPage";
+import ServiceContractPage from "./pages/ServiceContractPage";
+import SupplyContractPage from "./pages/SupplyContractPage";
+import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 import CompanyStatisticsPage from './pages/CompanyStatisticsPage';
+import ContractInboxPage from './pages/ContractInboxPage';
 
 export default function App() {
   return (
