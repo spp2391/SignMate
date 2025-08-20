@@ -8,7 +8,8 @@ import ServiceContractPage from "./pages/ServiceContractPage";
 import SupplyContractPage from "./pages/SupplyContractPage";
 import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 import Login from "./User/pages/Login";
-import Mailbox from "./component/Mailbox";
+import ContractInboxPage from "./pages/ContractInboxPage";
+
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
         <Link to="/service">용역계약서</Link>
         <Link to="/supply">자재/물품 공급계약서</Link>
         <Link to="/outsourcing">업무위탁 계약서</Link>
+        <Link to="/inbox">내 문서 관리함</Link>
       </nav>
 
       <Routes>
@@ -28,8 +30,9 @@ export default function App() {
         <Route path="/service" element={<ServiceContractPage />} />
         <Route path="/supply" element={<SupplyContractPage />} />
         <Route path="/outsourcing" element={<OutsourcingContractPage />} />
+        <Route path="/inbox" element={<ContractInboxPage />} />
         {/* 기본 라우트 */}
-        <Route path="/notifications" element={<Mailbox />} />
+       
         <Route path="*" element={<SecretPage signerId="김철수" />} />
         <Route path="/login" element={<Login />} />
       </Routes>
