@@ -170,7 +170,7 @@ export default function SupplyContractPage() {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={supplyTemplate}
-        data={formData}
+        data={supplyTemplate.defaults}
         handleChange={handleChange}
       />
       <button

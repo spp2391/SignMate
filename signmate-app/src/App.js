@@ -1,3 +1,4 @@
+// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header.jsx";
@@ -25,6 +26,8 @@ export default function App() {
         <Route path="/outsourcing" element={<OutsourcingContractPage />} />
         <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
         <Route path="*" element={<Index />} />
+        <Route path="/inbox" element={<ContractInboxPage />} />
+        {/* 기본 라우트 */}
       </Routes>
       <Footer />
     </Router>

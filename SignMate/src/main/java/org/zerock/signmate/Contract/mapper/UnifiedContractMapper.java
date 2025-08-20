@@ -8,7 +8,6 @@ import org.zerock.signmate.Contract.newservice.domain.ServiceContractDocument;
 import org.zerock.signmate.Contract.secret.domain.Secret;
 import org.zerock.signmate.Contract.supply.domain.SupplyContract;
 import org.zerock.signmate.Contract.standard.domain.Standard;
-import org.zerock.signmate.Contract.dto.ServiceContractDto;
 import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDate;

@@ -12,9 +12,11 @@ import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.Contract.secret.domain.Secret;
 import org.zerock.signmate.Contract.secret.dto.SecretDTO;
 import org.zerock.signmate.Contract.secret.repository.SecretRepository;
+import org.zerock.signmate.notification.service.NotificationService;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,7 @@ public class SecretService {
     private final SecretRepository secretRepository;
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public SecretDTO addOrUpdateSecret(SecretDTO dto) {
@@ -47,13 +50,20 @@ public class SecretService {
                 .contractType(enums.ContractType.SERVICE)
                 .writer(writer)
                 .receiver(receiver)
+                .status(enums.ContractStatus.DRAFT)
                 .build()
                 : contractRepository.findById(dto.getContractId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
 
         contract.setWriter(writer);
         contract.setReceiver(receiver);
+
+        if (contract.getStatus() == enums.ContractStatus.DRAFT) {
+            contract.setStatus(enums.ContractStatus.IN_PROGRESS);
+        }
         contractRepository.save(contract);
+
+
 
         // Secret 생성 or 조회
         Secret secret = secretRepository.findByContract(contract)
@@ -70,9 +80,28 @@ public class SecretService {
         secret.setGoverningLaw(dto.getGoverningLaw());
         secret.setWriterSignature(dto.getWriterSignature());
         secret.setReceiverSignature(dto.getReceiverSignature());
+        Secret savedSecret = secretRepository.save(secret);
 
-        return SecretDTO.fromEntity(secretRepository.save(secret));
+        // Notification 발송
+        if (receiver != null && !receiver.equals(writer)) {
+            notificationService.notifyUser(
+                    receiver,
+                    contract,
+                    writer.getName() + "님이 비밀유지계약서를 작성/수정했습니다.",
+                    LocalDateTime.now()
+
+            );
+        }
+
+        // 서명 완료 시 상태 변경
+        if (secret.getWriterSignature() != null && secret.getReceiverSignature() != null) {
+            contract.setStatus(enums.ContractStatus.COMPLETED);
+            contractRepository.save(contract);
+        }
+
+        return SecretDTO.fromEntity(savedSecret);
     }
+
 
 
     public SecretDTO findById(Long id) {

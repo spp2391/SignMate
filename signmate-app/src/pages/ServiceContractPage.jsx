@@ -172,11 +172,13 @@ export default function ServiceContractPage() {
     }
   };
 
+// fields 입력 시 formData 실시간 업데이트
+
   return (
     <div style={{ padding: 20 }}>
       <ContractBase
         template={serviceTemplate}
-        data={formData}
+        data={serviceTemplate.defaults}
         handleChange={handleChange}
       />
       <button

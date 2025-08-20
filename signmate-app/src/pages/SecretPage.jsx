@@ -154,7 +154,7 @@ export default function SecretPage() {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={ndaTemplate}
-        data={formData}
+        data={ndaTemplate.defaults}
         handleChange={handleChange}  // fields 입력 시 formData 실시간 업데이트
       />
       <button

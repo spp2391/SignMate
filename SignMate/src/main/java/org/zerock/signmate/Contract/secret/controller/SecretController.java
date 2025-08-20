@@ -4,7 +4,6 @@ package org.zerock.signmate.Contract.secret.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zerock.signmate.Contract.dto.ServiceContractDto;
 import org.zerock.signmate.Contract.secret.dto.SecretDTO;
 import org.zerock.signmate.Contract.secret.service.SecretService;
 
