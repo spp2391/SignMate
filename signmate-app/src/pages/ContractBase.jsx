@@ -315,7 +315,7 @@ function SignatureFooter({ signKeys, form }) {
 }
 
 /* ===== 메인 ===== */
-export default function ContractBase({
+function ContractBase({
   template,
   role = "sender",
   data = {},
@@ -687,3 +687,4 @@ export default function ContractBase({
     </div>
   );
 }
+export default React.memo(ContractBase);

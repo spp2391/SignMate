@@ -1,6 +1,8 @@
 // SecretPage.jsx
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import ContractBase from "./ContractBase";
+import { useParams } from "react-router-dom";
+import debounce from "lodash/debounce";
 
 /** 비밀유지계약서(NDA)
  *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
@@ -11,38 +13,47 @@ const ndaTemplate = {
 
   // 서명은 패드에서 처리되므로 editable에 굳이 넣지 않아도 ContractBase가 본문에서 자동 감지
   editable: [
-    "discloser.name","discloser.rep","discloser.address",
-    "recipient.name","recipient.rep","recipient.address",
-    "effective","purpose","termMonths","survivalYears","law"
+    "writerName","discloserRepresentative","discloserAddress",
+    "receiverName","receiverRepresentative","receiverAddress",
+    "effectiveDate","purpose","contractDurationMonths",
+    "confidentialityDurationYears","governingLaw",
+    // "writerSignature","receiverSignature",
   ],
 
   defaults: {
-    discloser: { name: "김철수", rep: "", address: "" }, // 갑
-    recipient: { name: "이영희", rep: "", address: "" }, // 을
-    effective: "",
+    writerName : "김철수",
+    discloserRepresentative :"" ,
+    discloserAddress :"" ,
+    receiverName :"이영희" ,
+    receiverRepresentative :"" ,
+    receiverAddress :"" ,
+    effectiveDate: "",
     purpose: "",
-    termMonths: "",
-    survivalYears: "",
-    law: "대한민국 법",
-    sign: { discloser: "", recipient: "" } // 서명 이미지(dataURL)
+    contractDurationMonths: "",
+    confidentialityDurationYears: "",
+    governingLaw: "대한민국 법",
+    // writerSignature: "",
+    // receiverSignature: "",// 서명 이미지(dataURL)
   },
 
   fields: [
     { type: "section", label: "당사자" },
-    { type: "text", name: "discloser.name",    label: "공개자(갑)" },
-    { type: "text", name: "discloser.rep",     label: "갑 대표자" },
-    { type: "text", name: "discloser.address", label: "갑 주소" },
+    { type: "text", name: "writerName",    label: "공개자(갑)" },
+    { type: "text", name: "discloserRepresentative",     label: "갑 대표자" },
+    { type: "text", name: "discloserAddress", label: "갑 주소" },
 
-    { type: "text", name: "recipient.name",    label: "수신자(을)" },
-    { type: "text", name: "recipient.rep",     label: "을 대표자" },
-    { type: "text", name: "recipient.address", label: "을 주소" },
+    { type: "text", name: "receiverName",    label: "수신자(을)" },
+    { type: "text", name: "receiverRepresentative",     label: "을 대표자" },
+    { type: "text", name: "receiverAddress", label: "을 주소" },
 
     { type: "section", label: "기간/목적" },
-    { type: "date", name: "effective",   label: "발효일" },
+    { type: "date", name: "effectiveDate",   label: "발효일" },
     { type: "textarea", name: "purpose", label: "정보 제공 목적" },
-    { type: "text", name: "termMonths",    label: "계약기간(개월)" },
-    { type: "text", name: "survivalYears", label: "비밀유지 존속기간(년)" },
-    { type: "text", name: "law",           label: "준거법" },
+    { type: "text", name: "contractDurationMonths",    label: "계약기간(개월)" },
+    { type: "text", name: "confidentialityDurationYears", label: "비밀유지 존속기간(년)" },
+    { type: "text", name: "governingLaw",           label: "준거법" },
+    // { type: "text", name: "writerSignature",           label: "갑서명" },
+    // { type: "text", name: "receiverSignature",           label: "을서명" }, 
   ],
   
 
@@ -50,18 +61,18 @@ const ndaTemplate = {
 비밀유지계약서(NDA)
 
 1. 당사자
-  - 공개자(갑): {{discloser.name}} (대표 {{discloser.rep}} / 주소 {{discloser.address}})
-  - 수신자(을): {{recipient.name}} (대표 {{recipient.rep}} / 주소 {{recipient.address}})
+  - 공개자(갑): {{writerName}} (대표 {{discloserRepresentative}} / 주소 {{discloserAddress}})
+  - 수신자(을): {{receiverName}} (대표 {{receiverRepresentative}} / 주소 {{receiverAddress}})
 
 2. 목적: {{purpose}}
 3. 비밀정보의 범위: 서면·구두·전자적 형태의 모든 정보 및 그 복제물
 4. 비밀유지 의무: 수신자는 목적 외 사용 금지, 제3자 제공 금지, 필요한 보호조치 이행
 5. 예외: 공지 정보, 제3자로부터 적법 취득, 독자적 개발, 법령·법원·기관 요구
-6. 계약기간: 발효일({{effective}})부터 {{termMonths}}개월
-7. 존속기간: 계약 종료 후 {{survivalYears}}년간 비밀유지 의무 존속
+6. 계약기간: 발효일({{effective}})부터 {{contractDurationMonths}}개월
+7. 존속기간: 계약 종료 후 {{confidentialityDurationYears}}년간 비밀유지 의무 존속
 8. 자료의 반환/파기: 공개자의 요구 시 지체 없이 반환 또는 파기
 9. 손해배상 및 금지명령: 위반 시 손해배상 및 가처분 등 법적 구제 가능
-10. 준거법 및 관할: {{law}}
+10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
 갑: {{discloser.name}} (서명)
@@ -79,46 +90,66 @@ const ndaTemplate = {
 //   return <ContractBase template={ndaTemplate} />;
 // }
 
+
 export default function SecretPage() {
-  // const {signerId} = props;
+  const { contractId } = useParams();
   const [formData, setFormData] = useState(ndaTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  
 
-  // ContractBase에서 field 변경 시 호출
-  const handleChange = (updated) => {
-  setFormData(prev => {
-    const newState = { ...prev };
+  // 필드 변경 시 formData 업데이트
+  const handleChange = useCallback((updated) => {
+    debouncedSetValue(updated);
+  },[]);
 
-    Object.entries(updated).forEach(([key, value]) => {
-      if (key.includes(".")) {
-        const [parent, child] = key.split(".");
-        newState[parent] = { ...newState[parent], [child]: value };
-      } else {
-        newState[key] = value;
+  // debounce 함수를 ref에 저장
+  const debouncedSetValue = useRef(
+    debounce((updated) => setFormData(prev => { return { ...prev, ...updated} } ), 300)
+  ).current;
+
+  // ContractId 기준 데이터 로딩
+  useEffect(() => {
+    if (!contractId) return;
+
+    const fetchSecret = async () => {
+      try {
+        const res = await fetch(`/api/secrets/${contractId}`, {
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("accessToken"),
+          },
+        });
+        if (!res.ok) throw new Error("계약서 로딩 실패");
+        const data = await res.json();
+        console.log(data)
+        setFormData(prev => ({
+          ...prev,
+          ...data
+        }));
+      } catch (err) {
+        console.error(err);
       }
-    });
+    };
 
-    return newState;
-  });
-};
+    fetchSecret();
+  }, [contractId]);
 
+  // 저장 (POST/PUT 통합)
   const handleSave = async () => {
-    if (!formData.discloser.name || !formData.recipient.name) {
+    if (!formData.writerName || !formData.receiverName) {
       alert("공개자와 수신자 이름은 필수입니다.");
       return;
     }
     setLoadingSubmit(true);
 
     try {
-      // fields에 입력된 값을 기반으로 payload 생성
       const payload = {
-        contractId: formData.contractId || null,
-        writerName: formData.discloser.name,
-        receiverName: formData.recipient.name,
+        contractId: contractId || null,
         discloserRepresentative: formData.discloser.rep,
         discloserAddress: formData.discloser.address,
         receiverRepresentative: formData.recipient.rep,
         receiverAddress: formData.recipient.address,
+        writerName: formData.discloser.name,
+        receiverName: formData.recipient.name,
         purpose: formData.purpose,
         effectiveDate: formData.effective || null,
         contractDurationMonths: formData.termMonths ? Number(formData.termMonths) : null,
@@ -128,22 +159,22 @@ export default function SecretPage() {
         receiverSignature: formData.sign.recipient
       };
 
-      console.log("보낼 payload:", payload);
+      const method = contractId ? "PUT" : "POST";
+      const url = contractId ? `/api/secrets/${contractId}` : `/api/secrets`;
 
-      const res = await fetch("/api/secrets", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json" ,
-          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error(await res.text() || "서버 오류");
-      const result = await res.json();
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      setFormData(prev => ({ ...prev, ...data }));
       alert("계약서 제출 완료!");
-      console.log("서버 응답:", result);
-
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -153,11 +184,7 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase
-        template={ndaTemplate}
-        data={ndaTemplate.defaults}
-        handleChange={handleChange}  // fields 입력 시 formData 실시간 업데이트
-      />
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} />
       <button
         onClick={handleSave}
         disabled={loadingSubmit}
@@ -169,7 +196,7 @@ export default function SecretPage() {
           color: "white",
           border: "none",
           borderRadius: 4,
-          cursor: "pointer"
+          cursor: "pointer",
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}

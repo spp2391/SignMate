@@ -1,10 +1,8 @@
 package org.zerock.signmate.Contract.secret.controller;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zerock.signmate.Contract.dto.ServiceContractDto;
 import org.zerock.signmate.Contract.secret.dto.SecretDTO;
 import org.zerock.signmate.Contract.secret.service.SecretService;
 
@@ -17,78 +15,43 @@ public class SecretController {
 
     private final SecretService secretService;
 
-    // 비밀유지계약서 생성 및 수정 (POST/PUT 구분 없이 save 사용)
+    // Contract 기준 저장 (POST = 새 작성, PUT = 수정)
     @PostMapping
-    public ResponseEntity<?> createSecret(@RequestBody SecretDTO dto) {
+    public ResponseEntity<?> createOrUpdateSecret(@RequestBody SecretDTO dto) {
         try {
-            if (dto.getId() != null) {
-                return ResponseEntity.badRequest().body(Map.of("message", "생성 시 ID는 없어야 합니다."));
-            }
-            SecretDTO savedDto = secretService.addOrUpdateSecret(dto);
+            SecretDTO savedDto = secretService.saveSecretByContract(dto);
             return ResponseEntity.ok(savedDto);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateSecret(@PathVariable Long id, @RequestBody SecretDTO dto) {
-        if (!id.equals(dto.getId())) {
-            return ResponseEntity.badRequest().body(Map.of("message", "URL ID와 요청 데이터 ID가 일치하지 않습니다."));
-        }
-
+    @PutMapping("/{contractId}")
+    public ResponseEntity<?> updateSecret(@PathVariable Long contractId, @RequestBody SecretDTO dto) {
         try {
-            SecretDTO updatedDto = secretService.addOrUpdateSecret(dto);
+            dto.setContractId(contractId); // URL의 contractId 적용
+            SecretDTO updatedDto = secretService.saveSecretByContract(dto);
             return ResponseEntity.ok(updatedDto);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
     }
 
-
-//    @PutMapping("/{id}")
-//    public ResponseEntity<?> updateSecret(@PathVariable Long id, @RequestBody SecretDTO dto) {
-//        if (!id.equals(dto.getId())) {
-//            return ResponseEntity.badRequest().body(Map.of("message", "URL ID와 요청 데이터 ID가 일치하지 않습니다."));
-//        }
-//
-//        try {
-//            SecretDTO updatedDto = secretService.save(dto);
-//            return ResponseEntity.ok(updatedDto);
-//        } catch (IllegalArgumentException e) {
-//            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
-//        }
-//    }
-
-    // 단일 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getSecret(@PathVariable Long id) {
-        SecretDTO dto = secretService.findById(id);
-        if (dto == null) {
-            return ResponseEntity.notFound().build();
-        }
+    // ContractId 기준 조회
+    @GetMapping("/{contractId}")
+    public ResponseEntity<SecretDTO> getSecret(@PathVariable Long contractId) {
+        SecretDTO dto = secretService.findByContractId(contractId);
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/contract/{contractId}")
-    public ResponseEntity<?> getSecretByContract(@PathVariable Long contractId) {
+    // ContractId 기준 삭제
+    @DeleteMapping("/{contractId}")
+    public ResponseEntity<?> deleteSecret(@PathVariable Long contractId) {
         try {
-            SecretDTO dto = secretService.findByContractId(contractId);
-            return ResponseEntity.ok(dto);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
-        }
-    }
-    // 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSecret(@PathVariable Long id) {
-        try {
-            secretService.deleteById(id);
+            secretService.deleteByContractId(contractId);
             return ResponseEntity.ok(Map.of("message", "비밀유지계약서가 삭제되었습니다."));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류가 발생했습니다."));
+            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
         }
     }
 }
