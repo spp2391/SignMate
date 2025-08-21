@@ -6,7 +6,7 @@ export function useContracts() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/contracts/user/1") // 백엔드 API 주소
+    fetch("http://localhost:8080/contracts/user/3") // 백엔드 API 주소
       .then((res) => res.json())
       .then((json) => {
         setData(json);

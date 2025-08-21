@@ -23,23 +23,23 @@ public class UnifiedContractController {
     public ResponseEntity<List<UnifiedContractDto>> getUserContracts(@PathVariable Long userId) {
         return ResponseEntity.ok(unifiedContractService.getAllContractsForUser(userId));
     }
-
-    // 📌 유저 대시보드 데이터 조회
+//
+//    // 📌 유저 대시보드 데이터 조회
     @GetMapping("/user/{userId}/dashboard")
     public ResponseEntity<UserDashboardDTO> getUserDashboard(@PathVariable Long userId) {
         return ResponseEntity.ok(unifiedContractService.getUserDashboard(userId));
     }
 
-//    @GetMapping("/user/{userId}")
-//    public ResponseEntity<Map<String, Object>> getUserContractsAndDashboard(@PathVariable Long userId) {
-//        List<UnifiedContractDto> contracts = unifiedContractService.getAllContractsForUser(userId);
-//        UserDashboardDTO dashboard = unifiedContractService.getUserDashboard(userId);
-//
-//        Map<String, Object> result = new HashMap<>();
-//        result.put("contracts", contracts);
-//        result.put("dashboard", dashboard);
-//
-//        return ResponseEntity.ok(result);
-//    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Map<String, Object>> getUserContractsAndDashboard(@PathVariable Long userId) {
+        List<UnifiedContractDto> contracts = unifiedContractService.getAllContractsForUser(userId);
+        UserDashboardDTO dashboard = unifiedContractService.getUserDashboard(userId);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("contracts", contracts);
+        result.put("dashboard", dashboard);
+
+        return ResponseEntity.ok(result);
+    }
 
 }

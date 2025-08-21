@@ -26,12 +26,35 @@ import logo20 from "../../assets/icons/ico_email.svg"
 import logo21 from "../../assets/icons/ico_message.svg"
 import logo22 from "../../assets/icons/ico_message.svg"
 import logo23 from "../../assets/icons/ico_person.svg"
-import logo24 from "../../assets/images/temhabank_N4_001.png"
-import logo25 from "../../assets/images/temhabank_N4_002.png"
+// import logo24 from "../../assets/images/temhabank_N4_001.png"
+// import logo25 from "../../assets/images/temhabank_N4_002.png"
+import React, { useEffect, useState } from "react";
+import Dashboard from "../../components/Dashboard";
 
+
+    
 
 const Index = () => {
+    const [contract, setContract]= useState([]);
+    const [setDashboard]= useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    useEffect (() => {
+      fetch("http://localhost:8080/contracts/user/3") // 백엔드 API 주소
+        .then((res) => res.json())
+        .then((json) => {
+          setContract(json.contracts);
+          setDashboard(json.dashboard);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsLoading(false);
+        });
+    }, [])
+
     return (
+        
         <main className="th-layout-main">
             <div className="th-layout-content">
                 <div className="temhabank-N3" id="LhmdzpPNf2">
@@ -252,7 +275,7 @@ const Index = () => {
                                     </div>
                                     <div className="col-right">
                                         <div className="title">
-                                            <strong className="h6">팝업존</strong>
+                                            <strong className="h6">계약서 현황</strong>
                                             <div className="btn-wrap">
                                                 <button type="button" className="btn-prev ff-ico ti-chevron-rect-left">
                                                     <span className="blind">이전</span>
@@ -270,16 +293,7 @@ const Index = () => {
                                         </div>
                                         <div className="swiper">
                                             <div className="swiper-wrapper">
-                                                <div className="swiper-slide">
-                                                    <Link to="javascript:void(0)">
-                                                        <img src={logo24} alt="지금 바로 전자계약을 시작해보세요!" />
-                                                    </Link>
-                                                </div>
-                                                <div className="swiper-slide">
-                                                    <Link to="javascript:void(0)">
-                                                        <img src={logo25} alt="전자계약으로 쉽고 간편하게" />
-                                                    </Link>
-                                                </div>
+                                                <Dashboard docs={contract} isLoading={isLoading} />
                                             </div>
                                         </div>
                                     </div>

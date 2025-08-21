@@ -28,8 +28,11 @@ export function ListView({ docs, selected, setSelected }) {
     docs.forEach((d) => (next[d.id] = !!checked));
     setSelected(next);
   };
+  
+  
 
   return (
+    
     <div className="overflow-hidden rounded-xl border">
       {/* header */}
       <div className="grid grid-cols-12 items-center gap-2 border-b bg-neutral-50 p-3 text-xs font-medium text-neutral-600">
@@ -66,7 +69,7 @@ export function ListView({ docs, selected, setSelected }) {
                   {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType} - {d.address}
                   <StatusBadge status={d.status} />
                     <span className="rounded-full border px-2 py-0.5 text-xs bg-neutral-100">
-                      요청자
+                      요청자 
                     </span>
                 </div>
                 <div className="text-xs text-neutral-500 mt-0.5">{d.receiverName}, {d.address}</div>

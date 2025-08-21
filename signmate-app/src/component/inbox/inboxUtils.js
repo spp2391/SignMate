@@ -11,7 +11,6 @@ import { CheckCircle2, Clock, Pencil, Tag } from "lucide-react";
 // 1) 상태(enum) & 계약서 종류(enum)
 export const ContractStatus = {
   DRAFT: "DRAFT",
-  PENDING: "PENDING",
   COMPLETED: "COMPLETED",
   IN_PROGRESS: "IN_PROGRESS",
 };

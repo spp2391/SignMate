@@ -2,16 +2,16 @@
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
 import { ContractStatus, ContractType } from "./inboxUtils";
-import Dashboard from "../../components/Dashboard";
+// import Dashboard from "../../components/Dashboard";
 
 
 export default function Inbox() {
-   const [contract, setContract]= useState([]);
+    const [contract, setContract]= useState([]);
     const [setDashboard]= useState([]);
     const [isLoading, setIsLoading] = useState(true);
     
     useEffect (() => {
-      fetch("http://localhost:8080/contracts/user/1") // 백엔드 API 주소
+      fetch("http://localhost:8080/contracts/user/3") // 백엔드 API 주소
         .then((res) => res.json())
         .then((json) => {
           setContract(json.contracts);
@@ -62,7 +62,7 @@ export default function Inbox() {
   return (
     <div className="w-full p-4 md:p-8">
       {/* ✅ 대시보드 섹션 */}
-      <Dashboard docs={contract} isLoading={isLoading} />
+      {/* <Dashboard docs={contract} isLoading={isLoading} /> */}
 
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between">

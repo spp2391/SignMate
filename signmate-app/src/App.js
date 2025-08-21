@@ -15,22 +15,23 @@ import ContractInboxPage from './pages/ContractInboxPage';
 import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 
+
 export default function App() {
     return (
         <Router>
-            <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
+            {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
                 <Link to="/secrets">비밀유지서약서</Link>
                 <Link to="/employment">표준근로계약서</Link>
                 <Link to="/service">용역계약서</Link>
                 <Link to="/supply">자재/물품 공급계약서</Link>
                 <Link to="/outsourcing">업무위탁 계약서</Link>
-            </nav>
+            </nav> */}
 
             <Header />
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/contracts" element={<ContractList />} />
-                <Route path="/secret" element={<SecretPage />} />
+                <Route path="/secrets" element={<SecretPage />} />
                 <Route path="/employment" element={<EmploymentContractPage />} />
                 <Route path="/service" element={<ServiceContractPage />} />
                 <Route path="/supply" element={<SupplyContractPage />} />
