@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ContractBase from "./ContractBase";
+import ContractBase from "../component/contracts/ContractBase";
 
 
 /** 자재/물품 공급계약서

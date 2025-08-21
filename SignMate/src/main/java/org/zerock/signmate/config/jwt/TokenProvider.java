@@ -45,7 +45,7 @@ public class TokenProvider {
                 .setSubject(user.getEmail())
                 // 저장하고 싶은 데이터를 claim으로 저장 가능
                 // "id" : "hong"
-                .claim("id",user.getUserId())
+                .claim("name",user.getName())
                 // 서명에서 사용할 암호화 알고리즘 및 키값
                 // "alg" : "HS256"
                 // HS256을 사용하여 secretKey를 암호화한 값을 서명 부분에 저장

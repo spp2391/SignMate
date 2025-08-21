@@ -1,6 +1,6 @@
 // EmploymentContractPage.jsx
 import React, { useState } from "react";
-import ContractBase from "./ContractBase";
+import ContractBase from "../component/contracts/ContractBase";
 
 // 표준근로계약서 템플릿 (원본 유지)
 const employmentTemplate = {

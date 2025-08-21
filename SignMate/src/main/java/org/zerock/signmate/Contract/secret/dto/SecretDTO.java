@@ -39,6 +39,8 @@ public class SecretDTO {
     // 서명(base64)
     private String writerSignature;
     private String receiverSignature;
+    private String myRole; // 추가
+
 
     public static SecretDTO fromEntity(Secret entity) {
         return SecretDTO.builder()
@@ -58,5 +60,6 @@ public class SecretDTO {
                 .writerSignature(entity.getWriterSignature())
                 .receiverSignature(entity.getReceiverSignature())
                 .build();
+
     }
 }
