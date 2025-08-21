@@ -1,20 +1,21 @@
-// EmploymentContractPage.jsx
-import React, { useState } from "react";
-import ContractBase from "../component/contracts/ContractBase";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { useParams } from "react-router-dom";
+import debounce from "lodash/debounce";
+import ContractBase from "../component/contracts/ContractBase";
 // 표준근로계약서 템플릿 (원본 유지)
 const employmentTemplate = {
   name: "표준근로계약서(기간의 정함이 없는 경우)",
   editable: [
-    "employer.name","employer.address","employer.ceo",
-    "employee.name","employee.address","employee.phone",
-    "start.year","start.month","start.day",
-    "work.place","work.duty",
-    "time.startH","time.endH","time.breakH","time.breakM",
-    "weeklyWorkday","weeklyHoliday",
-    "wage.base","wage.bonus","wage.extra",
-    "payday","paymethod",
-    "ins.nps","ins.nhi","ins.ei","ins.aci"
+    "employerName","employerAddress","employerRepresentative",
+    "employeeName","employeeAddress","employeeContact",
+    "workStartYear","workStartMonth","workStartDay",
+    "workLocation","workDescription",
+    "workStartHour","workEndHour","breakHour","breakMinute",
+    "workDays","weeklyHoliday",
+    "wageAmount","bonus","otherAllowance",
+    "wagePaymentDate","paymentMethod",
+    "nationalPension","healthInsurance","employmentInsurance","industrialAccidentInsurance"
   ],
   defaults: {
     employer: { name: "", address: "", ceo: "" },
@@ -35,35 +36,38 @@ const employmentTemplate = {
   },
   fields: [
     { type: "section", label: "사업주/근로자" },
-    { type: "text", name: "employer.name",    label: "사업주(회사명)" },
-    { type: "text", name: "employer.address", label: "사업주 주소" },
-    { type: "text", name: "employer.ceo",     label: "대표자" },
-    { type: "text", name: "employee.name",    label: "근로자 성명" },
-    { type: "text", name: "employee.address", label: "근로자 주소" },
-    { type: "text", name: "employee.phone",   label: "근로자 연락처" },
-    { type: "section", label: "근로개시/근무" },
-    { type: "text", name: "start.year",  label: "근로개시(년)" },
-    { type: "text", name: "start.month", label: "근로개시(월)" },
-    { type: "text", name: "start.day",   label: "근로개시(일)" },
-    { type: "text",     name: "work.place", label: "근무 장소" },
-    { type: "textarea", name: "work.duty",  label: "업무 내용" },
-    { type: "text", name: "time.startH", label: "소정근로 시작(시)" },
-    { type: "text", name: "time.endH",   label: "소정근로 종료(시)" },
-    { type: "text", name: "time.breakH", label: "휴게(시)" },
-    { type: "text", name: "time.breakM", label: "휴게(분)" },
-    { type: "text", name: "weeklyWorkday", label: "근무일(예: 월~금)" },
-    { type: "text", name: "weeklyHoliday", label: "주휴일(예: 일)" },
-    { type: "section", label: "임금/지급" },
-    { type: "text", name: "wage.base",  label: "임금(월/시급)" },
-    { type: "text", name: "wage.bonus", label: "상여금(있음 시 금액/율)" },
-    { type: "text", name: "wage.extra", label: "기타수당(제수당 등)" },
-    { type: "text",   name: "payday",    label: "임금지급일(매월 n일 등)" },
-    { type: "select", name: "paymethod", label: "지급방법", options: ["직접지급","통장입금"] },
-    { type: "section", label: "사회보험" },
-    { type: "checkbox", name: "ins.nps", label: "국민연금" },
-    { type: "checkbox", name: "ins.nhi", label: "건강보험" },
-    { type: "checkbox", name: "ins.ei",  label: "고용보험" },
-    { type: "checkbox", name: "ins.aci", label: "산재보험" },
+  { type: "text", name: "employerName", label: "사업주(회사명)" },
+  { type: "text", name: "employerAddress", label: "사업주 주소" },
+  { type: "text", name: "employerRepresentative", label: "대표자" },
+  { type: "text", name: "employeeName", label: "근로자 성명" },
+  { type: "text", name: "employeeAddress", label: "근로자 주소" },
+  { type: "text", name: "employeeContact", label: "근로자 연락처" },
+
+  { type: "section", label: "근로개시/근무" },
+  { type: "text", name: "workStartYear", label: "근로개시(년)" },
+  { type: "text", name: "workStartMonth", label: "근로개시(월)" },
+  { type: "text", name: "workStartDay", label: "근로개시(일)" },
+  { type: "text", name: "workLocation", label: "근무 장소" },
+  { type: "textarea", name: "workDescription", label: "업무 내용" },
+  { type: "text", name: "workStartHour", label: "소정근로 시작(시)" },
+  { type: "text", name: "workEndHour", label: "소정근로 종료(시)" },
+  { type: "text", name: "breakHour", label: "휴게(시)" },
+  { type: "text", name: "breakMinute", label: "휴게(분)" },
+  { type: "text", name: "workDays", label: "근무일(예: 월~금)" },
+  { type: "text", name: "weeklyHoliday", label: "주휴일(예: 일)" },
+
+  { type: "section", label: "임금/지급" },
+  { type: "text", name: "wageAmount", label: "임금(월/시급)" },
+  { type: "text", name: "bonus", label: "상여금(있음 시 금액/율)" },
+  { type: "text", name: "otherAllowance", label: "기타수당(제수당 등)" },
+  { type: "text", name: "wagePaymentDate", label: "임금지급일(매월 n일 등)" },
+  { type: "select", name: "paymentMethod", label: "지급방법", options: ["직접지급","통장입금"] },
+
+  { type: "section", label: "사회보험" },
+  { type: "checkbox", name: "nationalPension", label: "국민연금" },
+  { type: "checkbox", name: "healthInsurance", label: "건강보험" },
+  { type: "checkbox", name: "employmentInsurance", label: "고용보험" },
+  { type: "checkbox", name: "industrialAccidentInsurance", label: "산재보험" },
   ],
     body: `
 (이하 "사업주") {{employer.name}} 과(와) (이하 "근로자") {{employee.name}} 은 다음과 같이 근로계약을 체결한다.
@@ -120,12 +124,20 @@ const employmentTemplate = {
 };
 
 export default function EmploymentContractPage() {
+  const { contractId } = useParams();
   const [formData, setFormData] = useState(employmentTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const writerSigRef = useRef(null);
+  const receiverSigRef = useRef(null);
+  const [currentUserRole, setCurrentUserRole] = useState("sender");
 
-  // SecretPage처럼 handleChange 구현
-  const handleChange = (updated) => {
-    setFormData(prev => {
+  // handleChange: SecretPage처럼 debounced 처리
+  const handleChange = useCallback((updated) => {
+    debouncedSetValue(updated);
+  }, []);
+
+  const debouncedSetValue = useRef(
+    debounce((updated) => setFormData(prev => {
       const newState = { ...prev };
       Object.entries(updated).forEach(([key, value]) => {
         if (key.includes(".")) {
@@ -136,59 +148,125 @@ export default function EmploymentContractPage() {
         }
       });
       return newState;
-    });
+    }), 300)
+  ).current;
+
+  // 로그인 사용자 이름 추출
+  const getLoginUserName = () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      if (!token) return null;
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
+      );
+      const payload = JSON.parse(jsonPayload);
+      return payload.username || payload.name || payload.sub;
+    } catch (e) {
+      console.error("JWT 파싱 실패", e);
+      return null;
+    }
   };
 
-  // 저장 API 호출
-   const handleSave = async () => {
+  const loginUserName = getLoginUserName();
+
+  useEffect(() => {
+    if (!contractId) return;
+
+    const fetchContract = async () => {
+      try {
+        const res = await fetch(`/api/employment/${contractId}`, {
+          headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
+        });
+        if (!res.ok) throw new Error("계약서 로딩 실패");
+        const data = await res.json();
+
+        setFormData(prev => ({
+          ...prev,
+          ...data,
+          sign: {
+            employer: data.writerSignature || prev.sign.employer,
+            employee: data.receiverSignature || prev.sign.employee
+          }
+        }));
+
+        if (loginUserName) {
+          if (loginUserName === data.employerName) setCurrentUserRole("employer");
+          else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+          else setCurrentUserRole("none");
+        }
+
+        if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
+        if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchContract();
+  }, [contractId]);
+
+  const handleSave = async () => {
     setLoadingSubmit(true);
     try {
       const dto = {
-        employerName: formData.employer.name,
-        employerRepresentative: formData.employer.ceo,
-        employerAddress: formData.employer.address,
-        employeeName: formData.employee.name,
-        employeeAddress: formData.employee.address,
-        employeeContact: formData.employee.phone,
-        workStartYear: parseInt(formData.start.year) || new Date().getFullYear(),
-        workStartMonth: parseInt(formData.start.month) || 1,
-        workStartDay: parseInt(formData.start.day) || 1,
-        workLocation: formData.work.place,
-        workDescription: formData.work.duty,
-        workStartHour: parseInt(formData.time.startH || 0),
-        workEndHour: parseInt(formData.time.endH || 0),
-        breakHour: parseInt(formData.time.breakH || 0),
-        breakMinute: parseInt(formData.time.breakM || 0),
-        workDays: formData.weeklyWorkday,
-        weeklyHoliday: formData.weeklyHoliday,
-        wageAmount: formData.wage.base,
-        bonus: formData.wage.bonus,
-        otherAllowance: formData.wage.extra,
-        wagePaymentDate: formData.payday,
-        paymentMethod: formData.paymethod,
-        nationalPension: formData.ins.nps,
-        healthInsurance: formData.ins.nhi,
-        employmentInsurance: formData.ins.ei,
-        industrialAccidentInsurance: formData.ins.aci,
-        writerSignature: formData.sign.employer,
-        receiverSignature: formData.sign.employee,
-        body: employmentTemplate.body
-      };
+  contractId: contractId || null,
+  employerName: formData.employerName,
+  employerRepresentative: formData.employerRepresentative,
+  employerAddress: formData.employerAddress,
+  employeeName: formData.employeeName,
+  employeeAddress: formData.employeeAddress,
+  employeeContact: formData.employeeContact,
+  workStartYear: parseInt(formData.workStartYear) || new Date().getFullYear(),
+  workStartMonth: parseInt(formData.workStartMonth) || 1,
+  workStartDay: parseInt(formData.workStartDay) || 1,
+  workLocation: formData.workLocation,
+  workDescription: formData.workDescription,
+  workStartHour: parseInt(formData.workStartHour || 0),
+  workEndHour: parseInt(formData.workEndHour || 0),
+  breakHour: parseInt(formData.breakHour || 0),
+  breakMinute: parseInt(formData.breakMinute || 0),
+  workDays: formData.workDays,
+  weeklyHoliday: formData.weeklyHoliday,
+  wageAmount: formData.wageAmount,
+  bonus: formData.bonus,
+  otherAllowance: formData.otherAllowance,
+  wagePaymentDate: formData.wagePaymentDate,
+  paymentMethod: formData.paymentMethod,
+  nationalPension: formData.nationalPension,
+  healthInsurance: formData.healthInsurance,
+  employmentInsurance: formData.employmentInsurance,
+  industrialAccidentInsurance: formData.industrialAccidentInsurance,
+  writerSignature: formData.sign?.employer || null,
+  receiverSignature: formData.sign?.employee || null,
+  body: employmentTemplate.body
+};
 
-      console.log("보낼 DTO:", dto);
+      const method = contractId ? "PUT" : "POST";
+      const url = contractId ? `/api/employment/${contractId}` : `/api/employment`;
 
-      const res = await fetch("/api/employment", {
-        method: "POST",
-        headers: { "Content-Type": "application/json",
-          "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
-         },
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + localStorage.getItem("accessToken")
+        },
         body: JSON.stringify(dto)
       });
 
       if (!res.ok) throw new Error(await res.text() || "서버 오류");
       const result = await res.json();
+      setFormData(prev => ({
+        ...prev,
+        ...result,
+        sign: {
+          employer: result.writerSignature || prev.sign.employer,
+          employee: result.receiverSignature || prev.sign.employee
+        }
+      }));
+
       alert("계약서 제출 완료! ID = " + result.id);
-      console.log("서버 응답:", result);
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -200,8 +278,9 @@ export default function EmploymentContractPage() {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={employmentTemplate}
-        data={employmentTemplate.defaults}          // SecretPage와 동일
-        handleChange={handleChange} // SecretPage와 동일
+        data={formData}
+        handleChange={handleChange}
+        role={currentUserRole}
       />
       <button
         onClick={handleSave}

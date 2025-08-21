@@ -15,37 +15,48 @@ public class StandardController {
 
     private final StandardService standardService;
 
-    // 생성 및 수정 (POST)
+    // Contract 기준 생성 (POST) / 수정 (PUT)
     @PostMapping
-    public ResponseEntity<?> saveOrUpdateStandard(@RequestBody StandardDTO dto) {
+    public ResponseEntity<?> createOrUpdateStandard(@RequestBody StandardDTO dto) {
         try {
             StandardDTO savedDto = standardService.addOrUpdateStandard(dto);
             return ResponseEntity.ok(savedDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
     }
 
-    // 단일 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getStandard(@PathVariable Long id) {
-        StandardDTO dto = standardService.findById(id);
-        if (dto == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(dto);
-    }
-
-    // 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteStandard(@PathVariable Long id) {
+    @PutMapping("/{contractId}")
+    public ResponseEntity<?> updateStandard(@PathVariable Long contractId, @RequestBody StandardDTO dto) {
         try {
-            standardService.deleteById(id);
+            dto.setContractId(contractId); // URL의 contractId 적용
+            StandardDTO updatedDto = standardService.addOrUpdateStandard(dto);
+            return ResponseEntity.ok(updatedDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
+        }
+    }
+
+    // ContractId 기준 단일 조회
+    @GetMapping("/{contractId}")
+    public ResponseEntity<?> getStandard(@PathVariable Long contractId) {
+        try {
+            StandardDTO dto = standardService.findByContractId(contractId);
+            return ResponseEntity.ok(dto);
+        } catch (Exception e) {
+            return ResponseEntity.status(404).body(Map.of("message", "해당 계약서가 존재하지 않습니다."));
+        }
+    }
+
+    // ContractId 기준 삭제
+    @DeleteMapping("/{contractId}")
+    public ResponseEntity<?> deleteStandard(@PathVariable Long contractId) {
+        try {
+            StandardDTO dto = standardService.findByContractId(contractId); // 존재 확인
+            standardService.deleteById(dto.getId());
             return ResponseEntity.ok(Map.of("message", "근로계약서가 삭제되었습니다."));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류가 발생했습니다."));
+            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류가 발생했습니다: " + e.getMessage()));
         }
     }
 }
