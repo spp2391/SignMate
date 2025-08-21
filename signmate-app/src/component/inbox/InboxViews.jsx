@@ -62,15 +62,14 @@ export function ListView({ docs, selected, setSelected }) {
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium leading-tight">{d.title}</span>
+                  <span className="font-medium leading-tight"></span>
+                  {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType} - {d.address}
                   <StatusBadge status={d.status} />
-                  {d.requester && (
                     <span className="rounded-full border px-2 py-0.5 text-xs bg-neutral-100">
-                      {d.requester}
+                      요청자
                     </span>
-                  )}
                 </div>
-                <div className="text-xs text-neutral-500 mt-0.5">{d.participants}</div>
+                <div className="text-xs text-neutral-500 mt-0.5">{d.receiverName}, {d.address}</div>
               </div>
             </div>
           </div>
@@ -86,7 +85,7 @@ export function ListView({ docs, selected, setSelected }) {
           </div>
 
           <div className="col-span-2 text-sm">
-            {formatLocalDateTime(d.lastEdited)}
+            {formatLocalDateTime(d.contractEndDate)}
           </div>
         </div>
       ))}
@@ -106,14 +105,14 @@ export function GridView({ docs, selected, setSelected }) {
                 <StatusBadge status={d.status} />
               </div>
             </div>
-            <div className="mt-3 font-medium leading-tight line-clamp-2">{d.title}</div>
-            <div className="mt-1 text-xs text-neutral-500 line-clamp-1">{d.participants}</div>
+            <div className="mt-3 font-medium leading-tight line-clamp-2">{CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}</div>
+            <div className="mt-1 text-xs text-neutral-500 line-clamp-1">{d.receiverName}</div>
             <div className="mt-3 flex items-center justify-between">
               <span className="rounded-full border px-2 py-0.5 text-xs">
                 {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}
               </span>
               <div className="text-xs text-neutral-500">
-                {formatLocalDateTime(d.lastEdited)}
+                {formatLocalDateTime(d.contractEndDate)}
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2">

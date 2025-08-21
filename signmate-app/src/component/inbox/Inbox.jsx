@@ -1,17 +1,31 @@
-﻿// 페이지 전체를 담당하는 컨테이너
-// 페이지의 상태 (검색, 필터, 정렬, 보기 등)을 관리
-// inboxUtils.js 에서 불러온 데이터 사용
-// InboxViews.jsx의 ListView, GridView 를 화면에 표시
-// 이 파일이 메인 페이지 역할을 하고 나머지 파일들을 조립
-
-
-import React, { useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
-import { useContracts, ContractStatus, ContractType } from "./inboxUtils";
+import { ContractStatus, ContractType } from "./inboxUtils";
+import Dashboard from "../../components/Dashboard";
+
 
 export default function Inbox() {
-  const { data, isLoading } = useContracts();
+   const [contract, setContract]= useState([]);
+    const [setDashboard]= useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    
+    useEffect (() => {
+      fetch("http://localhost:8080/contracts/user/1") // 백엔드 API 주소
+        .then((res) => res.json())
+        .then((json) => {
+          setContract(json.contracts);
+          setDashboard(json.dashboard);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsLoading(false);
+        });
+    }, [])
+
+  // 항상 배열로 보장
+  // const data = Array.isArray(rawData) ? rawData : [];
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
@@ -22,25 +36,34 @@ export default function Inbox() {
   const [selected, setSelected] = useState({});
 
   const filtered = useMemo(() => {
-    let out = data.filter(
+    if (!Array.isArray(contract)) return [];
+
+    let out = contract.filter(
       (d) =>
-        d.title.toLowerCase().includes(query.toLowerCase()) ||
-        d.participants.toLowerCase().includes(query.toLowerCase())
+        (d.title?.toLowerCase().includes(query.toLowerCase()) ||
+          d.participants?.toLowerCase().includes(query.toLowerCase()))
     );
+
     if (status !== "all") out = out.filter((d) => d.status === status);
     if (contractType !== "all") out = out.filter((d) => d.contractType === contractType);
     if (onlyCompleted) out = out.filter((d) => d.status === ContractStatus.COMPLETED);
 
     if (sort === "title") out = [...out].sort((a, b) => a.title.localeCompare(b.title));
-    if (sort === "recent") out = [...out].sort((a, b) => new Date(b.lastEdited) - new Date(a.lastEdited));
+    if (sort === "recent") out = [...out].sort(
+      (a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)
+    );
+
     return out;
-  }, [data, query, status, contractType, onlyCompleted, sort]);
+  }, [contract, query, status, contractType, onlyCompleted, sort]);
 
   const anyChecked = Object.values(selected).some(Boolean);
   const clearSelection = () => setSelected({});
 
   return (
     <div className="w-full p-4 md:p-8">
+      {/* ✅ 대시보드 섹션 */}
+      <Dashboard docs={contract} isLoading={isLoading} />
+
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between">
         <div className="text-xl md:text-2xl font-semibold">계약서 보관함</div>
@@ -172,9 +195,9 @@ export default function Inbox() {
           </div>
 
           {view === "list" ? (
-            <ListView docs={filtered} selected={selected} setSelected={setSelected} />
+            <ListView docs={contract} selected={selected} setSelected={setSelected} />
           ) : (
-            <GridView docs={filtered} selected={selected} setSelected={setSelected} />
+            <GridView docs={contract} selected={selected} setSelected={setSelected} />
           )}
         </>
       )}
