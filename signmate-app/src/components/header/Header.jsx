@@ -3,7 +3,7 @@ import "../../assets/css/style.css";
 import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
 import "../../assets/css/templatehouse.css";
-import logo from "../../assets/images/logo_small.png";
+import logo from "../../assets/images/logo.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
 
 const Header = () => {
@@ -14,7 +14,7 @@ const Header = () => {
                     <div className="header-left">
                         <h2 className="header-title">
                             <Link to="/">
-                                <img height="82" src={logo} alt="SIGN MATE" />
+                                {/* <img height="1" src={logo} alt="SIGN MATE" /> */}
                             </Link>
                         </h2>
                     </div>

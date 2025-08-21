@@ -10,6 +10,8 @@ import java.util.Optional;
 
 public interface SecretRepository extends JpaRepository<Secret, Long> {
     Optional<ServiceContract> findByContract_Id(Long contractId);
-
+    Optional<Secret> findByContractId(Long contractId);
     Optional<Secret> findByContract(Contract contract);
+
+    Iterable<Secret> findByContract_Writer_UserId(Long userId);
 }

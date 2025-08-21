@@ -949,7 +949,8 @@
 
 .temhabank-N4 .col-right {
   padding: 3rem;
-  background: #454b57;
+  background: #ffffff;
+  border: #e5e7eb 0.1rem solid;
 }
 
 .temhabank-N4 .col-right .title {
@@ -957,7 +958,7 @@
 }
 
 .temhabank-N4 .col-right .title strong {
-  color: var(--white);
+  color: #454b57;
 }
 
 .temhabank-N4 .btn-wrap {

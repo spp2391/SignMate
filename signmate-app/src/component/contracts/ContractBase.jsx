@@ -294,6 +294,7 @@ export default function ContractBase({
         </div>
       </div>
 
+      {/* 스타일 */}
       <style>{`
         .wrap{max-width:1200px;margin:0 auto;padding:16px}
         .ttl{font-size:22px;font-weight:700;margin-bottom:12px}

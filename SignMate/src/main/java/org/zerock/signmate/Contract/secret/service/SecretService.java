@@ -17,7 +17,6 @@ import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,46 +28,50 @@ public class SecretService {
     private final NotificationService notificationService;
 
     @Transactional
-    public SecretDTO addOrUpdateSecret(SecretDTO dto) {
-        // 로그인한 사용자 가져오기
+    public SecretDTO saveSecretByContract(SecretDTO dto) {
+        // 로그인 사용자
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loginUser = authentication.getName();
 
-        User writer = userRepository.findByName(loginUser)
+        User loginUserEntity = userRepository.findByName(loginUser)
                 .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
-        // 수신자 (옵션)
+        // 수신자
         User receiver = null;
         if (dto.getReceiverName() != null && !dto.getReceiverName().isBlank()) {
             receiver = userRepository.findByName(dto.getReceiverName())
                     .orElseThrow(() -> new EntityNotFoundException("받는 사람 유저가 없습니다: " + dto.getReceiverName()));
         }
 
-        // Contract 생성 or 조회
-        Contract contract = dto.getContractId() == null
-                ? Contract.builder()
-                .contractType(enums.ContractType.SERVICE)
-                .writer(writer)
-                .receiver(receiver)
-                .status(enums.ContractStatus.DRAFT)
-                .build()
-                : contractRepository.findById(dto.getContractId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
+        // Contract 조회/생성
+        Contract contract;
+        if (dto.getContractId() != null) {
+            contract = contractRepository.findById(dto.getContractId())
+                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
+            // 기존 계약이라면 writer는 유지, receiver만 업데이트
+            if (receiver != null) contract.setReceiver(receiver);
+        } else {
+            // 신규 생성 시 로그인 사용자가 writer
+            contract = Contract.builder()
+                    .contractType(enums.ContractType.SERVICE)
+                    .writer(loginUserEntity)
+                    .receiver(receiver)
+                    .status(enums.ContractStatus.DRAFT)
+                    .build();
+            contractRepository.save(contract);
+        }
 
-        contract.setWriter(writer);
-        contract.setReceiver(receiver);
-
+        // DRAFT 상태라면 진행중으로 변경
         if (contract.getStatus() == enums.ContractStatus.DRAFT) {
             contract.setStatus(enums.ContractStatus.IN_PROGRESS);
         }
         contractRepository.save(contract);
 
-
-
-        // Secret 생성 or 조회
+        // Secret 조회/생성 (Contract 기준)
         Secret secret = secretRepository.findByContract(contract)
                 .orElseGet(() -> Secret.builder().contract(contract).build());
 
+        // DTO 값 적용
         secret.setDiscloserRepresentative(dto.getDiscloserRepresentative());
         secret.setDiscloserAddress(dto.getDiscloserAddress());
         secret.setReceiverRepresentative(dto.getReceiverRepresentative());
@@ -80,45 +83,47 @@ public class SecretService {
         secret.setGoverningLaw(dto.getGoverningLaw());
         secret.setWriterSignature(dto.getWriterSignature());
         secret.setReceiverSignature(dto.getReceiverSignature());
+
         Secret savedSecret = secretRepository.save(secret);
 
-        // Notification 발송
-        if (receiver != null && !receiver.equals(writer)) {
-            notificationService.notifyUser(
-                    receiver,
-                    contract,
-                    writer.getName() + "님이 비밀유지계약서를 작성/수정했습니다.",
-                    LocalDateTime.now()
+        LocalDateTime now = LocalDateTime.now();
 
-            );
-        }
-
-        // 서명 완료 시 상태 변경
         if (secret.getWriterSignature() != null && secret.getReceiverSignature() != null) {
+            // 서명 완료: 계약 완료 상태
             contract.setStatus(enums.ContractStatus.COMPLETED);
             contractRepository.save(contract);
+            String msg = "비밀유지계약서가 완료되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        } else {
+            // 작성/수정 중
+            String msg = "비밀유지계약서가 작성/수정되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
         }
 
         return SecretDTO.fromEntity(savedSecret);
+
     }
 
-
-
-    public SecretDTO findById(Long id) {
-        Optional<Secret> opt = secretRepository.findById(id);
-        return opt.map(SecretDTO::fromEntity).orElse(null);
-    }
-
-    public void deleteById(Long id) {
-        secretRepository.deleteById(id);
-    }
-
-    // ContractId로 Secret 조회
+    // ContractId 기준 조회
     public SecretDTO findByContractId(Long contractId) {
         Contract contract = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 계약서 ID: " + contractId));
         Secret secret = secretRepository.findByContract(contract)
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 Secret이 존재하지 않습니다. contractId=" + contractId));
         return SecretDTO.fromEntity(secret);
+    }
+
+    public void deleteByContractId(Long contractId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 계약서 ID: " + contractId));
+        Secret secret = secretRepository.findByContract(contract)
+                .orElseThrow(() -> new RuntimeException("해당 계약서에 Secret이 존재하지 않습니다. contractId=" + contractId));
+        secretRepository.delete(secret);
     }
 }
