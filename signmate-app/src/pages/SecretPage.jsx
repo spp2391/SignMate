@@ -1,6 +1,6 @@
 // SecretPage.jsx
 import { useState } from "react";
-import ContractBase from "./ContractBase";
+import ContractBase from "../component/contracts/ContractBase";
 
 /** 비밀유지계약서(NDA)
  *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
