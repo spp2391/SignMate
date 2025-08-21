@@ -1,6 +1,6 @@
 // ServiceContractPage.jsx
 import React, { useState } from "react";
-import ContractBase from "./ContractBase";
+import ContractBase from "../component/contracts/ContractBase";
 
 /** 용역계약서
  *  - 좌측 입력: 당사자, 과업기간, 금액, 범위/산출물, 지급, 하자/지체, 서명일

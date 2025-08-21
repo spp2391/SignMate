@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ContractBase from "./ContractBase";
+import ContractBase from "../component/contracts/ContractBase";
 
 /** 업무위탁 계약서
  *  - 좌측 입력: 당사자, 기간, 정산표, 합계, 서명일

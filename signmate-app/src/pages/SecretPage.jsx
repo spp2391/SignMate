@@ -1,8 +1,10 @@
 // SecretPage.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
-import ContractBase from "./ContractBase";
+
 import { useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
+import ContractBase from "../component/contracts/ContractBase";
+
 
 /** 비밀유지계약서(NDA)
  *  - 좌측 입력: 당사자, 발효일/기간, 목적, 준거법
@@ -17,7 +19,7 @@ const ndaTemplate = {
     "receiverName","receiverRepresentative","receiverAddress",
     "effectiveDate","purpose","contractDurationMonths",
     "confidentialityDurationYears","governingLaw",
-    // "writerSignature","receiverSignature",
+     "writerSignature","receiverSignature",
   ],
 
   defaults: {
@@ -32,8 +34,10 @@ const ndaTemplate = {
     contractDurationMonths: "",
     confidentialityDurationYears: "",
     governingLaw: "대한민국 법",
-    // writerSignature: "",
-    // receiverSignature: "",// 서명 이미지(dataURL)
+    sign: {                // 여기 변경
+        discloser: null,      // 기존 writerSignature
+        recipient: null       // 기존 receiverSignature
+      }
   },
 
   fields: [
@@ -95,6 +99,8 @@ export default function SecretPage() {
   const { contractId } = useParams();
   const [formData, setFormData] = useState(ndaTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const writerSigRef = useRef(null);
+  const receiverSigRef = useRef(null);
   
 
   // 필드 변경 시 formData 업데이트
@@ -123,8 +129,15 @@ export default function SecretPage() {
         console.log(data)
         setFormData(prev => ({
           ...prev,
-          ...data
+          ...data,
+          sign: {
+            discloser: data.writerSignature || prev.sign.discloser,
+            recipient: data.receiverSignature || prev.sign.recipient
+          }
+          
         }));
+         if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
+        if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
       } catch (err) {
         console.error(err);
       }
@@ -132,7 +145,9 @@ export default function SecretPage() {
 
     fetchSecret();
   }, [contractId]);
-
+console.log(localStorage);
+   const loginUser = localStorage.getItem("loginUser"); // JWT payload나 세션에서 실제 사용자명 가져오기
+  const currentUserRole = loginUser === formData.writerName ? "sender" : "receiver";
   // 저장 (POST/PUT 통합)
   const handleSave = async () => {
     if (!formData.writerName || !formData.receiverName) {
@@ -142,23 +157,29 @@ export default function SecretPage() {
     setLoadingSubmit(true);
 
     try {
-      const payload = {
-        contractId: contractId || null,
-        discloserRepresentative: formData.discloser.rep,
-        discloserAddress: formData.discloser.address,
-        receiverRepresentative: formData.recipient.rep,
-        receiverAddress: formData.recipient.address,
-        writerName: formData.discloser.name,
-        receiverName: formData.recipient.name,
-        purpose: formData.purpose,
-        effectiveDate: formData.effective || null,
-        contractDurationMonths: formData.termMonths ? Number(formData.termMonths) : null,
-        confidentialityDurationYears: formData.survivalYears ? Number(formData.survivalYears) : null,
-        governingLaw: formData.law,
-        writerSignature: formData.sign.discloser,
-        receiverSignature: formData.sign.recipient
-      };
+      
 
+      const payload = {
+  contractId: contractId || null,
+  discloserRepresentative: formData.discloserRepresentative,
+  discloserAddress: formData.discloserAddress,
+  receiverRepresentative: formData.receiverRepresentative,
+  receiverAddress: formData.receiverAddress,
+  writerName: formData.writerName,
+  receiverName: formData.receiverName,
+  purpose: formData.purpose,
+  effectiveDate: formData.effectiveDate || null,
+  contractDurationMonths: formData.contractDurationMonths
+    ? Number(formData.contractDurationMonths)
+    : null,
+  confidentialityDurationYears: formData.confidentialityDurationYears
+    ? Number(formData.confidentialityDurationYears)
+    : null,
+  governingLaw: formData.governingLaw,
+ writerSignature: formData.sign.discloser,
+  receiverSignature: formData.sign.recipient,
+};
+console.log("payload", payload);
       const method = contractId ? "PUT" : "POST";
       const url = contractId ? `/api/secrets/${contractId}` : `/api/secrets`;
 
@@ -173,8 +194,16 @@ export default function SecretPage() {
 
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-      setFormData(prev => ({ ...prev, ...data }));
+       
+      setFormData(prev => ({ ...prev, ...data, 
+          sign: {
+            discloser: data.writerSignature || prev.sign.discloser,
+            recipient: data.receiverSignature || prev.sign.recipient
+          }
+     }));
       alert("계약서 제출 완료!");
+      if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
+      if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -184,7 +213,7 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} />
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} />
       <button
         onClick={handleSave}
         disabled={loadingSubmit}
