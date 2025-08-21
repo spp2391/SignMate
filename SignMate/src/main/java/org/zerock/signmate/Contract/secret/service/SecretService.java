@@ -33,7 +33,7 @@ public class SecretService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loginUser = authentication.getName();
 
-        User writer = userRepository.findByName(loginUser)
+        User loginUserEntity = userRepository.findByName(loginUser)
                 .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
         // 수신자
@@ -48,19 +48,20 @@ public class SecretService {
         if (dto.getContractId() != null) {
             contract = contractRepository.findById(dto.getContractId())
                     .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
+            // 기존 계약이라면 writer는 유지, receiver만 업데이트
+            if (receiver != null) contract.setReceiver(receiver);
         } else {
+            // 신규 생성 시 로그인 사용자가 writer
             contract = Contract.builder()
                     .contractType(enums.ContractType.SERVICE)
-                    .writer(writer)
+                    .writer(loginUserEntity)
                     .receiver(receiver)
                     .status(enums.ContractStatus.DRAFT)
                     .build();
             contractRepository.save(contract);
         }
 
-        contract.setWriter(writer);
-        contract.setReceiver(receiver);
-
+        // DRAFT 상태라면 진행중으로 변경
         if (contract.getStatus() == enums.ContractStatus.DRAFT) {
             contract.setStatus(enums.ContractStatus.IN_PROGRESS);
         }
@@ -85,21 +86,28 @@ public class SecretService {
 
         Secret savedSecret = secretRepository.save(secret);
 
-        // Notification 발송
-        String msg = "비밀유지계약서를 작성/수정했습니다.";
         LocalDateTime now = LocalDateTime.now();
-        notificationService.notifyUser(writer, contract, msg, now);
-        if (receiver != null && !receiver.equals(writer)) {
-            notificationService.notifyUser(receiver, contract, msg, now);
-        }
 
-        // 서명 완료 시 Contract 상태 변경
         if (secret.getWriterSignature() != null && secret.getReceiverSignature() != null) {
+            // 서명 완료: 계약 완료 상태
             contract.setStatus(enums.ContractStatus.COMPLETED);
             contractRepository.save(contract);
+            String msg = "비밀유지계약서가 완료되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        } else {
+            // 작성/수정 중
+            String msg = "비밀유지계약서가 작성/수정되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
         }
 
         return SecretDTO.fromEntity(savedSecret);
+
     }
 
     // ContractId 기준 조회

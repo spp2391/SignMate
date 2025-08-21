@@ -101,19 +101,41 @@ export default function SecretPage() {
   const [loadingSubmit, setLoadingSubmit] = useState(false);
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
-  
+  const [currentUserRole, setCurrentUserRole] = useState("sender");
 
-  // 필드 변경 시 formData 업데이트
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
-  },[]);
+  }, []);
 
-  // debounce 함수를 ref에 저장
   const debouncedSetValue = useRef(
-    debounce((updated) => setFormData(prev => { return { ...prev, ...updated} } ), 300)
+    debounce((updated) => setFormData(prev => ({ ...prev, ...updated })), 300)
   ).current;
 
-  // ContractId 기준 데이터 로딩
+ const getLoginUserName = () => {
+  try {
+    const token = localStorage.getItem("accessToken"); // LoginInputArea에서 넣은 값 그대로
+    if (!token) return null;
+
+    const base64Url = token.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split("")
+        .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    const payload = JSON.parse(jsonPayload);
+     console.log("JWT Payload 확인:", payload);
+   return payload.username || payload.name || payload.sub;
+
+  } catch (e) {
+    console.error("JWT 파싱 실패", e);
+    return null;
+  }
+};
+
+  const loginUserName = getLoginUserName();
+
   useEffect(() => {
     if (!contractId) return;
 
@@ -126,7 +148,9 @@ export default function SecretPage() {
         });
         if (!res.ok) throw new Error("계약서 로딩 실패");
         const data = await res.json();
-        console.log(data)
+         console.log("📄 Contract 데이터:", data);
+      console.log("👤 로그인 사용자:", loginUserName);
+
         setFormData(prev => ({
           ...prev,
           ...data,
@@ -134,9 +158,15 @@ export default function SecretPage() {
             discloser: data.writerSignature || prev.sign.discloser,
             recipient: data.receiverSignature || prev.sign.recipient
           }
-          
         }));
-         if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
+
+        if (loginUserName) {
+          if (loginUserName === data.writerName) setCurrentUserRole("sender");
+          else if (loginUserName === data.receiverName) setCurrentUserRole("receiver");
+          else setCurrentUserRole("none");
+        }
+
+        if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
         if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
       } catch (err) {
         console.error(err);
@@ -145,10 +175,7 @@ export default function SecretPage() {
 
     fetchSecret();
   }, [contractId]);
-console.log(localStorage);
-   const loginUser = localStorage.getItem("loginUser"); // JWT payload나 세션에서 실제 사용자명 가져오기
-  const currentUserRole = loginUser === formData.writerName ? "sender" : "receiver";
-  // 저장 (POST/PUT 통합)
+
   const handleSave = async () => {
     if (!formData.writerName || !formData.receiverName) {
       alert("공개자와 수신자 이름은 필수입니다.");
@@ -157,29 +184,23 @@ console.log(localStorage);
     setLoadingSubmit(true);
 
     try {
-      
-
       const payload = {
-  contractId: contractId || null,
-  discloserRepresentative: formData.discloserRepresentative,
-  discloserAddress: formData.discloserAddress,
-  receiverRepresentative: formData.receiverRepresentative,
-  receiverAddress: formData.receiverAddress,
-  writerName: formData.writerName,
-  receiverName: formData.receiverName,
-  purpose: formData.purpose,
-  effectiveDate: formData.effectiveDate || null,
-  contractDurationMonths: formData.contractDurationMonths
-    ? Number(formData.contractDurationMonths)
-    : null,
-  confidentialityDurationYears: formData.confidentialityDurationYears
-    ? Number(formData.confidentialityDurationYears)
-    : null,
-  governingLaw: formData.governingLaw,
- writerSignature: formData.sign.discloser,
-  receiverSignature: formData.sign.recipient,
-};
-console.log("payload", payload);
+        contractId: contractId || null,
+        discloserRepresentative: formData.discloserRepresentative,
+        discloserAddress: formData.discloserAddress,
+        receiverRepresentative: formData.receiverRepresentative,
+        receiverAddress: formData.receiverAddress,
+        writerName: formData.writerName,
+        receiverName: formData.receiverName,
+        purpose: formData.purpose,
+        effectiveDate: formData.effectiveDate || null,
+        contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
+        confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
+        governingLaw: formData.governingLaw,
+        writerSignature: formData.sign.discloser,
+        receiverSignature: formData.sign.recipient,
+      };
+
       const method = contractId ? "PUT" : "POST";
       const url = contractId ? `/api/secrets/${contractId}` : `/api/secrets`;
 
@@ -194,13 +215,16 @@ console.log("payload", payload);
 
       if (!res.ok) throw new Error(await res.text());
       const data = await res.json();
-       
-      setFormData(prev => ({ ...prev, ...data, 
-          sign: {
-            discloser: data.writerSignature || prev.sign.discloser,
-            recipient: data.receiverSignature || prev.sign.recipient
-          }
-     }));
+
+      setFormData(prev => ({
+        ...prev,
+        ...data,
+        sign: {
+          discloser: data.writerSignature || prev.sign.discloser,
+          recipient: data.receiverSignature || prev.sign.recipient
+        }
+      }));
+
       alert("계약서 제출 완료!");
       if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
       if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
