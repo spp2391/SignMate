@@ -62,6 +62,7 @@ body.gradient-custom {
     margin-bottom: 20px;
 }
 .label-group input {
+    width: 100%;
     padding: 12px 16px;
     background-color: #ffffff;
     color: #000000;
@@ -135,6 +136,22 @@ body.gradient-custom {
     cursor: pointer;
     transition: 0.3s;
     text-align: center;
+    /* align-items는 flex 컨테이너에서만 작동하므로 제거하거나 부모에 적용 */
+}
+.login-btn, .google-btn {
+    display: block;
+    width: 100%;
+    padding: 12px 0;
+    color: #ffffff;
+    background: #EA4335;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+    text-align: center;
+    margin-top: 10px;
     /* align-items는 flex 컨테이너에서만 작동하므로 제거하거나 부모에 적용 */
 }
 .naver-btn {

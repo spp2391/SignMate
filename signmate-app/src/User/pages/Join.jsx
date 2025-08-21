@@ -5,7 +5,9 @@ const Join = () => {
     return (
         <div>
             <Header/>
-            <JoinInputArea />
+            <div>
+                <JoinInputArea />
+            </div>
             {/* Footer */}
         </div>
     )

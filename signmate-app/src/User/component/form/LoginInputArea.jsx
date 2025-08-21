@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./login.css";
 
 const LoginInputArea = () => {
     const [state, setState] = useState(
@@ -19,29 +20,6 @@ const LoginInputArea = () => {
             ...state,
             pw: event.target.value,
         })
-    }
-    const handleJoin = (event) => {
-        event.preventDefault();
-        const joinRequest = {
-            email: state.id,
-            password: state.pw,
-            name: state.id,
-            nickname: state.id,
-            companyName: "ABC",
-            userType: "USER",
-            userRole: "COMPANY"
-        }
-        fetch("http://localhost:8080/api/user/join", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(joinRequest),
-        })
-        .then((response) => response.json())
-        .then((data) => setState({
-            status: data
-        }))
     }
     const handleLogin = (event) => {
         event.preventDefault();
@@ -65,30 +43,84 @@ const LoginInputArea = () => {
         })
     }
     const handleKakaoLogin = () => {
-
+        fetch("http://localhost:8080/login/oauth2/code/kakao", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
     }
     const handleGoogleLogin = () => {
-
+        fetch("http://localhost:8080/login/oauth2/code/google", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
+    }
+    const handleNaverLogin = () => {
+        fetch("http://localhost:8080/login/oauth2/code/naver", {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
     }
     return (
-        <div>
-            <h1>Login</h1>
-            <input
-                type="id"
-                value={state.id}
-                onChange={handleChangeId}
-            />
-            <input
-                type="pw"
-                value={state.pw}
-                onChange={handleChangePw}
-            />
-            <p>{state.status}</p>
-            <p>{state.id}, {state.pw}</p>
-            <button onClick={handleJoin}>Join</button>
-            <button onClick={handleLogin}>Submit</button>
-            <button onClick={handleKakaoLogin}>Kakao</button>
-            <button onClick={handleGoogleLogin}>Google</button>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="logo">
+                    Login
+                </div>
+                <div>
+                    <div className="tab-menu">
+                        아이디/패스워드를 입력해주세요.
+                    </div>
+                    <div className="input-group">
+                        <input
+                            type="id"
+                            value={state.id}
+                            onChange={handleChangeId}
+                            placeholder="email"
+                        />
+                        <input
+                            type="pw"
+                            value={state.pw}
+                            onChange={handleChangePw}
+                            placeholder="password"
+                        />
+                    </div>
+                    {/* <p>{state.status}</p>
+                    <p>{state.id}, {state.pw}</p> */}
+                    {/* <button onClick={handleJoin}>Join</button> */}
+                    <button onClick={handleLogin} className="login-btn">Submit</button>
+                    <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button>
+                    <a href="http://localhost:8080/login/oauth2/code/kakao" className="kakao-btn">Kakao</a>
+                    <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
+                    <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
+                </div>
+            </div>     
         </div>
     )
 }

@@ -9,9 +9,7 @@ import Join from './User/pages/Join';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {/* <App /> */}
-    {/* <Login /> */}
-    <Join/>
+    <App />
   </React.StrictMode>
 );
 

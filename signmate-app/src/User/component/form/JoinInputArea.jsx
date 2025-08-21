@@ -1,3 +1,4 @@
+import "./login.css";
 import { useState } from "react";
 
 const JoinInputArea = () => {
@@ -76,70 +77,70 @@ const JoinInputArea = () => {
     }
 
     return (
-        <div>
-            <h1>Join</h1>
-            <div>
-                email
-                <input
-                    type="email"
-                    value={state.email}
-                    onChange={handleChangeEmail}
-                />
+        <div className="login-container">
+        <div className="login-card">
+            <div className="logo">
+                <h1>Join</h1>
             </div>
-            <div>
-                password
+            <div className="input-group">
+                <input
+                        type="email"
+                        value={state.email}
+                        onChange={handleChangeEmail}
+                        placeholder="email"
+                />
                 <input
                     type="pw"
                     value={state.pw}
                     onChange={handleChangePw}
+                    placeholder="password"
                 />
-            </div>
-            <div>
-                name
                 <input
                     type="text"
                     value={state.name}
                     onChange={handleChangeName}
+                    placeholder="name"
                 />
-            </div>
-            <div>
-                nickname
                 <input
                     type="text"
                     value={state.nickname}
                     onChange={handleChangeNickname}
+                    placeholder="nickname"
                 />
-            </div>
-            <div>
-                companyName
                 <input
                     type="text"
                     value={state.companyName}
                     onChange={handleChangeCompanyName}
+                    placeholder="company name"
                 />
-            </div>
-            <div>
-                userType USER/ADMIN
-                <input
-                    type="text"
-                    value={state.userType}
-                    onChange={handleChangeUserType}
-                />
-            </div>
-            <div>
-                userRole PRIVATE/COMPANY
+                {/* <div>
+                    userType USER/ADMIN
+                    <input
+                        type="text"
+                        value={state.userType}
+                        onChange={handleChangeUserType}
+                    />
+                </div> */}
                 <input
                     type="text"
                     value={state.userRole}
                     onChange={handleChangeUserRole}
+                    placeholder="userRole PRIVATE/COMPANY"
                 />
+                {/* <div>
+                    {state.status}
+                </div> */}
             </div>
-            <div>
-                {state.status}
-            </div>
+            <div className="options">
+                <label><input type="checkbox" id="terms" required /> [필수] 약관 전체 동의</label>
+            </div>         
             <div>
                 <button onClick={handleJoin}>Join</button>
             </div>
+            <div className="helper-links">
+                <a href="/">이미 계정이 있으신가요? 로그인</a>
+            </div>
+        </div>
         </div>
     )
 }

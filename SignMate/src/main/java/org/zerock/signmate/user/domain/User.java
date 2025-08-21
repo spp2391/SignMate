@@ -37,8 +37,9 @@ public class User implements UserDetails {
     @Column(name = "google_id", length = 255, unique = true)
     private String googleId;
 
+    // 제공되는 정보의 차이로 인해 Long 사용
     @Column(name = "kakao_id", length = 255, unique = true)
-    private String kakaoId;
+    private Long kakaoId;
 
     @Column(name = "naver_id", length = 255, unique = true)
     private String naverId;
