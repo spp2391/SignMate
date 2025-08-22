@@ -15,8 +15,10 @@ import org.zerock.signmate.Contract.standard.repository.StandardRepository;
 import org.zerock.signmate.notification.service.NotificationService;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
+import org.zerock.signmate.visualization.repository.StandardEmploymentContractRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -27,6 +29,13 @@ public class StandardService {
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
     private final NotificationService notificationService;
+
+    // 로그인된 사용자 가져오기
+    private final StandardEmploymentContractRepository standardRepo;
+
+    public List<Standard> getMyContracts(User loginUser) {
+        return standardRepo.findByContract_Writer(loginUser);
+    }
 
     @Transactional
     public StandardDTO addOrUpdateStandard(StandardDTO dto) {
