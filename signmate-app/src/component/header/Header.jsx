@@ -5,6 +5,8 @@ import "../../assets/css/setting.css";
 import "../../assets/css/templatehouse.css";
 import logo from "../../assets/images/logo_small.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
+import NotificationBell from "../../pages/NotificationBell";
+
 
 const Header = () => {
     return (
@@ -52,6 +54,17 @@ const Header = () => {
                     <div className="header-right">
                         <div className="header-utils">
                             <ul>
+                                <li className="auth-menu">
+                                    <NotificationBell />
+                                    </li>
+
+                                    <li className="allmenu">
+                                    <button className="btn-allmenu">
+                                        <i className="ico-hamburger"></i>
+                                        <i className="ico-hamburger"></i>
+                                        <i className="ico-hamburger"></i>
+                                    </button>
+                                    </li>
                                 {/* 로그인 상태일 때 */}
                                 {/* <li className="auth-menu">
                                     <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
