@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
+import { getLoginUserName } from "./util";
 // 표준근로계약서 템플릿 (원본 유지)
 const employmentTemplate = {
   name: "표준근로계약서(기간의 정함이 없는 경우)",
@@ -18,15 +19,16 @@ const employmentTemplate = {
     "nationalPension","healthInsurance","employmentInsurance","industrialAccidentInsurance"
   ],
   defaults: {
-    employer: { name: "", address: "", ceo: "" },
-    employee: { name: "", address: "", phone: "" },
-    start: { year: "", month: "", day: "" },
-    work: { place: "", duty: "" },
-    time: { startH: "", endH: "", breakH: "", breakM: "" },
-    weeklyWorkday: "", weeklyHoliday: "",
-    wage: { base: "", bonus: "", extra: "" },
-    payday: "", paymethod: "통장입금",
-    ins: { nps: false, nhi: false, ei: false, aci: false },
+    // :"", :"", :"", :"", :"", :"",
+    employerName: "", employerRepresentative:"", employerAddress:"",
+    employeeName:"",employeeAddress:"",employeeContact:"",
+    workStartYear:"", workStartMonth:"", workStartDay:"",
+    workLocation:"", workDescription:"",
+    workStartHour:"", workEndHour:"", breakHour:"", breakMinute:"",
+    workDays: "", weeklyHoliday: "",
+    wageAmount:"", bonus:"", otherAllowance:"",
+    wagePaymentDate: "", paymentMethod: "통장입금",
+    nationalPension: false, healthInsurance: false, employmentInsurance: false, industrialAccidentInsurance: false,
     rates: { overtime: "통상임금의 1.5배", night: "통상임금의 1.5배", holiday: "통상임금의 1.5배" },
     probationMonths: "3",
     noticeDays: "30",
@@ -70,19 +72,19 @@ const employmentTemplate = {
   { type: "checkbox", name: "industrialAccidentInsurance", label: "산재보험" },
   ],
     body: `
-(이하 "사업주") {{employer.name}} 과(와) (이하 "근로자") {{employee.name}} 은 다음과 같이 근로계약을 체결한다.
+(이하 "사업주") {{employerName}} 과(와) (이하 "근로자") {{employeeName}} 은 다음과 같이 근로계약을 체결한다.
 
-1. 근로개시일: {{start.year}}년 {{start.month}}월 {{start.day}}일 부터
-2. 근무 장소: {{work.place}}
-3. 업무 내용: {{work.duty}}
-4. 소정근로시간: {{time.startH}}시 ~ {{time.endH}}시 (휴게 {{time.breakH}}시간 {{time.breakM}}분)
-5. 근무일/휴일: 매주 {{weeklyWorkday}} 근무, 주휴일 매주 {{weeklyHoliday}}요일
+1. 근로개시일: {{workStartYear}}년 {{workStartMonth}}월 {{workStartDay}}일 부터
+2. 근무 장소: {{workLocation}}
+3. 업무 내용: {{workDescription}}
+4. 소정근로시간: {{workStartHour}}시 ~ {{workEndHour}}시 (휴게 {{breakHour}}시간 {{breakMinute}}분)
+5. 근무일/휴일: 매주 {{workDays}} 근무, 주휴일 매주 {{weeklyHoliday}}요일
 
 6. 임금
- - 기본임금(월/시간): {{wage.base}} 원
- - 상여금: {{wage.bonus}}
- - 기타수당(제수당 등): {{wage.extra}}
- - 임금지급일: {{payday}} (지급방법: {{paymethod}})
+ - 기본임금(월/시간): {{wageAmount}} 원
+ - 상여금: {{bonus}}
+ - 기타수당(제수당 등): {{otherAllowance}}
+ - 임금지급일: {{wagePaymentDate}} (지급방법: {{paymentMethod}})
  - 법정수당: 연장 {{rates.overtime}}, 야간 {{rates.night}}, 휴일 {{rates.holiday}} 적용
 
 7. 수습
@@ -92,7 +94,7 @@ const employmentTemplate = {
  - 연차유급휴가 및 출‧퇴근·휴게 등은 근로기준법과 회사 취업규칙에 따른다.
 
 9. 사회보험
- - 적용 여부: 국민연금({{ins.nps}}), 건강보험({{ins.nhi}}), 고용보험({{ins.ei}}), 산재보험({{ins.aci}}).
+ - 적용 여부: 국민연금({{nationalPension}}), 건강보험({{healthInsurance}}), 고용보험({{employmentInsurance}}), 산재보험({{industrialAccidentInsurance}}).
 
 10. 개인정보
  - 이용 목적: {{privacy}}. 관련 법령과 회사 정책에 따라 보관·파기한다.
@@ -114,10 +116,10 @@ const employmentTemplate = {
  - 본 계약서 사본 각 1부씩 교부·보관한다.
 
 [서명]
-(사업주) {{employer.name}} / 대표자: {{employer.ceo}} (서명) / 주소: {{employer.address}}
+(사업주) {{employerName}} / 대표자: {{employerRepresentative}} (서명) / 주소: {{employerAddress}}
 {{sign.employer}}
 
-(근로자) 성명: {{employee.name}} (서명) / 주소: {{employee.address}} / 연락처: {{employee.phone}}
+(근로자) 성명: {{employeeName}} (서명) / 주소: {{employeeAddress}} / 연락처: {{employeeContact}}
 {{sign.employee}}
   `,
   footerNote: "※ 취업규칙·인사규정과 함께 운영하면 좋습니다.",
@@ -138,37 +140,11 @@ export default function EmploymentContractPage() {
 
   const debouncedSetValue = useRef(
     debounce((updated) => setFormData(prev => {
-      const newState = { ...prev };
-      Object.entries(updated).forEach(([key, value]) => {
-        if (key.includes(".")) {
-          const [parent, child] = key.split(".");
-          newState[parent] = { ...newState[parent], [child]: value };
-        } else {
-          newState[key] = value;
-        }
-      });
-      return newState;
+      return { ...prev, ...updated };
     }), 300)
   ).current;
 
   // 로그인 사용자 이름 추출
-  const getLoginUserName = () => {
-    try {
-      const token = localStorage.getItem("accessToken");
-      if (!token) return null;
-      const base64Url = token.split(".")[1];
-      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-      const jsonPayload = decodeURIComponent(
-        atob(base64).split("").map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)).join("")
-      );
-      const payload = JSON.parse(jsonPayload);
-      return payload.username || payload.name || payload.sub;
-    } catch (e) {
-      console.error("JWT 파싱 실패", e);
-      return null;
-    }
-  };
-
   const loginUserName = getLoginUserName();
 
   useEffect(() => {

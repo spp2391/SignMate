@@ -71,11 +71,11 @@ public class Standard extends CommonEntity {
 
     // 전자서명 - 사업주, 근로자 (Base64 문자열 저장)
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature", columnDefinition = "LONGTEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature", columnDefinition = "LONGTEXT")
     private String receiverSignature; // base64
 
     // 상태 및 이력

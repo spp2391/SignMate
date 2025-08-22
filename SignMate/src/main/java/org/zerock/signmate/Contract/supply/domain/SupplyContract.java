@@ -53,11 +53,11 @@ public class SupplyContract extends CommonEntity {
     private String otherTerms;
 
     @Lob
-    @Column(name = "supplier_signature")
+    @Column(name = "supplier_signature", columnDefinition = "LONGTEXT")
     private String supplierSignature;
 
     @Lob
-    @Column(name = "demander_signature")
+    @Column(name = "demander_signature", columnDefinition = "LONGTEXT")
     private String demanderSignature;
 
     @OneToMany(mappedBy = "supplyContract", cascade = CascadeType.ALL, orphanRemoval = true)
