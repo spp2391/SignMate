@@ -1,5 +1,6 @@
 // src/App.js
 import React from "react";
+import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
@@ -14,7 +15,9 @@ import CompanyStatisticsPage from './pages/CompanyStatisticsPage';
 import ContractInboxPage from './pages/ContractInboxPage';
 import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
-import Header from "./component/header/Header";
+import Inbox from "./component/inbox/Inbox";
+import NoticePage from "./pages/Notice";
+
 
 export default function App() {
   return (
@@ -29,7 +32,7 @@ export default function App() {
         <Header />
       {/* </nav> */}
 
-            <Header />
+         
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/contracts" element={<ContractList />} />
@@ -45,6 +48,8 @@ export default function App() {
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/inbox" element={<Inbox />} />
+                <Route path="/notice" element={<NoticePage />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

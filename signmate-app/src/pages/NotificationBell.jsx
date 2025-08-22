@@ -96,7 +96,7 @@ export default function NotificationBell() {
           style={{
             position: "fixed",
             top: 72,
-            right: 20,
+            right: 300,
             width: 360,
             maxHeight: 600,
             background: "#fff",
