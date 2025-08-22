@@ -22,9 +22,11 @@ public class SupplyContractController {
         try {
             SupplyContractDTO savedDto = supplyContractService.addOrUpdateContract(dto);
             return ResponseEntity.ok(savedDto);
-        } catch (IllegalArgumentException e) {
+        } catch (EntityNotFoundException e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
         }
     }
