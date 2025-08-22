@@ -1,7 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./login.css";
+import { useLocation } from "react-router-dom";
 
 const LoginInputArea = () => {
+    const location = useLocation();
+    useEffect(()=>{
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');  // 'react'
+        if(token){
+            localStorage.setItem("accessToken", token);
+        }
+    },[])
     const [state, setState] = useState(
         {
             id: "",
@@ -43,23 +52,23 @@ const LoginInputArea = () => {
         })
     }
     const handleKakaoLogin = () => {
-        fetch("http://localhost:8080/login/oauth2/code/kakao", {
-            method: "POST",
+        fetch("/oauth2/authorization/kakao", {
+            method: "GET",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
             },
         })
         .then((response) =>
-            response.text()
+            response.json()
         )
         .then(text=>{
             localStorage.setItem("accessToken", text);
         })
     }
     const handleGoogleLogin = () => {
-        fetch("http://localhost:8080/login/oauth2/code/google", {
-            method: "POST",
+        fetch("/oauth2/authorization/google", {
+            method: "GET",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
@@ -73,8 +82,8 @@ const LoginInputArea = () => {
         })
     }
     const handleNaverLogin = () => {
-        fetch("http://localhost:8080/login/oauth2/code/naver", {
-            method: "POST",
+        fetch("/oauth2/authorization/naver", {
+            method: "GET",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
@@ -116,7 +125,7 @@ const LoginInputArea = () => {
                     {/* <button onClick={handleJoin}>Join</button> */}
                     <button onClick={handleLogin} className="login-btn">Submit</button>
                     <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button>
-                    <a href="http://localhost:8080/login/oauth2/code/kakao" className="kakao-btn">Kakao</a>
+                    <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a>
                     <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
                     <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
                 </div>
