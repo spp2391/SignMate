@@ -65,7 +65,7 @@ const Header = () => {
                                 </li> */}
                                 {/* 비로그인 상태일 때 */}
                                 <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/member/login}"><span>로그인</span></Link>
+                                    <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
                                 </li>
                                  {/* style="padding-right: 30px;" */}
                                 <li className="auth-menu">
