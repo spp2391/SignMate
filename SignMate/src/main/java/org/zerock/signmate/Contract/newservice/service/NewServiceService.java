@@ -7,13 +7,16 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
+import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.Contract.newservice.domain.ServiceContractDocument;
 import org.zerock.signmate.Contract.newservice.dto.NewServiceDTO;
 
 import org.zerock.signmate.Contract.newservice.repository.ServiceContractDocumentRepository;
+import org.zerock.signmate.notification.service.NotificationService;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -23,6 +26,7 @@ public class NewServiceService {
     private final ServiceContractDocumentRepository documentRepository;
     private final UserRepository userRepository;
     private final ContractRepository contractRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public NewServiceDTO addOrUpdateDocument(NewServiceDTO dto) {
@@ -79,7 +83,28 @@ public class NewServiceService {
         document.setWriterSignature(dto.getWriterSignature());
         document.setReceiverSignature(dto.getReceiverSignature());
 
-        return NewServiceDTO.fromEntity(documentRepository.save(document));
+        ServiceContractDocument saved = documentRepository.save(document);
+
+        LocalDateTime now = LocalDateTime.now();
+        if (document.getWriterSignature() != null && document.getReceiverSignature() != null) {
+            // 서명 완료: 계약 완료 상태
+            contract.setStatus(enums.ContractStatus.COMPLETED);
+            contractRepository.save(contract);
+            String msg = "용역계약서가 완료되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        } else {
+            // 작성/수정 중
+            String msg = "용역계약서가 작성/수정되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        }
+
+        return NewServiceDTO.fromEntity(saved);
     }
 
     public NewServiceDTO findById(Long id) {

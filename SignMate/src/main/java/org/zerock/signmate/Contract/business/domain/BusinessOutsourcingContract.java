@@ -55,11 +55,11 @@ public class BusinessOutsourcingContract extends CommonEntity {
     private LocalDate signatureDate;  // 서명일
 
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature", columnDefinition = "LONGTEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature", columnDefinition = "LONGTEXT")
     private String receiverSignature; // base64
 
     // 정산 내역 목록 (1:N 관계)
