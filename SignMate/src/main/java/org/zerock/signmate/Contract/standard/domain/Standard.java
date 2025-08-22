@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.signmate.Contract.domain.CommonEntity;
 import org.zerock.signmate.Contract.domain.Contract;
+import org.zerock.signmate.user.domain.User;
+
+import java.time.temporal.ChronoUnit;
 
 @Getter
 @Setter
@@ -78,7 +81,8 @@ public class Standard extends CommonEntity {
     @Column(name = "receiver_signature", columnDefinition = "LONGTEXT")
     private String receiverSignature; // base64
 
-    // 상태 및 이력
-
-
+//    // 내 문서 조회시에 필요
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "writer_id", nullable = false)
+//    private User writer;
 }

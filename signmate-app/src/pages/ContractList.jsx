@@ -9,7 +9,7 @@ const contracts = [
       "기업/기관용 비밀유지 서약서",
       "중요 정보와 기밀 사항을 안전하게 보호합니다."
     ],
-    path: "/secret",
+    path: "/secrets",
     color: "#f8d7da"
   },
   {

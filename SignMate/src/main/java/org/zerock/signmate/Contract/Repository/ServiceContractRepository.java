@@ -1,11 +1,13 @@
 package org.zerock.signmate.Contract.Repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 import org.zerock.signmate.Contract.domain.Contract;
 import org.zerock.signmate.Contract.domain.ServiceContract;
 
 import java.util.Optional;
 
+@Repository("serviceContractVisualizationRepository")
 public interface ServiceContractRepository extends JpaRepository<ServiceContract, Long> {
     Optional<ServiceContract> findByContract(Contract contract);
     Optional<ServiceContract> findByContract_Id(Long contractId);

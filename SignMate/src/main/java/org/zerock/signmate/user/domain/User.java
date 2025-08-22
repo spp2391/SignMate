@@ -5,9 +5,13 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.zerock.signmate.Contract.domain.ServiceContract;
+import org.zerock.signmate.Contract.secret.domain.Secret;
+import org.zerock.signmate.Contract.standard.domain.Standard;
 
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -114,5 +118,14 @@ public class User implements UserDetails {
         return this;
     }
 
+
+//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    public List<Secret> secrets = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    public List<ServiceContract> services = new ArrayList<>();
+//
+//    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+//    public List<Standard> standards = new ArrayList<>();
 
 }

@@ -1,12 +1,17 @@
 // src/App.js
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Header from "./components/header/Header";
+import Footer from "./components/footer/Footer";
+import Index from "./components/index/index";
+import ContractList from "./pages/ContractList";
 import SecretPage from "./pages/SecretPage";
 import EmploymentContractPage from "./pages/EmploymentContractPage";
 import ServiceContractPage from "./pages/ServiceContractPage";
 import SupplyContractPage from "./pages/SupplyContractPage";
 import OutsourcingContractPage from "./pages/OutsourcingContractPage";
+import CompanyStatisticsPage from './pages/CompanyStatisticsPage';
+import ContractInboxPage from './pages/ContractInboxPage';
 import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 import Header from "./component/header/Header";
@@ -24,17 +29,25 @@ export default function App() {
         <Header />
       {/* </nav> */}
 
-      <Routes>
-        <Route path="/secrets/:contractId" element={<SecretPage signerId="" />} />
-        <Route path="/employment" element={<EmploymentContractPage />} />
-        <Route path="/service" element={<ServiceContractPage />} />
-        <Route path="/supply" element={<SupplyContractPage />} />
-        <Route path="/outsourcing" element={<OutsourcingContractPage />} />
-        {/* 기본 라우트 */}
-        <Route path="/notifications" element={<Mailbox />} />
-        <Route path="*" element={<SecretPage signerId="" />} />
-        <Route path="/login" element={<Login />} />
-      </Routes>
-    </Router>
-  );
+            <Header />
+            <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/contracts" element={<ContractList />} />
+                <Route path="/secrets" element={<SecretPage />} />
+                <Route path="/employment" element={<EmploymentContractPage />} />
+                <Route path="/service" element={<ServiceContractPage />} />
+                <Route path="/supply" element={<SupplyContractPage />} />
+                <Route path="/outsourcing" element={<OutsourcingContractPage />} />
+                <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
+                <Route path="*" element={<Index />} />
+                <Route path="/inbox" element={<ContractInboxPage />} />
+                <Route path="/secrets/:contractId" element={<SecretPage signerId="" />} />
+                <Route path="/notifications" element={<Mailbox />} />
+                <Route path="*" element={<SecretPage signerId="" />} />
+                <Route path="/login" element={<Login />} />
+                {/* 기본 라우트 */}
+            </Routes>
+            <Footer />
+        </Router>
+    );
 }
