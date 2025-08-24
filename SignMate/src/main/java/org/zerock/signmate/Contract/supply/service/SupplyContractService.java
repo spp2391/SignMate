@@ -53,7 +53,7 @@ public class SupplyContractService {
         // Contract 엔티티 생성 또는 조회
         Contract contract = dto.getContractId() == null
                 ? Contract.builder()
-                .contractType(ContractType.SERVICE)
+                .contractType(ContractType.SUPPLY)
                 .writer(writer)
                 .receiver(receiver)
                 .build()

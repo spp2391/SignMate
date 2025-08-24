@@ -34,7 +34,7 @@ const employmentTemplate = {
     noticeDays: "30",
     privacy: "업무 수행 및 인사‧급여 목적 범위 내",
     rulesUrl: "(회사 내규 위치)",
-    sign: { employer: "", employee: "" }
+    sign: { employer: null, employee: null }
   },
   fields: [
     { type: "section", label: "사업주/근로자" },

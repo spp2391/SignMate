@@ -64,9 +64,9 @@ public class StandardController {
         }
     }
 
-    @GetMapping("/my")
-    public List<Standard> getMyContracts(@AuthenticationPrincipal User loginUser) {
-        return standardService.getMyContracts(loginUser);
-    }
+//    @GetMapping("/my")
+//    public List<Standard> getMyContracts(@AuthenticationPrincipal User loginUser) {
+//        return standardService.getMyContracts(loginUser);
+//    }
 
 }

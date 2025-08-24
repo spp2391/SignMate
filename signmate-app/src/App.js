@@ -45,6 +45,7 @@ export default function App() {
                 <Route path="*" element={<Index />} />
                 <Route path="/inbox" element={<ContractInboxPage />} />
                 <Route path="/secrets/:contractId" element={<SecretPage signerId="" />} />
+               <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
                 <Route path="/login" element={<Login />} />

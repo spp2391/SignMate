@@ -22,29 +22,33 @@ export default function Mailbox({ refreshUnread }) {
     }
   };
 
-  // 읽음 처리 후 이동
-const handleClick = async (contractId, notificationId) => {
-  // 1. 로컬에서 바로 읽음 처리
-  setNotifications((prev) =>
-    prev.map((n) =>
-      n.notificationId === notificationId ? { ...n, isRead: true } : n
-    )
-  );
+  // 읽음 처리 후 이동 (contractType에 따라 동적 경로 이동)
+  const handleClick = async (contractId, notificationId, contractType) => {
+    // 1. 로컬에서 바로 읽음 처리
+    setNotifications((prev) =>
+      prev.map((n) =>
+        n.notificationId === notificationId ? { ...n, isRead: true } : n
+      )
+    );
 
-  if (refreshUnread) refreshUnread();
+    if (refreshUnread) refreshUnread();
 
-  // 2. 서버에 읽음 처리 비동기 요청
-  fetch(`/api/notifications/read/${notificationId}`, {
-    method: "POST",
-    headers: {
-      Authorization: "Bearer " + localStorage.getItem("accessToken"),
-    },
-  }).catch((err) => console.error("읽음 처리 실패:", err));
+    // 2. 서버에 읽음 처리 비동기 요청
+    fetch(`/api/notifications/read/${notificationId}`, {
+      method: "POST",
+      headers: {
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    }).catch((err) => console.error("읽음 처리 실패:", err));
 
-  // 3. navigate
-  navigate(`/secrets/${contractId}`);
-};
-
+    // 3. contractType을 소문자로 바꿔서 해당 경로로 navigate
+    if (contractType) {
+      navigate(`/${contractType.toLowerCase()}/${contractId}`);
+    } else {
+      // contractType 없으면 기본 경로로 이동 (fallback)
+      navigate(`/employment/${contractId}`);
+    }
+  };
 
   useEffect(() => {
     fetchNotifications();
@@ -57,13 +61,13 @@ const handleClick = async (contractId, notificationId) => {
         {notifications.map((n) => (
           <li
             key={n.notificationId}
-            onClick={() => handleClick(n.contractId, n.notificationId)}
+            onClick={() => handleClick(n.contractId, n.notificationId, n.contractType)}
             style={{
               cursor: "pointer",
               marginBottom: 8,
               padding: "8px 6px",
               borderRadius: 6,
-              backgroundColor: n.isRead ? "#fff" : "#fff",
+              backgroundColor: n.isRead ? "#fff" : "#f0f8ff",
               border: "1px solid #f1f5f9",
             }}
           >
