@@ -6,8 +6,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.zerock.signmate.user.OAuth2User.CustomOAuth2User;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.dto.AddUserRequest;
+import org.zerock.signmate.user.dto.EditUserRequest;
 import org.zerock.signmate.user.dto.LoginUserRequest;
 import org.zerock.signmate.user.repository.UserRepository;
 
@@ -37,6 +39,21 @@ public class UserRegisterService {
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public User editUser(CustomOAuth2User user, EditUserRequest dto) throws Exception {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User userPrimary = user.getUser();
+//        User userEdit = User.builder()
+//                .userId(userPrimary.getUserId())
+//                .name(dto.getName()!=null ? dto.getName() : userPrimary.getName())
+//                .nickname(dto.getNickname()!=null ? dto.getNickname() : userPrimary.getNickname())
+//                .password(dto.getPassword()!=null ? passwordEncoder.encode(dto.getPassword()) : userPrimary.getPassword())
+//                .
+
+
+        return null;
+
     }
 
     public User findUserByEmailAndPassword(LoginUserRequest dto) throws Exception{

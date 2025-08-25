@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import "./login.css";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const LoginInputArea = () => {
     const location = useLocation();
+    const navigate = useNavigate();
     useEffect(()=>{
         const queryParams = new URLSearchParams(location.search);
         const token = queryParams.get('token');  // 'react'
@@ -44,28 +45,41 @@ const LoginInputArea = () => {
             },
             body: JSON.stringify(loginRequest),
         })
-        .then((response) =>
+        .then(async (response) => {
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
             response.text()
+        }
         )
         .then(text=>{
             localStorage.setItem("accessToken", text);
+            alert("로그인 되었습니다.");
+            navigate("/");
+        })
+        .catch((e) => {
+            alert(e.message);
+            // console.log(e.message);
         })
     }
-    const handleKakaoLogin = () => {
-        fetch("/oauth2/authorization/kakao", {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((response) =>
-            response.json()
-        )
-        .then(text=>{
-            localStorage.setItem("accessToken", text);
-        })
-    }
+    // const handleKakaoLogin = () => {
+    //     fetch("/oauth2/authorization/kakao", {
+    //         method: "GET",
+    //         credentials: "include",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //     })
+    //     .then((response) =>
+    //         response.json()
+    //     )
+    //     .then(text=>{
+    //         localStorage.setItem("accessToken", text);
+    //     })
+    //     .catch(e => {
+    //         alert(e);
+    //     })
+    // }
     const handleGoogleLogin = () => {
         fetch("/oauth2/authorization/google", {
             method: "GET",
@@ -114,7 +128,7 @@ const LoginInputArea = () => {
                             placeholder="email"
                         />
                         <input
-                            type="pw"
+                            type="password"
                             value={state.pw}
                             onChange={handleChangePw}
                             placeholder="password"
@@ -124,7 +138,7 @@ const LoginInputArea = () => {
                     <p>{state.id}, {state.pw}</p> */}
                     {/* <button onClick={handleJoin}>Join</button> */}
                     <button onClick={handleLogin} className="login-btn">Submit</button>
-                    <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button>
+                    {/* <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button> */}
                     <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a>
                     <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
                     <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
