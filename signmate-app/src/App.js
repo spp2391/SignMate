@@ -56,7 +56,7 @@ export default function App() {
                 <Route path="/notifications" element={<Mailbox/>}/>
                 <Route path="*" element={<SecretPage signerId=""/>}/>
                 <Route path="/login" element={<Login/>}/>
-                <Route path="/join" element={<Join/>} /
+                <Route path="/join" element={<Join/>} 
                 <Route path="/inbox" element={<Inbox/>} />
                 <Route path="/notice" element={<NoticePage/>}/>
                     {/* 기본 라우트 */}
