@@ -10,7 +10,7 @@ const Header = () => {
     // 아이디가 변경되었을 때 로그인 상태 확인 및 아이디 조정
 
     useEffect(() => {
-        checkLoggedIn();
+        // checkLoggedIn();
     },[])
 
     const checkLoggedIn = () => {
@@ -39,7 +39,32 @@ const Header = () => {
     } else {
         return (
             <div className="container">
-                join login
+                <div className="logo">SignMate</div>
+                <div className="menu1">
+                    <div className="list-item">
+                        item 0
+                    </div>
+                    <div className="list-item">
+                        item 1
+                    </div>
+                    <div className="list-item">
+                        item 2
+                    </div>
+                    <div className="list-item">
+                        item 3
+                    </div>
+                    <div className="list-item">
+                        item 4
+                    </div>
+                </div>
+                <div className="menu2">
+                    <div className="list-item">
+                        login    
+                    </div>
+                    <div className="list-item">
+                        logout
+                    </div>
+                </div>
             </div>
         )
     }

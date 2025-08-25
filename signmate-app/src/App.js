@@ -17,6 +17,7 @@ import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
+import Join from './User/pages/Join';
 
 
 export default function App() {
@@ -33,8 +34,8 @@ export default function App() {
     }
   }
   return (
-    
-    
+
+
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
         <Link to="/secret">비밀유지서약서</Link>
@@ -45,7 +46,7 @@ export default function App() {
         <Header />
       {/* </nav> */}
 
-         
+
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/contracts" element={<ContractList />} />
@@ -68,9 +69,12 @@ export default function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/inbox" element={<Inbox />} />
                 <Route path="/notice" element={<NoticePage />} />
+                <Route path="/join" element={<Join />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />
         </Router>
     );
 }
+
+export default App;
