@@ -1,6 +1,5 @@
 package org.zerock.signmate.Contract.supply.controller;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,58 +9,49 @@ import org.zerock.signmate.Contract.supply.service.SupplyContractService;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/supplies")
+@RequestMapping("/api/supply")
 @RequiredArgsConstructor
 public class SupplyContractController {
 
     private final SupplyContractService supplyContractService;
 
-    // 자재/물품 공급계약서 생성 및 수정
+    // Contract 기준 저장 (POST = 새 작성, PUT = 수정)
     @PostMapping
-    public ResponseEntity<?> saveOrUpdateSupply(@RequestBody SupplyContractDTO dto) {
+    public ResponseEntity<?> createOrUpdateSupply(@RequestBody SupplyContractDTO dto) {
         try {
             SupplyContractDTO savedDto = supplyContractService.addOrUpdateContract(dto);
             return ResponseEntity.ok(savedDto);
-        } catch (EntityNotFoundException e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
     }
 
-    // 단일 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getSupply(@PathVariable Long id) {
-        SupplyContractDTO dto = supplyContractService.findById(id);
-        if (dto == null) {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/{contractId}")
+    public ResponseEntity<?> updateSupply(@PathVariable Long contractId, @RequestBody SupplyContractDTO dto) {
+        try {
+            dto.setContractId(contractId); // URL의 contractId 적용
+            SupplyContractDTO updatedDto = supplyContractService.addOrUpdateContract(dto);
+            return ResponseEntity.ok(updatedDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
+    }
+
+    // ContractId 기준 조회
+    @GetMapping("/{contractId}")
+    public ResponseEntity<SupplyContractDTO> getSupply(@PathVariable Long contractId) {
+        SupplyContractDTO dto = supplyContractService.findByContractId(contractId);
         return ResponseEntity.ok(dto);
     }
 
-    // ContractId로 조회
-    @GetMapping("/contract/{contractId}")
-    public ResponseEntity<?> getByContractId(@PathVariable Long contractId) {
-        try {
-            SupplyContractDTO dto = supplyContractService.findByContractId(contractId);
-            return ResponseEntity.ok(dto);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.status(404).body(Map.of("message", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
-        }
-    }
-
-    // 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteSupply(@PathVariable Long id) {
-        try {
-            supplyContractService.deleteById(id);
-            return ResponseEntity.ok(Map.of("message", "자재/물품 공급계약서가 삭제되었습니다."));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류가 발생했습니다."));
-        }
-    }
+    // ContractId 기준 삭제
+//    @DeleteMapping("/{contractId}")
+//    public ResponseEntity<?> deleteSupply(@PathVariable Long contractId) {
+//        try {
+//            supplyContractService.deleteByContractId(contractId);
+//            return ResponseEntity.ok(Map.of("message", "자재/물품 공급계약서가 삭제되었습니다."));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
+//        }
+//    }
 }

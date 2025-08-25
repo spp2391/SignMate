@@ -35,7 +35,7 @@ const serviceTemplate = {
     warrantyMonths: "",
     delayPenaltyRate: "",
     signatureDate: "",
-    sign: { client: "", vendor: "" } // 서명 이미지(dataURL)
+    sign: { discloser: null, recipient: null } // 서명 이미지(dataURL)
   },
 
   fields: [
@@ -96,10 +96,10 @@ const serviceTemplate = {
 서명일: {{signatureDate}}
 
 (갑) {{clientName}}  대표자: {{clientRepresentative}} (서명)
-{{sign.client}}
+{{sign.discloser}}
 
 (을) {{contractorName}}  대표자: {{contractorRepresentative}} (서명)
-{{sign.vendor}}
+{{sign.recipient}}
   `,
 
   footerNote: "※ 과업 범위/검수 기준을 구체적으로 기재하세요.",
@@ -121,7 +121,7 @@ export default function ServiceContractPage() {
   
       const fetchContract = async () => {
         try {
-          const res = await fetch(`/api/employment/${contractId}`, {
+          const res = await fetch(`/api/service/${contractId}`, {
             headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
           });
           if (!res.ok) throw new Error("계약서 로딩 실패");
@@ -131,14 +131,14 @@ export default function ServiceContractPage() {
             ...prev,
             ...data,
             sign: {
-              employer: data.writerSignature || prev.sign.employer,
-              employee: data.receiverSignature || prev.sign.employee
+              discloser: data.writerSignature || prev.sign.discloser,
+              recipient: data.receiverSignature || prev.sign.recipient
             }
           }));
   
           if (loginUserName) {
-            if (loginUserName === data.employerName) setCurrentUserRole("employer");
-            else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+            if (loginUserName === data.clientName) setCurrentUserRole("sender");
+            else if (loginUserName === data.contractorName) setCurrentUserRole("receiver");
             else setCurrentUserRole("none");
           }
   
@@ -190,11 +190,11 @@ export default function ServiceContractPage() {
         warrantyMonths: formData.warrantyMonths ? Number(formData.warrantyMonths) : null,
         delayPenaltyRate: formData.delayPenaltyRate ? Number(formData.delayPenaltyRate) : null,
         signatureDate: formData.signatureDate || null,
-        writerSignature: formData.sign.client,
-        receiverSignature: formData.sign.vendor
+        writerSignature: formData.sign.discloser,
+        receiverSignature: formData.sign.recipient
       };
 
-      const res = await fetch("/api/new-services", {
+      const res = await fetch("/api/service", {
         method: "POST",
         headers: { "Content-Type": "application/json" ,
           "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
@@ -220,7 +220,7 @@ export default function ServiceContractPage() {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={serviceTemplate}
-        data={serviceTemplate.defaults}
+        data={formData}
         handleChange={handleChange}
         role={currentUserRole}
       />
