@@ -65,7 +65,7 @@ export function ListView({ docs, selected, setSelected }) {
               </div>
               <div
                 className="cursor-pointer"
-                onClick={() => navigate(`/secrets/${d.id}`)}
+                onClick={() => navigate(`/${d.contractType.toLowerCase()}/${d.id}`)}
               >
               <div>
                 <div className="flex flex-wrap items-center gap-2">

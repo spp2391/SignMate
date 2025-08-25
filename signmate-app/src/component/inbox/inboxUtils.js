@@ -17,7 +17,7 @@ export const ContractStatus = {
 
 export const ContractType = {
   STANDARD: "STANDARD",
-  OUTSOURCING: "OUTSOURCING",
+  BUSINESS_OUTSOURCING: "BUSINESS_OUTSOURCING",
   SECRET: "SECRET",
   SERVICE: "SERVICE",
   SUPPLY: "SUPPLY",
@@ -26,7 +26,7 @@ export const ContractType = {
 // 2) 한글 라벨 매핑
 export const CONTRACT_TYPE_LABEL = {
   [ContractType.STANDARD]: "근로 계약서",
-  [ContractType.OUTSOURCING]: "업무위탁 계약서",
+  [ContractType.BUSINESS_OUTSOURCING]: "업무위탁 계약서",
   [ContractType.SECRET]: "비밀유지계약서",
   [ContractType.SERVICE]: "용역 계약서",
   [ContractType.SUPPLY]: "자재/물품 공급계약서",

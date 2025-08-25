@@ -29,7 +29,7 @@ const outsourcingTemplate = {
     totalPaymentAmount: "",
     signatureDate: "",
     governingLaw: "대한민국 법", // 고정
-    sign: { principal: "", agent: "" }
+    sign: { discloser: null, recipient: null }
   },
 
   fields: [
@@ -111,10 +111,10 @@ const outsourcingTemplate = {
 서명일: {{signatureDate}}
 
 (갑) {{clientName}} / 대표자: {{clientRepresentative}} (서명)
-{{sign.principal}}
+{{sign.discloser}}
 
 (을) {{contractorName}} / 대표자: {{contractorRepresentative}} (서명)
-{{sign.agent}}
+{{sign.recipient}}
   `,
 
   footerNote: "※ 과업명세서, 검수기준, 지연배상·하자보수 등 특약을 필요 시 추가하세요.",
@@ -145,24 +145,26 @@ export default function OutsourcingContractPage() {
   
       const fetchContract = async () => {
         try {
-          const res = await fetch(`/api/employment/${contractId}`, {
+          const res = await fetch(`/api/outsourcing/${contractId}`, {
             headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
           });
           if (!res.ok) throw new Error("계약서 로딩 실패");
           const data = await res.json();
+          console.log("📄 Contract 데이터:", data);
+      console.log("👤 로그인 사용자:", loginUserName);
   
           setFormData(prev => ({
             ...prev,
             ...data,
             sign: {
-              employer: data.writerSignature || prev.sign.employer,
-              employee: data.receiverSignature || prev.sign.employee
+              discloser: data.writerSignature || prev.sign.discloser,
+              recipient: data.receiverSignature || prev.sign.recipient
             }
           }));
   
           if (loginUserName) {
-            if (loginUserName === data.employerName) setCurrentUserRole("employer");
-            else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+            if (loginUserName === data.clientName) setCurrentUserRole("sender");
+            else if (loginUserName === data.contractorName) setCurrentUserRole("receiver");
             else setCurrentUserRole("none");
           }
   
@@ -209,11 +211,11 @@ export default function OutsourcingContractPage() {
           taskType: item.taskType,
           remarks: item.remarks,
         })),
-        writerSignature: formData.sign.principal,
-        receiverSignature: formData.sign.agent
+        writerSignature: formData.sign.discloser,
+        receiverSignature: formData.sign.recipient
       };
       const query = force ? "?force=true" : "";
-     const res = await fetch("/api/business" + query, {
+     const res = await fetch("/api/outsourcing" + query, {
   method: "POST",
   headers: { "Content-Type": "application/json",
     "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
@@ -248,7 +250,7 @@ if (res.status === 409) {
     <div style={{ padding: 20 }}>
       <ContractBase
         template={outsourcingTemplate}
-        data={outsourcingTemplate.defaults}
+        data={formData}
         handleChange={handleChange}
         role={currentUserRole}
       />

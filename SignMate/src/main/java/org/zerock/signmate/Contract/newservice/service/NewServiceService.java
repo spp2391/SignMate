@@ -112,7 +112,7 @@ public class NewServiceService {
         return opt.map(NewServiceDTO::fromEntity).orElse(null);
     }
 
-    public void deleteById(Long id) {
+    public void c(Long id) {
         documentRepository.deleteById(id);
     }
 

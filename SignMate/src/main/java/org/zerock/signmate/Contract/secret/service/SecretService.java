@@ -53,10 +53,12 @@ public class SecretService {
         } else {
             // 신규 생성 시 로그인 사용자가 writer
             contract = Contract.builder()
-                    .contractType(enums.ContractType.SERVICE)
+                    .contractType(enums.ContractType.SECRET)
                     .writer(loginUserEntity)
                     .receiver(receiver)
                     .status(enums.ContractStatus.DRAFT)
+                    .writerSignature(dto.getWriterSignature())
+                    .receiverSignature(dto.getReceiverSignature())
                     .build();
             contractRepository.save(contract);
         }

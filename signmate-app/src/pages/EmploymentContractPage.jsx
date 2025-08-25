@@ -34,7 +34,7 @@ const employmentTemplate = {
     noticeDays: "30",
     privacy: "업무 수행 및 인사‧급여 목적 범위 내",
     rulesUrl: "(회사 내규 위치)",
-    sign: { employer: "", employee: "" }
+    sign: { employer: null, employee: null }
   },
   fields: [
     { type: "section", label: "사업주/근로자" },
@@ -168,8 +168,8 @@ export default function EmploymentContractPage() {
         }));
 
         if (loginUserName) {
-          if (loginUserName === data.employerName) setCurrentUserRole("employer");
-          else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+          if (loginUserName === data.employerName) setCurrentUserRole("sender");
+          else if (loginUserName === data.employeeName) setCurrentUserRole("receiver");
           else setCurrentUserRole("none");
         }
 

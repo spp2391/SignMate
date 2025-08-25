@@ -141,7 +141,7 @@ export default function SecretPage() {
 
     const fetchSecret = async () => {
       try {
-        const res = await fetch(`/api/secrets/${contractId}`, {
+        const res = await fetch(`/api/secret/${contractId}`, {
           headers: {
             Authorization: "Bearer " + localStorage.getItem("accessToken"),
           },
@@ -202,7 +202,7 @@ export default function SecretPage() {
       };
 
       const method = contractId ? "PUT" : "POST";
-      const url = contractId ? `/api/secrets/${contractId}` : `/api/secrets`;
+      const url = contractId ? `/api/secret/${contractId}` : `/api/secret`;
 
       const res = await fetch(url, {
         method,
