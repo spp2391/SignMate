@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.zerock.signmate.admin.dto.UpdateUserRequest;
 import org.zerock.signmate.admin.dto.UserDetailDto;
 import org.zerock.signmate.admin.dto.UserListDto;
-import org.zerock.signmate.admin.service.UserService;
+import org.zerock.signmate.admin.service.adminUserService;
 
 import java.util.Map;
 
@@ -21,40 +21,40 @@ import java.util.Map;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
 
-    private final UserService userService;
+    private final adminUserService adminUserService;
 
     // 회원 목록 + 검색
     @GetMapping
     public Page<UserListDto> list(@RequestParam(required = false) String q,
                                   @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
-        return userService.list(q, pageable);
+        return adminUserService.list(q, pageable);
     }
 
     // 회원 상세
     @GetMapping("/{id}")
     public UserDetailDto get(@PathVariable("id") Long userId) {
-        return userService.get(userId);
+        return adminUserService.get(userId);
     }
 
     // 회원 수정
     @PatchMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable("id") Long userId,
                                        @Valid @RequestBody UpdateUserRequest req) {
-        userService.update(userId, req);
+        adminUserService.update(userId, req);
         return ResponseEntity.noContent().build();
     }
 
     // 회원 삭제
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable("id") Long userId) {
-        userService.delete(userId);
+        adminUserService.delete(userId);
         return ResponseEntity.noContent().build();
     }
 
     // 비밀번호 초기화
     @PostMapping("/{id}/reset-password")
     public Map<String, String> resetPassword(@PathVariable("id") Long userId) {
-        String temp = userService.resetPw(userId);
+        String temp = adminUserService.resetPw(userId);
         return Map.of("temporaryPassword", temp);
     }
 }

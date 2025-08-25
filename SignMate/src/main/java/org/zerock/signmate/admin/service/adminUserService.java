@@ -6,18 +6,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.zerock.signmate.admin.dto.*;
-import org.zerock.signmate.admin.repository.UserRepository;
+import org.zerock.signmate.admin.repository.adminUserRepository;
 import org.zerock.signmate.user.domain.User;
-
-import java.security.SecureRandom;
-import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class UserService {
+public class adminUserService {
 
-    private final UserRepository repo;
+    private final adminUserRepository repo;
     private final PasswordEncoder encoder;
 
     //회원목록 + 검색

@@ -1,4 +1,4 @@
-package org.zerock.signmate.Contract.dto;
+package org.zerock.signmate.unified.dto;
 
 import lombok.*;
 import java.time.LocalDate;
