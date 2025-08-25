@@ -32,11 +32,11 @@ public class Contract extends CommonEntity {
     private User receiver;
 
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature",columnDefinition = "LONGTEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature",columnDefinition = "LONGTEXT")
     private String receiverSignature; // base64
 
     @Version

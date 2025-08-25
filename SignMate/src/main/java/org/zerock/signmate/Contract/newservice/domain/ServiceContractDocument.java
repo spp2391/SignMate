@@ -40,6 +40,7 @@ public class ServiceContractDocument extends CommonEntity {
     private LocalDate contractEndDate;        // 계약기간 종료일
 
     private BigDecimal contractAmount;        // 계약금액
+    private String contractAmountKRW;        // 계약금액 원정 표기
 
     @Column(columnDefinition = "TEXT")
     private String scopeOfWork;               // 과업 범위
@@ -63,11 +64,11 @@ public class ServiceContractDocument extends CommonEntity {
 
     // 전자서명 (Base64 인코딩 이미지)
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature", columnDefinition = "LONGTEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature", columnDefinition = "LONGTEXT")
     private String receiverSignature; // base64
 
 

@@ -15,13 +15,14 @@ public class NotificationDTO {
     private String message;
     private Long contractId;
     private LocalDateTime createdAt;
-
+    private boolean isRead;
     public static NotificationDTO fromEntity(Notification n) {
         return NotificationDTO.builder()
                 .notificationId(n.getNotificationId())
                 .message(n.getMessage())
                 .contractId(n.getContract().getId())
                 .createdAt(n.getCreatedAt())
+                .isRead(n.isRead())
                 .build();
     }
 }

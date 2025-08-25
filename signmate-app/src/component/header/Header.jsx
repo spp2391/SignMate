@@ -3,9 +3,9 @@ import "../../assets/css/style.css";
 import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
 import "../../assets/css/templatehouse.css";
-import logo from "../../assets/images/logo.png";
+import logo from "../../assets/images/logo_small.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
-import NotificationBell from "../../pages/NotificationBell";
+import NotificationBell from "../../pages/NotificationBell";  
 
 
 const Header = () => {
@@ -16,7 +16,7 @@ const Header = () => {
                     <div className="header-left">
                         <h2 className="header-title">
                             <Link to="/">
-                                {/* <img height="1" src={logo} alt="SIGN MATE" /> */}
+                                <img height="82" src={logo} alt="SIGN MATE" />
                             </Link>
                         </h2>
                     </div>
@@ -54,13 +54,17 @@ const Header = () => {
                     <div className="header-right">
                         <div className="header-utils">
                             <ul>
-                                    {/* <li className="allmenu">
+                                <li className="auth-menu">
+                                    <NotificationBell />
+                                    </li>
+
+                                    <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                     </button>
-                                    </li> */}
+                                    </li>
                                 {/* 로그인 상태일 때 */}
                                 {/* <li className="auth-menu">
                                     <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
@@ -74,15 +78,13 @@ const Header = () => {
                                 </li> */}
                                 {/* 비로그인 상태일 때 */}
                                 <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
+                                    <Link className="header-gnblink" to="@{/member/login}"><span>로그인</span></Link>
                                 </li>
                                  {/* style="padding-right: 30px;" */}
                                 <li className="auth-menu">
                                     <Link className="header-gnblink" to="@{/member/join}"><span>회원가입</span></Link>
                                 </li>
-                                    <li className="auth-menu">
-                                    <NotificationBell />
-                                    </li>
+
                                 <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>

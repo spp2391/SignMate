@@ -3,11 +3,10 @@
 // GridView : 카드 형태로 계약서 목록을 보여줌
 // StatusBadge : 계약 상태(DRAFT, 완료 등)를 색상/아이콘과 함께 보여줌
 // Inbox.jsx가 상태와 데이터를 넘겨주면, 여기서는 단순히 화면 ui만 그린다.
-
 import React from "react";
 import { FileText } from "lucide-react";
 import { STATUS_META, CONTRACT_TYPE_LABEL, formatLocalDateTime } from "./inboxUtils";
-
+import { useNavigate } from "react-router-dom";
 function StatusBadge({ status }) {
   const meta = STATUS_META[status];
   const Icon = meta.Icon;
@@ -22,6 +21,7 @@ function StatusBadge({ status }) {
 }
 
 export function ListView({ docs, selected, setSelected }) {
+  const navigate = useNavigate();
   const allChecked = docs.length > 0 && docs.every((d) => selected[d.id]);
   const toggleAll = (checked) => {
     const next = { ...selected };
@@ -63,6 +63,10 @@ export function ListView({ docs, selected, setSelected }) {
               <div className="mt-0.5 hidden sm:block">
                 <FileText className="h-5 w-5 text-neutral-500" />
               </div>
+              <div
+                className="cursor-pointer"
+                onClick={() => navigate(`/secrets/${d.id}`)}
+              >
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="font-medium leading-tight"></span>
@@ -76,7 +80,7 @@ export function ListView({ docs, selected, setSelected }) {
               </div>
             </div>
           </div>
-
+        </div>
           <div className="col-span-2">
             <span className="rounded-full border px-2 py-0.5 text-xs">
               {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}

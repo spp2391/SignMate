@@ -26,7 +26,7 @@ public class BusinessOutsourcingContractController {
         }catch (SecurityException e) {
             // 작성자 불일치 경고용 409 반환
             return ResponseEntity.status(409).body(e.getMessage());
-        } catch (IllegalArgumentException e) {
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
