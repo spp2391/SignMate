@@ -82,7 +82,7 @@ const Header = () => {
                                 </li>
                                  {/* style="padding-right: 30px;" */}
                                 <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/member/join}"><span>회원가입</span></Link>
+                                    <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
                                 </li>
 
                                 <li className="allmenu">

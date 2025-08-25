@@ -1,49 +1,52 @@
-// Dashboard.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
- // useContracts만 import
-import { CONTRACT_TYPE_LABEL, STATUS_META, ContractStatus } from "../component/inbox/inboxUtils"; // 상수들은 inboxUtils에서 가져오기
+import { CONTRACT_TYPE_LABEL, STATUS_META, ContractStatus } from "../component/inbox/inboxUtils";
 
-export default function Dashboard() {
-  // const { data, isLoading } = useContracts(); // 항상 배열로 초기화
-  //  const [data, setData] = useState([]);
-   const [contract, setContract]= useState([]);
-   const [setDashboard]= useState([]);
+export default function Dashboard({ userId = 1, contracts: contractsProp }) {
+  const [contracts, setContracts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  
-  useEffect (() => {
-    fetch("http://localhost:8080/contracts/user/4") // 백엔드 API 주소
+
+  // 부모에서 contracts를 넘겨주면 그걸 사용, 없으면 fetch
+  useEffect(() => {
+    if (Array.isArray(contractsProp)) {
+      setContracts(contractsProp);
+      setIsLoading(false);
+      return;
+    }
+    setIsLoading(true);
+    fetch(`http://localhost:8080/contracts/user/${userId}`)
       .then((res) => res.json())
       .then((json) => {
-        setContract(json.contracts);
-        setDashboard(json.dashboard);
-        setIsLoading(false);
+        const items = Array.isArray(json) ? json : (json?.contracts ?? []);
+        setContracts(items);
       })
       .catch((err) => {
         console.error(err);
-        setIsLoading(false);
-      });
-  }, [])
+        setContracts([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, [userId, contractsProp]);
 
-  // 계약 상태별 집계
-  const stats = useMemo(() => {
-    const countsByStatus = {};
-    const countsByType = {};
+  const { countsByStatus, countsByType } = useMemo(() => {
+    const s = {};
+    const t = {};
+    (contracts || []).forEach((d) => {
+      const st = d.status;
+      const ct = d.contractType;
+      s[st] = (s[st] || 0) + 1;
+      t[ct] = (t[ct] || 0) + 1;
+    });
+    return { countsByStatus: s, countsByType: t };
+  }, [contracts]);
 
-    if (Array.isArray(contract)) {
-      contract.forEach((d) => {
-        countsByStatus[d.status] = (countsByStatus[d.status] || 0) + 1;
-        countsByType[d.contractType] = (countsByType[d.contractType] || 0) + 1;
-      });
-    }
-
-    return { countsByStatus, countsByType };
-  }, [contract]);
-
-  const chartData = Object.entries(stats.countsByType).map(([type, count]) => ({
-    name: CONTRACT_TYPE_LABEL[type] || type,
-    value: count,
-  }));
+  const chartData = useMemo(
+    () =>
+      Object.entries(countsByType).map(([type, count]) => ({
+        name: CONTRACT_TYPE_LABEL[type] || type,
+        value: count,
+      })),
+    [countsByType]
+  );
 
   const COLORS = ["#4ade80", "#60a5fa", "#facc15", "#f472b6", "#a78bfa"];
 
@@ -53,36 +56,24 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* 상태 카드 */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.values(ContractStatus).map((status) => {
           const meta = STATUS_META[status];
           return (
-            <div
-              key={status}
-              className={`rounded-xl border p-4 flex flex-col items-center ${meta.className}`} 
-            >
+            <div key={status} className={`rounded-xl border p-4 flex flex-col items-center ${meta.className}`}>
               <meta.Icon className="w-6 h-6 mb-2" />
               <div className="font-semibold">{meta.label}</div>
-              <div className="text-lg">{stats.countsByStatus[status] || 0} 건</div>
+              <div className="text-lg">{countsByStatus[status] || 0} 건</div>
             </div>
           );
         })}
       </div>
 
-      {/* 계약서 유형 분포 (원형 차트) */}
       <div className="rounded-xl border p-6">
         <h2 className="text-lg font-semibold mb-4">계약서 유형 분포</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
-            <Pie
-              data={chartData}
-              cx="50%"
-              cy="50%"
-              outerRadius={100}
-              dataKey="value"
-              label
-            >
+            <Pie data={chartData} cx="50%" cy="50%" outerRadius={100} dataKey="value" label>
               {chartData.map((_, idx) => (
                 <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
               ))}
