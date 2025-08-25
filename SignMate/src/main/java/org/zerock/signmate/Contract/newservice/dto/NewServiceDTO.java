@@ -29,6 +29,7 @@ public class NewServiceDTO {
     private LocalDate contractEndDate;
 
     private BigDecimal contractAmount;
+    private String contractAmountKRW;
 
     private String scopeOfWork;
     private String deliverablesAcceptanceCriteria;
@@ -61,6 +62,7 @@ public class NewServiceDTO {
                 .contractStartDate(entity.getContractStartDate())
                 .contractEndDate(entity.getContractEndDate())
                 .contractAmount(entity.getContractAmount())
+                .contractAmountKRW(entity.getContractAmountKRW())
                 .scopeOfWork(entity.getScopeOfWork())
                 .deliverablesAcceptanceCriteria(entity.getDeliverablesAcceptanceCriteria())
                 .depositAmount(entity.getDepositAmount())

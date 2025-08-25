@@ -38,7 +38,7 @@ const Index = () => {
     const [contract, setContract]= useState([]);
     const [setDashboard]= useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    
+   const [notices, setNotices] = useState([]);
     useEffect (() => {
       fetch("http://localhost:8080/contracts/user/3") // 백엔드 API 주소
         .then((res) => res.json())
@@ -51,7 +51,19 @@ const Index = () => {
           console.error(err);
           setIsLoading(false);
         });
+
+        fetch("/api/notices",{
+  headers: {
+    "Authorization": "Bearer " + localStorage.getItem("accessToken")
+  }}) // 공지사항 API 주소
+      .then((res) => res.json())
+      .then((json) => {
+        setNotices(json); // NoticePage에서 가져온 데이터
+      })
+      .catch((err) => console.error(err));
+
     }, [])
+
 
     return (
         
@@ -72,7 +84,7 @@ const Index = () => {
                         <div className="contents-inner">
                             <div className="tabset tabset-brick">
                                 <ul className="tabset-list tabset-lg tabset-fill">
-                                    <li className="tabset-item">
+                                    {/* <li className="tabset-item">
                                         <Link className="tabset-link active" to="javascript:void(0)">
                                             <i className="ff-ico ti-bell"></i>
                                             <span>서비스</span>
@@ -89,7 +101,7 @@ const Index = () => {
                                             <i className="ff-ico ti-chat-square-text"></i>
                                             <span>고객센터</span>
                                         </Link>
-                                    </li>
+                                    </li> */}
                                 </ul>
                             </div>
                             <div className="cont-area">
@@ -102,7 +114,7 @@ const Index = () => {
                                             </Link>
                                         </div>
                                         <div className="menu-item primary-alpha">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/inbox">
                                                 <img src={logo2} alt="조회/이체" />
                                                 <span className="h6">내 문서 조회</span>
                                             </Link>
@@ -122,13 +134,13 @@ const Index = () => {
                                     </div>
                                     <div className="col-left">
                                         <div className="menu-item primary">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/contracts">
                                                 <img src={logo5} alt="거래내역" />
                                                 <span className="h6">문서작성</span>
                                             </Link>
                                         </div>
                                         <div className="menu-item primary-alpha">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/inbox">
                                                 <img src={logo6} alt="조회/이체" />
                                                 <span className="h6">내 문서 조회</span>
                                             </Link>
@@ -176,21 +188,19 @@ const Index = () => {
                                         <div className="notice">
                                             <div className="title">
                                                 <strong className="h6">공지사항</strong>
-                                                <Link to="javascript:void(0)" className="ff-ico ti-plus">
+                                                <Link to="/notice" className="ff-ico ti-plus">
                                                     <span className="blind">더보기</span>
                                                 </Link>
+                                                </div>
+                                                <div className="notice-list">
+                                                {notices.slice(0, 2).map((notice) => (
+                                                    <Link key={notice.nbno} to={`/notice/${notice.nbno}`}>
+                                                    <p>{notice.title}</p>
+                                                    <span>{notice.regdate}</span>
+                                                    </Link>
+                                                ))}
+                                                </div>
                                             </div>
-                                            <div className="notice-list">
-                                                <Link to="javascript:void(0)">
-                                                    <p>2025년 추석 연휴 사인메이트 서비스 안내</p>
-                                                    <span>2025-08-27</span>
-                                                </Link>
-                                                <Link to="javascript:void(0)">
-                                                    <p>모바일 앱 업데이트 안내</p>
-                                                    <span>2025-05-08</span>
-                                                </Link>
-                                            </div>
-                                        </div>
                                         <div className="menu-wrap">
                                             <div className="menu-item gray-alpha">
                                                 <Link to="javascript:void(0)">

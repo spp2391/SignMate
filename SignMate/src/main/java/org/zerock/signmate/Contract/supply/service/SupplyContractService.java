@@ -8,15 +8,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.Repository.ContractRepository;
 import org.zerock.signmate.Contract.domain.Contract;
+import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.Contract.domain.enums.ContractType;
 import org.zerock.signmate.Contract.supply.domain.SupplyContract;
 import org.zerock.signmate.Contract.supply.domain.SupplyItem;
 import org.zerock.signmate.Contract.supply.dto.SupplyContractDTO;
 import org.zerock.signmate.Contract.supply.repository.SupplyContractRepository;
 import org.zerock.signmate.Contract.supply.repository.SupplyItemRepository;
+import org.zerock.signmate.notification.service.NotificationService;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,6 +31,7 @@ public class SupplyContractService {
     private final SupplyItemRepository supplyItemRepository;
     private final ContractRepository contractRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     @Transactional
     public SupplyContractDTO addOrUpdateContract(SupplyContractDTO dto) {
@@ -47,9 +51,9 @@ public class SupplyContractService {
         }
 
         // Contract 엔티티 생성 또는 조회
-        Contract contractEntity = dto.getContractId() == null
+        Contract contract = dto.getContractId() == null
                 ? Contract.builder()
-                .contractType(ContractType.SERVICE)
+                .contractType(ContractType.SUPPLY)
                 .writer(writer)
                 .receiver(receiver)
                 .build()
@@ -57,18 +61,18 @@ public class SupplyContractService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
 
         // writer/receiver 세팅 후 저장
-        contractEntity.setWriter(writer);
-        contractEntity.setReceiver(receiver);
-        contractRepository.save(contractEntity);
+        contract.setWriter(writer);
+        contract.setReceiver(receiver);
+        contractRepository.save(contract);
 
         // SupplyContract 생성 또는 조회
         SupplyContract supplyContract = dto.getId() == null
-                ? SupplyContract.builder().contract(contractEntity).build()
+                ? SupplyContract.builder().contract(contract).build()
                 : supplyContractRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 SupplyContract ID: " + dto.getId()));
 
         // SupplyContract 필드 복사
-        supplyContract.setContract(contractEntity);
+        supplyContract.setContract(contract);
         supplyContract.setSupplierName(dto.getSupplierName());
         supplyContract.setSupplierRepresentative(dto.getSupplierRepresentative());
         supplyContract.setDemanderName(dto.getDemanderName());
@@ -102,7 +106,28 @@ public class SupplyContractService {
             supplyContract.getItems().addAll(items);
         }
 
-        return SupplyContractDTO.fromEntity(supplyContractRepository.save(supplyContract));
+        SupplyContract saved = supplyContractRepository.save(supplyContract);
+        LocalDateTime now = LocalDateTime.now();
+
+        if (supplyContract.getSupplierSignature() != null && supplyContract.getDemanderSignature() != null) {
+            // 서명 완료: 계약 완료 상태
+            contract.setStatus(enums.ContractStatus.COMPLETED);
+            contractRepository.save(contract);
+            String msg = "자재/물품 공급계약서가 완료되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        } else {
+            // 작성/수정 중
+            String msg = "자재/물품 공급계약서가 작성/수정되었습니다.";
+            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
+            }
+        }
+
+        return SupplyContractDTO.fromEntity(saved);
     }
 
     public SupplyContractDTO findById(Long id) {

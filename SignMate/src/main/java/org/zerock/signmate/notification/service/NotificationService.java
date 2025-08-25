@@ -25,6 +25,7 @@ public class NotificationService {
                 .contract(contract)
                 .message(message)
                 .createdAt(LocalDateTime.now())
+                .isRead(false)
                 .build();
 
         notificationRepository.save(notification);
@@ -33,5 +34,16 @@ public class NotificationService {
     // 특정 유저의 알림 조회
     public List<Notification> getNotificationsForUser(User user) {
         return notificationRepository.findByUserUserIdOrderByCreatedAtDesc(user.getUserId());
+    }
+    public long getUnreadCount(User user) {
+        return notificationRepository.countByUserUserIdAndIsReadFalse(user.getUserId());
+    }
+
+    // ✅ 알림 읽음 처리
+    public void markAsRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("알림을 찾을 수 없습니다."));
+        notification.setRead(true);
+        notificationRepository.save(notification);
     }
 }

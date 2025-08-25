@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import ContractBase from "../component/contracts/ContractBase";
+import { debounce } from "lodash";
+import { useParams } from "react-router-dom";
+import { getLoginUserName } from "./util";
 
 /** 업무위탁 계약서
  *  - 좌측 입력: 당사자, 기간, 정산표, 합계, 서명일
@@ -10,45 +13,46 @@ const outsourcingTemplate = {
   name: "업무위탁 계약서",
 
   editable: [
-    "principal.name","principal.rep","principal.address","principal.contact",
-    "agent.name","agent.rep","agent.address","agent.contact",
-    "periodStart","periodEnd",
-    "items","totalPay","signDate"
+    "clientName","clientRepresentative","clientAddress","clientContact",
+    "contractorName","contractorRepresentative","contractorAddress","contractorContact",
+    "contractStartDate","contractEndDate",
+    "tasks","totalPaymentAmount","governingLaw","signatureDate"
   ],
 
   defaults: {
-    principal: { name: "", rep: "", address: "", contact: "" }, // 갑
-    agent:     { name: "", rep: "", address: "", contact: "" }, // 을
-    periodStart: "",
-    periodEnd:   "",
-    items: Array.from({ length: 5 }).map(() => ({})),
-    totalPay: "",
-    signDate: "",
-    law: "대한민국 법", // 고정
+    // :"",:"",:"",:"",
+    clientName:"",clientRepresentative:"",clientAddress:"",clientContact:"", // 갑
+    contractorName:"",contractorRepresentative:"",contractorAddress:"",contractorContact:"", // 을
+    contractStartDate: "",
+    contractEndDate:   "",
+    tasks: Array.from({ length: 5 }).map(() => ({})),
+    totalPaymentAmount: "",
+    signatureDate: "",
+    governingLaw: "대한민국 법", // 고정
     sign: { principal: "", agent: "" }
   },
 
   fields: [
     { type: "section", label: "당사자 정보(갑)" },
-    { type: "text",  name: "principal.name",    label: "갑 상호(명)" },
-    { type: "text",  name: "principal.rep",     label: "갑 대표자" },
-    { type: "text",  name: "principal.address", label: "갑 주소" },
-    { type: "text",  name: "principal.contact", label: "갑 연락처" },
+    { type: "text",  name: "clientName",    label: "갑 상호(명)" },
+    { type: "text",  name: "clientAddress",     label: "갑 대표자" },
+    { type: "text",  name: "clientRepresentative", label: "갑 주소" },
+    { type: "text",  name: "clientContact", label: "갑 연락처" },
 
     { type: "section", label: "당사자 정보(을)" },
-    { type: "text",  name: "agent.name",    label: "을 상호(명)" },
-    { type: "text",  name: "agent.rep",     label: "을 대표자" },
-    { type: "text",  name: "agent.address", label: "을 주소" },
-    { type: "text",  name: "agent.contact", label: "을 연락처" },
+    { type: "text",  name: "contractorName",    label: "을 상호(명)" },
+    { type: "text",  name: "contractorRepresentative",     label: "을 대표자" },
+    { type: "text",  name: "contractorAddress", label: "을 주소" },
+    { type: "text",  name: "contractorContact", label: "을 연락처" },
 
     { type: "section", label: "수행 기간" },
-    { type: "date", name: "periodStart", label: "시작일" },
-    { type: "date", name: "periodEnd",   label: "종료일" },
+    { type: "date", name: "contractStartDate", label: "시작일" },
+    { type: "date", name: "contractEndDate",   label: "종료일" },
 
     { type: "section", label: "대가 정산" },
     {
       type: "table",
-      name: "items",
+      name: "tasks",
       label: "정산 내역",
       minRows: 5,
       columns: [
@@ -56,23 +60,25 @@ const outsourcingTemplate = {
         { key: "unitPrice", label: "단가" },
         { key: "quantity",  label: "수량" },
         { key: "perUnit",   label: "1인/1건당" },
-        { key: "pay",       label: "지급액" },
+        { key: "paymentAmount",       label: "지급액" },
         { key: "taskType",  label: "업무구분" },
-        { key: "note",      label: "비고" },
+        { key: "remarks",      label: "비고" },
       ],
     },
-    { type: "text", name: "totalPay", label: "합계(총 지급액)" },
+    { type: "text", name: "totalPaymentAmount", label: "합계(총 지급액)" },
 
     { type: "section", label: "서명" },
     { type: "date", name: "signDate", label: "서명일" },
+    { type: "text", name: "governingLaw", label: "대한민국 법" },
+    { type: "date", name: "signatureDate", label: "서명일" },
   ],
 
   body: `
 업무위탁 계약서
 
 1. 당사자
-  - 위탁자(갑): {{principal.name}} (대표 {{principal.rep}} / 주소 {{principal.address}} / 연락처 {{principal.contact}})
-  - 수탁자(을): {{agent.name}} (대표 {{agent.rep}} / 주소 {{agent.address}} / 연락처 {{agent.contact}})
+  - 위탁자(갑): {{clientName}} (대표 {{clientRepresentative}} / 주소 {{clientAddress}} / 연락처 {{clientContact}})
+  - 수탁자(을): {{contractorName}} (대표 {{contractorRepresentative}} / 주소 {{contractorAddress}} / 연락처 {{contractorContact}})
 
 2. 업무목적
   - 갑은 을에게 아래 제3조의 업무를 위탁하고, 을은 이를 성실히 수행한다.
@@ -82,9 +88,9 @@ const outsourcingTemplate = {
     재고/물류 관리 보조, 고객 응대 및 통지 업무, 기타 갑이 서면으로 지정하는 업무
 
 4. 수행기간 및 대가정산
-  ① 수행기간: {{periodStart}} 부터 {{periodEnd}} 까지
+  ① 수행기간: {{contractStartDate}} 부터 {{contractEndDate}} 까지
   ② 대가 산정·지급은 ‘정산 내역’ 표를 따른다.
-  ③ 합계(총 지급액): {{totalPay}}
+  ③ 합계(총 지급액): {{totalPaymentAmount}}
 
 5. 비밀유지 및 지식재산권
   ① 을은 업무 수행 중 알게 된 일체의 비밀정보를 제3자에게 누설하지 않는다.
@@ -99,15 +105,15 @@ const outsourcingTemplate = {
 
 8. 기타
   - 본 계약에 정하지 아니한 사항은 민법 등 관계 법령 및 상관례를 따른다.
-  - 준거법: {{law}}
+  - 준거법: {{governingLaw}}
 
 [서명]
-서명일: {{signDate}}
+서명일: {{signatureDate}}
 
-(갑) {{principal.name}} / 대표자: {{principal.rep}} (서명)
+(갑) {{clientName}} / 대표자: {{clientRepresentative}} (서명)
 {{sign.principal}}
 
-(을) {{agent.name}} / 대표자: {{agent.rep}} (서명)
+(을) {{contractorName}} / 대표자: {{contractorRepresentative}} (서명)
 {{sign.agent}}
   `,
 
@@ -117,24 +123,61 @@ const outsourcingTemplate = {
 export default function OutsourcingContractPage() {
   const [formData, setFormData] = useState(outsourcingTemplate.defaults);
   const [loadingSubmit, setLoadingSubmit] = useState(false);
+  const { contractId } = useParams();
+  const writerSigRef = useRef(null);
+  const receiverSigRef = useRef(null);
+  const [currentUserRole, setCurrentUserRole] = useState("sender");
+  
+  const handleChange = useCallback((updated) => {
+      debouncedSetValue(updated);
+    }, []);
+  
+    const debouncedSetValue = useRef(
+      debounce((updated) => setFormData(prev => {
+        return { ...prev, ...updated };
+      }), 300)
+    ).current;
 
-  const handleChange = (updated) => {
-    setFormData(prev => {
-      const newState = { ...prev };
-      Object.entries(updated).forEach(([key, value]) => {
-        if (key.includes(".")) {
-          const [parent, child] = key.split(".");
-          newState[parent] = { ...newState[parent], [child]: value };
-        } else {
-          newState[key] = value;
+  // 로그인 사용자 이름 추출
+  const loginUserName = getLoginUserName();
+  useEffect(() => {
+      if (!contractId) return;
+  
+      const fetchContract = async () => {
+        try {
+          const res = await fetch(`/api/employment/${contractId}`, {
+            headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
+          });
+          if (!res.ok) throw new Error("계약서 로딩 실패");
+          const data = await res.json();
+  
+          setFormData(prev => ({
+            ...prev,
+            ...data,
+            sign: {
+              employer: data.writerSignature || prev.sign.employer,
+              employee: data.receiverSignature || prev.sign.employee
+            }
+          }));
+  
+          if (loginUserName) {
+            if (loginUserName === data.employerName) setCurrentUserRole("employer");
+            else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+            else setCurrentUserRole("none");
+          }
+  
+          if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
+          if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
+        } catch (err) {
+          console.error(err);
         }
-      });
-      return newState;
-    });
-  };
+      };
+  
+      fetchContract();
+    }, [contractId]);
 
   const handleSave = async (force = false) => {
-    if (!formData.principal.name || !formData.agent.name) {
+    if (!formData.clientName || !formData.contractorName) {
       alert("갑과 을 이름은 필수입니다.");
       return;
     }
@@ -143,27 +186,28 @@ export default function OutsourcingContractPage() {
     try {
       const payload = {
         contractId: formData.contractId,
-        clientName: formData.principal.name,
-        clientRepresentative: formData.principal.rep,
-        clientAddress: formData.principal.address,
-        clientContact: formData.principal.contact,
-        contractorName: formData.agent.name,
-        contractorRepresentative: formData.agent.rep,
-        contractorAddress: formData.agent.address,
-        contractorContact: formData.agent.contact,
-        contractStartDate: formData.periodStart || null,
-        contractEndDate: formData.periodEnd || null,
+        clientName: formData.clientName,
+        clientRepresentative: formData.clientRepresentative,
+        clientAddress: formData.clientAddress,
+        clientContact: formData.clientContact,
+        contractorName: formData.contractorName,
+        contractorRepresentative: formData.contractorRepresentative,
+        contractorAddress: formData.contractorAddress,
+        contractorContact: formData.contractorContact,
+        contractStartDate: formData.contractStartDate || null,
+        contractEndDate: formData.contractEndDate || null,
         taskDescription: formData.taskDescription,
-        totalPaymentAmount: formData.totalPay,
-        signatureDate: formData.signDate,
-        tasks: formData.items.map(item => ({
+        totalPaymentAmount: formData.totalPaymentAmount,
+        signatureDate: formData.signatureDate,
+        governingLaw:formData.governingLaw,
+        tasks: formData.tasks.map(item => ({
           category: item.category,
           unitPrice: item.unitPrice,
           quantity: item.quantity,
           perUnit: item.perUnit,
-          paymentAmount: item.pay,
+          paymentAmount: item.paymentAmount,
           taskType: item.taskType,
-          remarks: item.note
+          remarks: item.remarks,
         })),
         writerSignature: formData.sign.principal,
         receiverSignature: formData.sign.agent
@@ -206,6 +250,7 @@ if (res.status === 409) {
         template={outsourcingTemplate}
         data={outsourcingTemplate.defaults}
         handleChange={handleChange}
+        role={currentUserRole}
       />
       <button
         onClick={handleSave}
