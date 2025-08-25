@@ -107,7 +107,8 @@ public class UserRestController {
     @PostMapping("/checklogin")
     public ResponseEntity<String> checkLogin(@AuthenticationPrincipal CustomOAuth2User user) {
         if(user==null){
-            return ResponseEntity.badRequest().body("");
+
+            return ResponseEntity.ok().body("");
         } else {
             return ResponseEntity.ok(user.getUser().getUsername());
         }
