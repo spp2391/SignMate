@@ -16,46 +16,54 @@ import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
+import logo from './logo.svg';
+import './App.css';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import Join from './User/pages/Join';
+import Login from './User/pages/Login';
 
 
 export default function App() {
-  return (
-    
-    <Router>
-      {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
-        <Link to="/secret">비밀유지서약서</Link>
-        <Link to="/employment">표준근로계약서</Link>
-        <Link to="/service">용역계약서</Link>
-        <Link to="/supply">자재/물품 공급계약서</Link>
-        <Link to="/outsourcing">업무위탁 계약서</Link>
-        <Header />
-      {/* </nav> */}
+    return (
 
-         
+        <Router>
+            {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
+            <Link to="/secret">비밀유지서약서</Link>
+            <Link to="/employment">표준근로계약서</Link>
+            <Link to="/service">용역계약서</Link>
+            <Link to="/supply">자재/물품 공급계약서</Link>
+            <Link to="/outsourcing">업무위탁 계약서</Link>
+            <Header/>
+            {/* </nav> */}
+
+
             <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/contracts" element={<ContractList />} />
-                <Route path="/secret" element={<SecretPage />} />
-                <Route path="/employment" element={<EmploymentContractPage />} />
-                <Route path="/service" element={<ServiceContractPage />} />
-                <Route path="/supply" element={<SupplyContractPage />} />
-                <Route path="/outsourcing" element={<OutsourcingContractPage />} />
-                <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
-                <Route path="*" element={<Index />} />
-                <Route path="/inbox" element={<ContractInboxPage />} />
-                <Route path="/secret/:contractId" element={<SecretPage signerId="" />} />
-               <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
-               <Route path="/supply/:contractId" element={<SupplyContractPage signerId="" />} />
-                <Route path="/service/:contractId" element={<ServiceContractPage signerId="" />} />
-                <Route path="/outsourcing/:contractId" element={<OutsourcingContractPage signerId="" />} />
-                <Route path="/notifications" element={<Mailbox />} />
-                <Route path="*" element={<SecretPage signerId="" />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/inbox" element={<Inbox />} />
-                <Route path="/notice" element={<NoticePage />} />
-                {/* 기본 라우트 */}
+                <Route path="/" element={<Index/>}/>
+                <Route path="/contracts" element={<ContractList/>}/>
+                <Route path="/secret" element={<SecretPage/>}/>
+                <Route path="/employment" element={<EmploymentContractPage/>}/>
+                <Route path="/service" element={<ServiceContractPage/>}/>
+                <Route path="/supply" element={<SupplyContractPage/>}/>
+                <Route path="/outsourcing" element={<OutsourcingContractPage/>}/>
+                <Route path="/company-statistics" element={<CompanyStatisticsPage/>}/>
+                <Route path="*" element={<Index/>}/>
+                <Route path="/inbox" element={<ContractInboxPage/>}/>
+                <Route path="/secret/:contractId" element={<SecretPage signerId=""/>}/>
+                <Route path="/employment/:contractId" element={<EmploymentContractPage/>}/>
+                <Route path="/supply/:contractId" element={<SupplyContractPage signerId=""/>}/>
+                <Route path="/service/:contractId" element={<ServiceContractPage signerId=""/>}/>
+                <Route path="/outsourcing/:contractId" element={<OutsourcingContractPage signerId=""/>}/>
+                <Route path="/notifications" element={<Mailbox/>}/>
+                <Route path="*" element={<SecretPage signerId=""/>}/>
+                <Route path="/login" element={<Login/>}/>
+                <Route path="/join" element={<Join/>} /
+                <Route path="/inbox" element={<Inbox/>} />
+                <Route path="/notice" element={<NoticePage/>}/>
+                    {/* 기본 라우트 */}
             </Routes>
             <Footer />
         </Router>
     );
 }
+
+export default App;
