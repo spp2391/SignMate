@@ -9,7 +9,7 @@ import org.zerock.signmate.Contract.secret.service.SecretService;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/secrets")
+@RequestMapping("/api/secret")
 @RequiredArgsConstructor
 public class SecretController {
 

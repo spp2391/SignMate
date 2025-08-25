@@ -24,7 +24,7 @@ export default function App() {
     
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
-        <Link to="/secrets">비밀유지서약서</Link>
+        <Link to="/secret">비밀유지서약서</Link>
         <Link to="/employment">표준근로계약서</Link>
         <Link to="/service">용역계약서</Link>
         <Link to="/supply">자재/물품 공급계약서</Link>
@@ -36,7 +36,7 @@ export default function App() {
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/contracts" element={<ContractList />} />
-                <Route path="/secrets" element={<SecretPage />} />
+                <Route path="/secret" element={<SecretPage />} />
                 <Route path="/employment" element={<EmploymentContractPage />} />
                 <Route path="/service" element={<ServiceContractPage />} />
                 <Route path="/supply" element={<SupplyContractPage />} />
@@ -44,7 +44,7 @@ export default function App() {
                 <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
                 <Route path="*" element={<Index />} />
                 <Route path="/inbox" element={<ContractInboxPage />} />
-                <Route path="/secrets/:contractId" element={<SecretPage signerId="" />} />
+                <Route path="/secret/:contractId" element={<SecretPage signerId="" />} />
                <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
