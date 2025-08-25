@@ -54,7 +54,7 @@ public class UnifiedContractMapper {
         return UnifiedContractDto.builder()
                 .id(entity.getId())
                 .contractId(entity.getContract() != null ? entity.getContract().getId() : null)
-                .contractType("BUSINESS_OUTSOURCING")
+                .contractType("OUTSOURCING")
                 .writerName(entity.getContract() != null && entity.getContract().getWriter() != null ? entity.getContract().getWriter().getName() : null)
                 .receiverName(entity.getContract() != null && entity.getContract().getReceiver() != null ? entity.getContract().getReceiver().getName() : null)
                 .contractStartDate(LocalDate.of(contract.getCreatedAt().getYear(), contract.getCreatedAt().getMonth(), contract.getCreatedAt().getDayOfMonth()))

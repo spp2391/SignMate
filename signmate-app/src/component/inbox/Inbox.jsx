@@ -2,32 +2,28 @@
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
 import { ContractStatus, ContractType } from "./inboxUtils";
-
 // import Dashboard from "../../components/Dashboard";
 
 
-export default function Inbox({ userId }) {
+export default function Inbox() {
     const [contract, setContract]= useState([]);
     const [setDashboard]= useState([]);
     const [isLoading, setIsLoading] = useState(true);
     
-    useEffect(() => {
-  if (!userId) return; // 유저 ID 없으면 fetch 중단
+    useEffect (() => {
+      fetch("http://localhost:8080/contracts/user/1") // 백엔드 API 주소
+        .then((res) => res.json())
+        .then((json) => {
+          setContract(json.contracts);
+          setDashboard(json.dashboard);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setIsLoading(false);
+        });
+    }, [])
 
-  fetch(`/contracts/user/${userId}`, {
-    headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
-  })
-    .then(res => res.json())
-    .then(json => {
-      setContract(json.contracts);
-      setDashboard(json.dashboard);
-      setIsLoading(false);
-    })
-    .catch(err => {
-      console.error(err);
-      setIsLoading(false);
-    });
-}, [userId]);
   // 항상 배열로 보장
   // const data = Array.isArray(rawData) ? rawData : [];
 
@@ -67,7 +63,6 @@ export default function Inbox({ userId }) {
     <div className="w-full p-4 md:p-8">
       {/* ✅ 대시보드 섹션 */}
       {/* <Dashboard docs={contract} isLoading={isLoading} /> */}
-    
 
       {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between">
@@ -207,7 +202,7 @@ export default function Inbox({ userId }) {
         </>
       )}
 
-      페이지네이션(목업)
+      {/* 페이지네이션(목업) */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-neutral-600">총 {filtered.length}건</div>
         <div className="flex items-center gap-2">
