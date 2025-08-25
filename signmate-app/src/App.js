@@ -20,7 +20,20 @@ import NoticePage from "./pages/Notice";
 
 
 export default function App() {
+  const token = localStorage.getItem("accessToken");
+  let userId = null;
+
+  if (token) {
+    try {
+      // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.id; // claim에 저장된 userId
+    } catch (err) {
+      console.error("JWT 파싱 실패:", err);
+    }
+  }
   return (
+    
     
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
@@ -43,6 +56,7 @@ export default function App() {
                 <Route path="/outsourcing" element={<OutsourcingContractPage />} />
                 <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
                 <Route path="*" element={<Index />} />
+                <Route path="/inbox" element={<Inbox userId={userId} />} />
                 <Route path="/inbox" element={<ContractInboxPage />} />
                 <Route path="/secret/:contractId" element={<SecretPage signerId="" />} />
                <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
