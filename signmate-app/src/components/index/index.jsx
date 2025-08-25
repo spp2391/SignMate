@@ -84,7 +84,7 @@ const Index = () => {
                         <div className="contents-inner">
                             <div className="tabset tabset-brick">
                                 <ul className="tabset-list tabset-lg tabset-fill">
-                                    <li className="tabset-item">
+                                    {/* <li className="tabset-item">
                                         <Link className="tabset-link active" to="javascript:void(0)">
                                             <i className="ff-ico ti-bell"></i>
                                             <span>서비스</span>
@@ -101,7 +101,7 @@ const Index = () => {
                                             <i className="ff-ico ti-chat-square-text"></i>
                                             <span>고객센터</span>
                                         </Link>
-                                    </li>
+                                    </li> */}
                                 </ul>
                             </div>
                             <div className="cont-area">

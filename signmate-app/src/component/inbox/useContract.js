@@ -6,7 +6,7 @@ export function useContracts(userId = 1) {
 
   useEffect(() => {
     setIsLoading(true);
-    fetch(`http://localhost:8080/contracts/user/${userId}`)
+    fetch(`http://localhost:8080/contracts/user/${data.userId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();
