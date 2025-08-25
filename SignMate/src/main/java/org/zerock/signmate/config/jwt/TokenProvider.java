@@ -49,6 +49,7 @@ public class TokenProvider {
                 // 서명에서 사용할 암호화 알고리즘 및 키값
                 // "alg" : "HS256"
                 // HS256을 사용하여 secretKey를 암호화한 값을 서명 부분에 저장
+                .claim("id",user.getUserId().toString())
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
     }
