@@ -65,12 +65,12 @@ public class UserRestController {
             User loginUser = userRegisterService.findUserByEmailAndPassword(dto);
             Authentication authentication = new UsernamePasswordAuthenticationToken(loginUser, null, loginUser.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String accessToken = tokenProvider.generateToken(loginUser, Duration.ofDays(1));
+            String accessToken = tokenProvider.generateToken(loginUser, Duration.ofHours(2));
             String refreshToken = tokenProvider.generateToken(loginUser, Duration.ofDays(14));
             Cookie cookie = new Cookie("refreshToken", refreshToken);
             cookie.setPath("/");
             cookie.setHttpOnly(true);
-            cookie.setMaxAge(14*60*60);
+            cookie.setMaxAge(14*24*60*60);
             response.addCookie(cookie);
 
             return ResponseEntity.ok(accessToken);

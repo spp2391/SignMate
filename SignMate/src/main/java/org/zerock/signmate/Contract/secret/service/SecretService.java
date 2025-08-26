@@ -57,6 +57,8 @@ public class SecretService {
                     .writer(loginUserEntity)
                     .receiver(receiver)
                     .status(enums.ContractStatus.DRAFT)
+                    .writerSignature(dto.getWriterSignature())
+                    .receiverSignature(dto.getReceiverSignature())
                     .build();
             contractRepository.save(contract);
         }

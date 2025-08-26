@@ -1,7 +1,5 @@
 package org.zerock.signmate.Contract.newservice.controller;
 
-
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,54 +9,49 @@ import org.zerock.signmate.Contract.newservice.service.NewServiceService;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/new-services")
+@RequestMapping("/api/service")
 @RequiredArgsConstructor
 public class NewServiceController {
 
-    private final NewServiceService service;
+    private final NewServiceService newServiceService;
 
-    // 생성 및 수정 (POST/PUT 구분 없이 save 사용)
+    // Contract 기준 저장 (POST = 새 작성, PUT = 수정)
     @PostMapping
-    public ResponseEntity<?> saveOrUpdate(@RequestBody NewServiceDTO dto) {
+    public ResponseEntity<?> createOrUpdateService(@RequestBody NewServiceDTO dto) {
         try {
-            NewServiceDTO savedDto = service.addOrUpdateDocument(dto);
+            NewServiceDTO savedDto = newServiceService.addOrUpdateDocument(dto);
             return ResponseEntity.ok(savedDto);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "서버 오류"));
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
     }
 
-    // 단일 조회
-    @GetMapping("/{id}")
-    public ResponseEntity<?> getDocument(@PathVariable Long id) {
-        NewServiceDTO dto = service.findById(id);
-        if (dto == null) {
-            return ResponseEntity.notFound().build();
+    @PutMapping("/{contractId}")
+    public ResponseEntity<?> updateService(@PathVariable Long contractId, @RequestBody NewServiceDTO dto) {
+        try {
+            dto.setContractId(contractId); // URL의 contractId 적용
+            NewServiceDTO updatedDto = newServiceService.addOrUpdateDocument(dto);
+            return ResponseEntity.ok(updatedDto);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
         }
+    }
+
+    // ContractId 기준 조회
+    @GetMapping("/{contractId}")
+    public ResponseEntity<NewServiceDTO> getService(@PathVariable Long contractId) {
+        NewServiceDTO dto = newServiceService.findByContractId(contractId);
         return ResponseEntity.ok(dto);
     }
 
-    // 삭제
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteDocument(@PathVariable Long id) {
-        try {
-            service.deleteById(id);
-            return ResponseEntity.ok(Map.of("message", "서비스 계약서가 삭제되었습니다."));
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류가 발생했습니다."));
-        }
-    }
-
-    // ContractId로 조회
-    @GetMapping("/contract/{contractId}")
-    public ResponseEntity<?> getByContractId(@PathVariable Long contractId) {
-        try {
-            NewServiceDTO dto = service.findByContractId(contractId);
-            return ResponseEntity.ok(dto);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body(Map.of("message", e.getMessage()));
-        }
-    }
+    // ContractId 기준 삭제
+//    @DeleteMapping("/{contractId}")
+//    public ResponseEntity<?> deleteService(@PathVariable Long contractId) {
+//        try {
+//            newServiceService.deleteByContractId(contractId);
+//            return ResponseEntity.ok(Map.of("message", "서비스 계약서가 삭제되었습니다."));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
+//        }
+//    }
 }

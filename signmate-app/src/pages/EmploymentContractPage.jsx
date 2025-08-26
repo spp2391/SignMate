@@ -168,8 +168,8 @@ export default function EmploymentContractPage() {
         }));
 
         if (loginUserName) {
-          if (loginUserName === data.employerName) setCurrentUserRole("employer");
-          else if (loginUserName === data.employeeName) setCurrentUserRole("employee");
+          if (loginUserName === data.employerName) setCurrentUserRole("sender");
+          else if (loginUserName === data.employeeName) setCurrentUserRole("receiver");
           else setCurrentUserRole("none");
         }
 

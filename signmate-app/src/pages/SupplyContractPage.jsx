@@ -117,7 +117,7 @@ export default function SupplyContractPage() {
   
       const fetchSecret = async () => {
         try {
-          const res = await fetch(`/api/secrets/${contractId}`, {
+          const res = await fetch(`/api/supply/${contractId}`, {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
@@ -131,19 +131,19 @@ export default function SupplyContractPage() {
             ...prev,
             ...data,
             sign: {
-              discloser: data.writerSignature || prev.sign.discloser,
-              recipient: data.receiverSignature || prev.sign.recipient
+              discloser: data.supplierSignature || prev.sign.discloser,
+              recipient: data.demanderSignature || prev.sign.recipient
             }
           }));
   
           if (loginUserName) {
-            if (loginUserName === data.writerName) setCurrentUserRole("sender");
-            else if (loginUserName === data.receiverName) setCurrentUserRole("receiver");
+            if (loginUserName === data.supplierName) setCurrentUserRole("sender");
+            else if (loginUserName === data.demanderName) setCurrentUserRole("receiver");
             else setCurrentUserRole("none");
           }
   
-          if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
-          if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
+          if (data.supplierSignature) writerSigRef.current?.fromDataURL(data.supplierSignature);
+          if (data.demanderSignature) receiverSigRef.current?.fromDataURL(data.demanderSignature);
         } catch (err) {
           console.error(err);
         }
@@ -197,7 +197,7 @@ export default function SupplyContractPage() {
 
       console.log("payload.items:", payload.items);
 
-      const res = await fetch("/api/supplies", {
+      const res = await fetch("/api/supply", {
         method: "POST",
         headers: { "Content-Type": "application/json",
         "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
@@ -212,14 +212,14 @@ export default function SupplyContractPage() {
         ...prev,
         ...data,
         sign: {
-          discloser: data.writerSignature || prev.sign.discloser,
-          recipient: data.receiverSignature || prev.sign.recipient
+          discloser: data.supplierSignature || prev.sign.discloser,
+          recipient: data.demanderSignature || prev.sign.recipient
         }
       }));
 
       alert("계약서 제출 완료!");
-      if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
-      if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
+      if (data.supplierSignature) writerSigRef.current?.fromDataURL(data.supplierSignature);
+      if (data.demanderSignature) receiverSigRef.current?.fromDataURL(data.demanderSignature);
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {

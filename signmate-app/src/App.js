@@ -17,12 +17,26 @@ import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
+import Join from './User/pages/Join';
 import LawComponent from "./components/LawComponent";
 
 
 export default function App() {
+  const token = localStorage.getItem("accessToken");
+  let userId = null;
+
+  if (token) {
+    try {
+      // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
+      const payload = JSON.parse(atob(token.split(".")[1]));
+      userId = payload.id; // claim에 저장된 userId
+    } catch (err) {
+      console.error("JWT 파싱 실패:", err);
+    }
+  }
   return (
-    
+
+
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
         <Link to="/secret">비밀유지서약서</Link>
@@ -33,7 +47,7 @@ export default function App() {
         <Header />
       {/* </nav> */}
 
-         
+
             <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/contracts" element={<ContractList />} />
@@ -44,14 +58,19 @@ export default function App() {
                 <Route path="/outsourcing" element={<OutsourcingContractPage />} />
                 <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
                 <Route path="*" element={<Index />} />
+                <Route path="/inbox" element={<Inbox userId={userId} />} />
                 <Route path="/inbox" element={<ContractInboxPage />} />
                 <Route path="/secret/:contractId" element={<SecretPage signerId="" />} />
                <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
+               <Route path="/supply/:contractId" element={<SupplyContractPage signerId="" />} />
+                <Route path="/service/:contractId" element={<ServiceContractPage signerId="" />} />
+                <Route path="/outsourcing/:contractId" element={<OutsourcingContractPage signerId="" />} />
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/inbox" element={<Inbox />} />
                 <Route path="/notice" element={<NoticePage />} />
+                <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 {/* 기본 라우트 */}
             </Routes>

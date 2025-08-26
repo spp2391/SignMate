@@ -35,8 +35,18 @@ public class User implements UserDetails {
     @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(name = "email", length = 255)
+    @Column(name = "email", length = 255, unique = true)
     private String email;
+
+    @Column(name = "google_id", length = 255, unique = true)
+    private String googleId;
+
+    // 제공되는 정보의 차이로 인해 Long 사용
+    @Column(name = "kakao_id", length = 255, unique = true)
+    private Long kakaoId;
+
+    @Column(name = "naver_id", length = 255, unique = true)
+    private String naverId;
 
     @Column(name = "password", length = 255)
     private String password;
@@ -52,6 +62,9 @@ public class User implements UserDetails {
     @Column(name = "user_role", length = 10)
     private String userRole;
 
+    @Column(name = "auth_type", length = 10)
+    private String authType;
+
     @Column(name = "regdate")
     private LocalDateTime regdate;
 
@@ -61,12 +74,6 @@ public class User implements UserDetails {
     @Builder.Default
     @Column(nullable = false)
     private boolean deleted = false;
-
-    private Long kakaoId;
-
-//    private Long receiverUserId;
-
-
 
     // ===== UserDetails 구현 =====
     @Override

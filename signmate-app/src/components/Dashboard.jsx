@@ -12,7 +12,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect (() => {
-    fetch("http://localhost:8080/contracts/user/4") // 백엔드 API 주소
+    fetch("/contracts/user/4") // 백엔드 API 주소
       .then((res) => res.json())
       .then((json) => {
         setContract(json.contracts);
@@ -60,7 +60,7 @@ export default function Dashboard() {
           return (
             <div
               key={status}
-              className={`rounded-xl border p-4 flex flex-col items-center ${meta.className}`} 
+              className={`rounded-xl border p-4 flex flex-col items-center ${meta.className}`}
             >
               <meta.Icon className="w-6 h-6 mb-2" />
               <div className="font-semibold">{meta.label}</div>

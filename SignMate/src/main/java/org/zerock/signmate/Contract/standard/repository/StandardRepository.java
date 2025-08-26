@@ -11,4 +11,6 @@ public interface StandardRepository extends JpaRepository<Standard, Long> {
     Optional<Standard> findByContract(Contract contract);
 
     List<Standard> findByContract_Writer_UserIdOrContract_Receiver_UserId(Long writerId, Long receiverUserId);
+//    List<Standard> findByContract_Writer_UserId(Long writerId);
+//    List<Standard> findByContract_Receiver_UserId(Long receiverId);
 }

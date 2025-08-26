@@ -1,6 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import "./login.css";
+import { useLocation } from "react-router-dom";
 
 const LoginInputArea = () => {
+    const location = useLocation();
+    useEffect(()=>{
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');  // 'react'
+        if(token){
+            localStorage.setItem("accessToken", token);
+        }
+    },[])
     const [state, setState] = useState(
         {
             id: "",
@@ -19,29 +29,6 @@ const LoginInputArea = () => {
             ...state,
             pw: event.target.value,
         })
-    }
-    const handleJoin = (event) => {
-        event.preventDefault();
-        const joinRequest = {
-            email: state.id,
-            password: state.pw,
-            name: state.id,
-            nickname: state.id,
-            companyName: "ABC",
-            userType: "USER",
-            userRole: "COMPANY"
-        }
-        fetch("http://localhost:8080/api/user/join", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(joinRequest),
-        })
-        .then((response) => response.json())
-        .then((data) => setState({
-            status: data
-        }))
     }
     const handleLogin = (event) => {
         event.preventDefault();
@@ -65,30 +52,84 @@ const LoginInputArea = () => {
         })
     }
     const handleKakaoLogin = () => {
-
+        fetch("/oauth2/authorization/kakao", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.json()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
     }
     const handleGoogleLogin = () => {
-
+        fetch("/oauth2/authorization/google", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
+    }
+    const handleNaverLogin = () => {
+        fetch("/oauth2/authorization/naver", {
+            method: "GET",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+        .then((response) =>
+            response.text()
+        )
+        .then(text=>{
+            localStorage.setItem("accessToken", text);
+        })
     }
     return (
-        <div>
-            <h1>Login</h1>
-            <input
-                type="id"
-                value={state.id}
-                onChange={handleChangeId}
-            />
-            <input
-                type="pw"
-                value={state.pw}
-                onChange={handleChangePw}
-            />
-            <p>{state.status}</p>
-            <p>{state.id}, {state.pw}</p>
-            <button onClick={handleJoin}>Join</button>
-            <button onClick={handleLogin}>Submit</button>
-            <button onClick={handleKakaoLogin}>Kakao</button>
-            <button onClick={handleGoogleLogin}>Google</button>
+        <div className="login-container">
+            <div className="login-card">
+                <div className="logo">
+                    Login
+                </div>
+                <div>
+                    <div className="tab-menu">
+                        아이디/패스워드를 입력해주세요.
+                    </div>
+                    <div className="input-group">
+                        <input
+                            type="id"
+                            value={state.id}
+                            onChange={handleChangeId}
+                            placeholder="email"
+                        />
+                        <input
+                            type="pw"
+                            value={state.pw}
+                            onChange={handleChangePw}
+                            placeholder="password"
+                        />
+                    </div>
+                    {/* <p>{state.status}</p>
+                    <p>{state.id}, {state.pw}</p> */}
+                    {/* <button onClick={handleJoin}>Join</button> */}
+                    <button onClick={handleLogin} className="login-btn">Submit</button>
+                    <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button>
+                    <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a>
+                    <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
+                    <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
+                </div>
+            </div>     
         </div>
     )
 }
