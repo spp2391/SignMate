@@ -1,9 +1,25 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
 import { ContractStatus, ContractType } from "./inboxUtils";
 
-export default function Inbox({ contracts = [], isLoading = false }) {
+function decodeUserIdFromToken() {
+  try {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default function Inbox({ userId: userIdProp }) {
+  const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
+
+  const [contracts, setContracts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [contractType, setContractType] = useState("all");
@@ -12,51 +28,53 @@ export default function Inbox({ contracts = [], isLoading = false }) {
   const [view, setView] = useState("list");
   const [selected, setSelected] = useState({});
 
-  const lower = (v) => (v ?? "").toString().toLowerCase();
-
-  const normalized = useMemo(() => {
-    return (Array.isArray(contracts) ? contracts : []).map((d, i) => {
-      const title = d.title ?? "";
-      const parts = Array.isArray(d.participants)
-        ? d.participants.map((p) => p?.name || p?.email || "")
-        : typeof d.participants === "string"
-        ? d.participants
-        : "";
-      const searchKey = `${lower(title)} ${lower(parts)}`;
-      return {
-        id: d.id ?? `doc-${i}`,
-        title,
-        status: d.status ?? "",
-        contractType: d.contractType ?? "",
-        receiverName: d.receiverName ?? "",
-        address: d.address ?? "",
-        updatedAt: d.updatedAt ?? d.lastEdited ?? d.contractEndDate ?? "",
-        _searchKey: searchKey,
-        _raw: d,
-      };
-    });
-  }, [contracts]);
+  useEffect(() => {
+   console.log("로그인 유저아이디는:"+resolvedUserId);
+    setIsLoading(true);
+    fetch(`http://localhost:8080/contracts/user/${resolvedUserId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((json) => {
+        const items = Array.isArray(json) ? json : (json?.contracts ?? []);
+        setContracts(items);
+      })
+      .catch((err) => {
+        console.error(err);
+        setContracts([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, [resolvedUserId]);
 
   const filtered = useMemo(() => {
-    const q = lower(query).trim();
+    const q = (query ?? "").toLowerCase().trim();
 
-    let out = normalized.filter((c) => {
-      const queryOk = q === "" || c._searchKey.includes(q);
-      const statusOk = status === "all" || c.status === status;
-      const typeOk = contractType === "all" || c.contractType === contractType;
-      const completedOk =
-        !onlyCompleted || c.status === ContractStatus.COMPLETED;
+    let out = (Array.isArray(contracts) ? contracts : []).filter((d) => {
+      const title = (d.title ?? "").toLowerCase();
+      const participantsText = Array.isArray(d.participants)
+        ? d.participants.map((p) => (p?.name || p?.email || "")).join(" ").toLowerCase()
+        : (d.participants ?? "").toString().toLowerCase();
+
+      const queryOk = !q || title.includes(q) || participantsText.includes(q);
+      const statusOk = status === "all" || d.status === status;
+      const typeOk = contractType === "all" || d.contractType === contractType;
+      const completedOk = !onlyCompleted || d.status === ContractStatus.COMPLETED;
       return queryOk && statusOk && typeOk && completedOk;
     });
 
-    if (sort === "title") out.sort((a, b) => a.title.localeCompare(b.title));
-    else
-      out.sort(
-        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    if (sort === "title") {
+      out = [...out].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    } else {
+      out = [...out].sort(
+        (a, b) =>
+          new Date(b.lastEdited || b.updatedAt || b.contractEndDate || 0).getTime() -
+          new Date(a.lastEdited || a.updatedAt || a.contractEndDate || 0).getTime()
       );
+    }
 
-    return out.map((x) => x._raw);
-  }, [normalized, query, status, contractType, onlyCompleted, sort]);
+    return out;
+  }, [contracts, query, status, contractType, onlyCompleted, sort]);
 
   const anyChecked = Object.values(selected).some(Boolean);
   const clearSelection = () => setSelected({});
@@ -155,10 +173,7 @@ export default function Inbox({ contracts = [], isLoading = false }) {
           <div className="flex items-center gap-2">
             <button className="rounded-md border px-3 py-2 text-sm">다운로드</button>
             <button className="rounded-md border px-3 py-2 text-sm">계약서 유형 변경</button>
-            <button
-              className="rounded-md bg-red-600 text-white px-3 py-2 text-sm"
-              onClick={clearSelection}
-            >
+            <button className="rounded-md bg-red-600 text-white px-3 py-2 text-sm" onClick={clearSelection}>
               삭제
             </button>
           </div>

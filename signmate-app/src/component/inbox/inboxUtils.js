@@ -1,9 +1,18 @@
+// inboxUtils.js
+// ContractStatus : 계약 상태(enum)
+// ContractType : 계약 종류(enum)
+// CONTRACT_TYPE_LABEL : 한글 라벨 매핑
+// STATUS_META : 상태별 색상/아이콘 정의
+// formatLocalDateTime : 날짜 포맷 함수
+// useContracts : 실제 API용 계약 데이터 훅
+
 import { CheckCircle2, Clock, Pencil } from "lucide-react";
 
+// 1) 상태(enum) & 계약서 종류(enum)
 export const ContractStatus = {
   DRAFT: "DRAFT",
-  IN_PROGRESS: "IN_PROGRESS",
   COMPLETED: "COMPLETED",
+  IN_PROGRESS: "IN_PROGRESS",
 };
 
 export const ContractType = {
@@ -14,6 +23,7 @@ export const ContractType = {
   SUPPLY: "SUPPLY",
 };
 
+// 2) 한글 라벨 매핑
 export const CONTRACT_TYPE_LABEL = {
   [ContractType.STANDARD]: "근로 계약서",
   [ContractType.BUSINESS_OUTSOURCING]: "업무위탁 계약서",
