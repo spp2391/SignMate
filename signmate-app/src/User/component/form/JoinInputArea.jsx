@@ -36,13 +36,13 @@ const JoinInputArea = () => {
             ...state,
             companyName: event.target.value,
         })
-    }
+   }
     const handleChangeUserType = (event) => {
         setState({
             ...state,
             userType: event.target.value,
         })
-    }
+    } 
     const handleChangeUserRole = (event) => {
         setState({
             ...state,
@@ -112,15 +112,15 @@ const JoinInputArea = () => {
                     value={state.companyName}
                     onChange={handleChangeCompanyName}
                     placeholder="company name"
-                />
-                {/* <div>
-                    userType USER/ADMIN
-                    <input
-                        type="text"
-                        value={state.userType}
-                        onChange={handleChangeUserType}
-                    />
-                </div> */}
+                 />
+                 { <div>
+                     userType USER/ADMIN
+                     <input
+                         type="text"
+                         value={state.userType}
+                         onChange={handleChangeUserType}
+                     />
+                </div>}
                 <input
                     type="text"
                     value={state.userRole}

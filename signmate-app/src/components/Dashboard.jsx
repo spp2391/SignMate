@@ -12,7 +12,7 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   
   useEffect (() => {
-    fetch("/contracts/user/4") // 백엔드 API 주소
+    fetch("/contracts/user/2") // 백엔드 API 주소
       .then((res) => res.json())
       .then((json) => {
         setContract(json.contracts);

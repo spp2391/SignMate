@@ -24,7 +24,7 @@ const Header = () => {
                         <div className="header-gnb">
                             <ul className="header-gnblist">
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/contracts">
                                         <span>서비스</span>
                                     </Link>
                                 </li>
@@ -39,7 +39,7 @@ const Header = () => {
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/notice">
                                         <span>공지사항</span>
                                     </Link>
                                 </li>
@@ -74,11 +74,11 @@ const Header = () => {
                                 </li> */}
                                 {/* 비로그인 상태일 때 */}
                                 <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/member/login}"><span>로그인</span></Link>
+                                    <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
                                 </li>
                                  {/* style="padding-right: 30px;" */}
                                 <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/member/join}"><span>회원가입</span></Link>
+                                    <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
                                 </li>
                                     <li className="auth-menu">
                                     <NotificationBell />
