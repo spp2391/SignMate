@@ -132,8 +132,8 @@ export default function Inbox({ userId: userIdProp }) {
                 onChange={(e) => setContractType(e.target.value)}
               >
                 <option value="all">전체 유형</option>
-                <option value={ContractType.STANDARD}>근로 계약서</option>
-                <option value={ContractType.BUSINESS_OUTSOURCING}>업무위탁 계약서</option>
+                <option value={ContractType.EMPLOYMENT}>근로 계약서</option>
+                <option value={ContractType.OUTSOURCING}>업무위탁 계약서</option>
                 <option value={ContractType.SECRET}>비밀유지계약서</option>
                 <option value={ContractType.SERVICE}>용역 계약서</option>
                 <option value={ContractType.SUPPLY}>자재/물품 공급계약서</option>

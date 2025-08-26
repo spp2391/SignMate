@@ -76,7 +76,7 @@ export function ListView({ docs, selected, setSelected }) {
                       요청자 
                     </span>
                 </div>
-                <div className="text-xs text-neutral-500 mt-0.5">{d.receiverName}, {d.address}</div>
+                <div className="text-xs text-neutral-500 mt-0.5">{d.writerName},{d.receiverName}</div>
               </div>
             </div>
           </div>
@@ -92,7 +92,8 @@ export function ListView({ docs, selected, setSelected }) {
           </div>
 
           <div className="col-span-2 text-sm">
-            {formatLocalDateTime(d.contractEndDate)}
+            {}
+            {formatLocalDateTime(d.update_at)}
           </div>
         </div>
       ))}

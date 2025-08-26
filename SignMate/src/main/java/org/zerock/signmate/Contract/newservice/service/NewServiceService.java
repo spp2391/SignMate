@@ -110,7 +110,7 @@ public class NewServiceService {
                 notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
             }
         } else {
-            String msg = dto.getClientName()+"이 용역 계약서를 보냈습니다.";
+            String msg = dto.getClientName()+"이 용역 계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
             notificationService.notifyUser(contract.getWriter(), contract, msg, now);
             if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
                 notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
