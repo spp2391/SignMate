@@ -18,21 +18,6 @@ import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
-<<<<<<< HEAD
-import Login from './User/pages/Login';
-import Edit from './User/pages/Edit';
-
-function App() {
-    return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<Login />} />
-				<Route path="/login" element={<Login />} />
-				<Route path="/join" element={<Join />} />
-				<Route path="/mypage/edit" element={<Edit/>} />
-			</Routes>
-		</BrowserRouter>
-=======
 
 
 export default function App() {
@@ -89,7 +74,6 @@ export default function App() {
             </Routes>
             <Footer />
         </Router>
->>>>>>> origin/Lee
     );
 }
 

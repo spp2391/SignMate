@@ -43,12 +43,12 @@ const JoinInputArea = () => {
             companyName: event.target.value,
         })
     }
-    const handleChangeUserType = (event) => {
-        setState({
-            ...state,
-            userType: event.target.value,
-        })
-    }
+    // const handleChangeUserType = (event) => {
+    //     setState({
+    //         ...state,
+    //         userType: event.target.value,
+    //     })
+    // }
     const handleChangeUserRole = (event) => {
         setState({
             ...state,
