@@ -6,7 +6,7 @@ import "../../assets/css/templatehouse.css";
 import logo1 from "../../assets/icons/ico_transaction.svg";
 import logo2 from "../../assets/icons/ico_transfer.svg";
 import logo3 from "../../assets/icons/ico_certcenter.svg";
-import logo4 from "../../assets/icons/ico_loan.svg";
+// import logo4 from "../../assets/icons/ico_loan.svg";
 import logo5 from "../../assets/icons/ico_transaction.svg";
 import logo6 from "../../assets/icons/ico_transfer.svg";
 import logo7 from "../../assets/icons/ico_certcenter.svg";
@@ -14,8 +14,8 @@ import logo8 from "../../assets/icons/ico_loan.svg";
 import logo9 from "../../assets/icons/ico_transaction.svg";
 import logo10 from "../../assets/icons/ico_transfer.svg";
 import logo11 from "../../assets/icons/ico_certcenter.svg";
-import logo12 from "../../assets/icons/ico_loan.svg";
-import logo13 from "../../assets/icons/ico_message.svg";
+// import logo12 from "../../assets/icons/ico_loan.svg";
+// import logo13 from "../../assets/icons/ico_message.svg";
 import logo14 from "../../assets/icons/ico_person.svg";
 import logo15 from "../../assets/icons/ico_authcenter.svg";
 import logo16 from "../../assets/icons/ico_security.svg";
@@ -127,8 +127,8 @@ const Index = () => {
                                         </div>
                                         <div className="menu-item secondary">
                                             <Link to="javascript:void(0)">
-                                                <img src={logo4} alt="대출" />
-                                                <span className="h6">매출 현황</span>
+                                                <img src={logo14} alt="마이페이지" />
+                                                <span className="h6">마이페이지</span>
                                             </Link>
                                         </div>
                                     </div>
@@ -179,8 +179,8 @@ const Index = () => {
                                         </div>
                                         <div className="menu-item secondary">
                                             <Link to="javascript:void(0)">
-                                                <img src={logo12} alt="대출" />
-                                                <span className="h6">매출 현황</span>
+                                                <img src={logo14} alt="마이페이지" />
+                                                <span className="h6">마이페이지</span>
                                             </Link>
                                         </div>
                                     </div>
@@ -201,7 +201,7 @@ const Index = () => {
                                                 ))}
                                                 </div>
                                             </div>
-                                        <div className="menu-wrap">
+                                        {/* <div className="menu-wrap">
                                             <div className="menu-item gray-alpha">
                                                 <Link to="javascript:void(0)">
                                                     <img src={logo13} alt="알림함" />
@@ -214,7 +214,7 @@ const Index = () => {
                                                     <span className="h6">마이페이지</span>
                                                 </Link>
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                     <div className="col-center">
                                         <div className="menu-wrap">

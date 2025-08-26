@@ -14,9 +14,9 @@ public interface SecretRepository extends JpaRepository<Secret, Long> {
     Optional<Secret> findByContractId(Long contractId);
     Optional<Secret> findByContract(Contract contract);
 //    @Query("SELECT c FROM Contract c WHERE c.writer.userId=:userId OR c.receiver.userId=:receiverUserId")
-    Iterable<Secret> findByContract_Writer_UserIdOrContract_Receiver_UserId(Long userId, Long receiverUserId);
+//    Iterable<Secret> findByContract_Writer_UserIdOrContract_Receiver_UserId(Long userId, Long receiverUserId);
 
-//    Iterable<Secret> findByContract_Writer_UserId(Long userId);
-//    Iterable<Secret> findByContract_Receiver_UserId(Long userId);
+    Iterable<Secret> findByContract_Writer_UserId(Long userId);
+    Iterable<Secret> findByContract_Receiver_UserId(Long userId);
 
 }

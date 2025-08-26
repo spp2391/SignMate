@@ -21,9 +21,11 @@ import Join from './User/pages/Join';
 import LawComponent from "./components/LawComponent";
 
 
+
 export default function App() {
   const token = localStorage.getItem("accessToken");
   let userId = null;
+  
 
   if (token) {
     try {

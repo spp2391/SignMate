@@ -838,7 +838,7 @@
 }
 
 .temhabank-N4 .secondary {
-  background: #1a937d;
+  background: #e9e9e9;
 }
 
 .temhabank-N4 .secondary-alpha {
@@ -865,7 +865,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(#111111);
   font-weight: var(--fw-bold);
 }
 
@@ -1432,7 +1432,7 @@ body:has(.fullmenu-active) .temhabank-N6 {
   color: #000;
 }
 .temhabank-N1 .header-gnblink span {
-  color: #195180;
+  color: #111111;
 }
 
 .temhabank-N2 .footer-modal {

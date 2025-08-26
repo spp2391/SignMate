@@ -1,8 +1,7 @@
-import { CheckCircle2, Clock, Pencil, Tag } from "lucide-react";
+import { CheckCircle2, Clock, Pencil } from "lucide-react";
 
 export const ContractStatus = {
   DRAFT: "DRAFT",
-  PENDING: "PENDING",
   IN_PROGRESS: "IN_PROGRESS",
   COMPLETED: "COMPLETED",
 };
@@ -36,11 +35,6 @@ export const STATUS_META = {
     label: "작성 중",
     Icon: Pencil,
     className: "bg-slate-50 text-slate-700 border-slate-200",
-  },
-  [ContractStatus.PENDING]: {
-    label: "서명 대기",
-    Icon: Tag,
-    className: "bg-blue-50 text-blue-700 border-blue-200",
   },
   [ContractStatus.IN_PROGRESS]: {
     label: "진행 중",

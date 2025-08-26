@@ -32,35 +32,46 @@ public class UnifiedContractService {
     private final ServiceContractDocumentRepository serviceContractDocumentRepository;
     private final BusinessOutsourcingContractRepository businessOutsourcingContractRepository;
 
-    public List<UnifiedContractDto> getAllContractsForUser(Long userId, Long receiverUserId) {
+    public List<UnifiedContractDto> getAllContractsForUser(Long userId) {
         List<UnifiedContractDto> result = new ArrayList<>();
 
         // Standard
-        standardRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
+        standardRepository.findByContract_Writer_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromStandard(c, c.getContract())));
+        standardRepository.findByContract_Receiver_UserId(userId)
+                        .forEach(c -> result.add(UnifiedContractMapper.fromStandard(c, c.getContract())));
+
 
         // Secret
-        secretRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
+        secretRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromSecret(c, c.getContract())));
+        secretRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSecret(c, c.getContract())));
 
         // Supply
-        supplyContractRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
+        supplyContractRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromSupply(c, c.getContract())));
+        supplyContractRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSupply(c, c.getContract())));
 
         // Service
-        serviceContractDocumentRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
+        serviceContractDocumentRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromService(c, c.getContract())));
+        serviceContractDocumentRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromService(c, c.getContract())));
 
         // BusinessOutsourcing
-        businessOutsourcingContractRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
+        businessOutsourcingContractRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromBusiness(c, c.getContract())));
+        businessOutsourcingContractRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromBusiness(c, c.getContract())));
 
         // 필요 시 Service/Outsourcing도 이어서 추가
         return result;
     }
 
-    public UserDashboardDTO getUserDashboard(Long userId, Long receiverUserId) {
-        List<UnifiedContractDto> contracts = getAllContractsForUser(userId, receiverUserId);
+    public UserDashboardDTO getUserDashboard(Long userId) {
+        List<UnifiedContractDto> contracts = getAllContractsForUser(userId);
         LocalDate today = LocalDate.now();
 
         long total = contracts.size();

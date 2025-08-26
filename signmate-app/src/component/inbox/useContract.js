@@ -1,26 +1,32 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
+import jwtDecode from "jwt-decode";
 
-export function useContracts(userId = 1) {
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function useContracts() {
+  const [contracts, setContracts] = useState([]);
+  const [dashboard, setDashboard] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    setIsLoading(true);
-    fetch("http://localhost:8080/contracts/user/1")
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-      })
-      .then((json) => {
-        const items = Array.isArray(json) ? json : (json?.contracts ?? []);
-        setData(items);
-      })
-      .catch((err) => {
-        console.error(err);
-        setData([]);
-      })
-      .finally(() => setIsLoading(false));
-  }, [userId]);
+  console.log("✅ useContracts 실행됨, userId =", userId);
 
-  return { data, isLoading };
+  setIsLoading(true);
+  fetch(`http://localhost:8080/contracts/user/${userId}`)
+    .then((res) => {
+      console.log("📩 fetch 응답", res);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    })
+    .then((json) => {
+      console.log("📦 응답 데이터", json);
+      const items = Array.isArray(json) ? json : (json?.contracts ?? []);
+      setData(items);
+    })
+    .catch((err) => {
+      console.error("❌ fetch 에러:", err);
+      setData([]);
+    })
+    .finally(() => setIsLoading(false));
+}, [userId]);
+
+  return { contracts, dashboard, isLoading };
 }
