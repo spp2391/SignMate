@@ -11,4 +11,5 @@ public interface BusinessOutsourcingContractRepository extends JpaRepository<Bus
     Optional<BusinessOutsourcingContract> findByContract(Contract contract);
 
     Iterable<BusinessOutsourcingContract> findByContract_Writer_UserId(Long userId);
+    Iterable<BusinessOutsourcingContract> findByContract_Receiver_UserId(Long userId);
 }

@@ -13,4 +13,5 @@ public interface ServiceContractDocumentRepository extends JpaRepository<Service
     Optional<ServiceContractDocument> findByContract(Contract contract);
 
     Iterable<ServiceContractDocument> findByContract_Writer_UserId(Long userId);
+    Iterable<ServiceContractDocument> findByContract_Receiver_UserId(Long userId);
 }

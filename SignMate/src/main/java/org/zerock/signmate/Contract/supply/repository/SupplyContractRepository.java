@@ -16,4 +16,5 @@ public interface SupplyContractRepository extends JpaRepository<SupplyContract, 
     Optional<SupplyContract> findByContract(Contract contract);
 
     Iterable<SupplyContract> findByContract_Writer_UserId(Long userId);
+    Iterable<SupplyContract> findByContract_Receiver_UserId(Long userId);
 }
