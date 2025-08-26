@@ -1,6 +1,7 @@
 // src/pages/NoticePage.jsx
 import React, { useState, useEffect } from "react";
 import "../component/contracts/NoticePage.css";
+import logo from "../assets/images/notice.png";
 
 export default function NoticePage() {
   const [notices, setNotices] = useState([]);
@@ -40,7 +41,7 @@ export default function NoticePage() {
   return (
     <div className="notice-container">
       <div className="notice-banner">
-        <img src="/images/notice.png" alt="공지사항 배너" />
+        <img src={logo} alt="공지사항 배너" />
       </div>
       <h2>공지사항</h2>
 

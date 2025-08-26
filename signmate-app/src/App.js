@@ -1,6 +1,6 @@
 // src/App.js
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
@@ -43,11 +43,11 @@ export default function App() {
 
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
-        <Link to="/secret">비밀유지서약서</Link>
+        {/* <Link to="/secret">비밀유지서약서</Link>
         <Link to="/employment">표준근로계약서</Link>
         <Link to="/service">용역계약서</Link>
         <Link to="/supply">자재/물품 공급계약서</Link>
-        <Link to="/outsourcing">업무위탁 계약서</Link>
+        <Link to="/outsourcing">업무위탁 계약서</Link> */}
         <Header />
       {/* </nav> */}
 

@@ -14,7 +14,7 @@ function decodeUserIdFromToken() {
   }
 }
 
-export default function Inbox({ userId: userIdProp }) {
+export default function Inbox({ resolvedUserId: userIdProp }) {
   const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
   const [contracts, setContracts] = useState([]);
@@ -133,7 +133,7 @@ export default function Inbox({ userId: userIdProp }) {
               >
                 <option value="all">전체 유형</option>
                 <option value={ContractType.STANDARD}>근로 계약서</option>
-                <option value={ContractType.BUSINESS_OUTSOURCING}>업무위탁 계약서</option>
+                <option value={ContractType.OUTSOURCING}>업무위탁 계약서</option>
                 <option value={ContractType.SECRET}>비밀유지계약서</option>
                 <option value={ContractType.SERVICE}>용역 계약서</option>
                 <option value={ContractType.SUPPLY}>자재/물품 공급계약서</option>
