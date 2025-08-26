@@ -55,12 +55,12 @@ export default function LawEffectPage() {
         </span>
 
         <h1 className="text-4xl md:text-6xl font-extrabold mt-12 text-gray-900 leading-snug md:leading-relaxed">
-          <span className="block mb-6">모두싸인 전자계약은</span>
+          <span className="block mb-6">SIGNMATE 전자계약은</span>
           <span className="block">종이계약과 법적효력이 동일합니다</span>
         </h1>
 
         <p className="text-lg md:text-xl mt-8 md:mt-10 text-gray-700 max-w-3xl mx-auto">
-          모두싸인에서 이용하는 서명과 계약은 법령에 근거해 확실한 법적효력이 인정됩니다.
+          SIGNMATE에서 이용하는 서명과 계약은 법령에 근거해 확실한 법적효력이 인정됩니다.
         </p>
       </motion.div>
 
