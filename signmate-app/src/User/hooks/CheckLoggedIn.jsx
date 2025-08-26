@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export function useCheckLoggedIn() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [loginUser, setLoginUser] = useState("")
-    useEffect(() => {
+    const [loginUser, setLoginUser] = useState("");
+    // useEffect(() => {
         fetch("http://localhost:8080/api/user/checklogin", {
             method: "POST",
             headers: {
@@ -11,13 +11,15 @@ export function useCheckLoggedIn() {
                 "Authorization": `Bearer ${localStorage.getItem("accessToken")}` 
             }
         })
-        .then((response) => response.text())
-        .then((data) => {    
-            if (data) {
+        .then(async (response) => {
+            if (response) {
                 setIsLoggedIn(true);
-                setLoginUser(data);
+                setLoginUser(response);
+            } else {
+                setIsLoggedIn(false);
+                setLoginUser(JSON.stringify({name:""}));
             }
         })
-    }, []);
-    return [isLoggedIn, loginUser];
+    // }, []);
+    return {isLoggedIn, loginUser};
 }

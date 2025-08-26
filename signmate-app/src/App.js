@@ -1,5 +1,5 @@
 // src/App.js
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
@@ -18,21 +18,47 @@ import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
+// import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
 export default function App() {
-  const token = localStorage.getItem("accessToken");
-  let userId = null;
+  // const token = localStorage.getItem("accessToken");
+  // let userId = null;
 
-  if (token) {
-    try {
-      // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      userId = payload.id; // claim에 저장된 userId
-    } catch (err) {
-      console.error("JWT 파싱 실패:", err);
-    }
-  }
+  // if (token) {
+  //   try {
+  //     // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
+  //     const payload = JSON.parse(atob(token.split(".")[1]));
+  //     userId = payload.id; // claim에 저장된 userId
+  //   } catch (err) {
+  //     console.error("JWT 파싱 실패:", err);
+  //   }
+  // }
+  // const {isLoggedIn, loginUser} = useCheckLoggedIn();
+  const [userId, setUserId] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loginUser, setLoginUser] = useState("");
+        
+  useEffect(()=>{
+    fetch("http://localhost:8080/api/user/checkloginuser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}` 
+            }
+        })
+        .then(async (response) => {
+            if (response) {
+                setIsLoggedIn(true);
+                let user = await response.json();
+                setLoginUser(user);
+                setUserId(user.name);
+            } else {
+                setIsLoggedIn(false);
+                setLoginUser({name:""});
+            }
+        })
+  },[]);
   return (
 
 
@@ -43,7 +69,7 @@ export default function App() {
         <Link to="/service">용역계약서</Link>
         <Link to="/supply">자재/물품 공급계약서</Link>
         <Link to="/outsourcing">업무위탁 계약서</Link>
-        <Header />
+        <Header isLoggedIn={isLoggedIn} loginUser={loginUser} />
       {/* </nav> */}
 
 

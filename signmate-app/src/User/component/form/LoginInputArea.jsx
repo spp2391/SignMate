@@ -49,7 +49,7 @@ const LoginInputArea = () => {
             if (!response.ok) {
                 throw new Error(await response.text());
             }
-            response.text()
+            return await response.text();
         }
         )
         .then(text=>{

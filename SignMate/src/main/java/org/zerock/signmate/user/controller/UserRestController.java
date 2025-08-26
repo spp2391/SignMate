@@ -1,10 +1,12 @@
 package org.zerock.signmate.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -116,6 +118,11 @@ public class UserRestController {
 
     @PostMapping("/checkloginuser")
     public ResponseEntity<User> checkLoginUser(@AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(user.getUser());
+        try {
+            return ResponseEntity.ok(user.getUser());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.ok(null);
+        }
     }
 }
