@@ -32,35 +32,35 @@ public class UnifiedContractService {
     private final ServiceContractDocumentRepository serviceContractDocumentRepository;
     private final BusinessOutsourcingContractRepository businessOutsourcingContractRepository;
 
-    public List<UnifiedContractDto> getAllContractsForUser(Long userId) {
+    public List<UnifiedContractDto> getAllContractsForUser(Long userId, Long receiverUserId) {
         List<UnifiedContractDto> result = new ArrayList<>();
 
         // Standard
-        standardRepository.findByContract_Writer_UserId(userId)
+        standardRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromStandard(c, c.getContract())));
 
         // Secret
-        secretRepository.findByContract_Writer_UserId(userId)
+        secretRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSecret(c, c.getContract())));
 
         // Supply
-        supplyContractRepository.findByContract_Writer_UserId(userId)
+        supplyContractRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSupply(c, c.getContract())));
 
         // Service
-        serviceContractDocumentRepository.findByContract_Writer_UserId(userId)
+        serviceContractDocumentRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromService(c, c.getContract())));
 
         // BusinessOutsourcing
-        businessOutsourcingContractRepository.findByContract_Writer_UserId(userId)
+        businessOutsourcingContractRepository.findByContract_Writer_UserIdOrContract_Receiver_UserId(userId, receiverUserId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromBusiness(c, c.getContract())));
 
         // 필요 시 Service/Outsourcing도 이어서 추가
         return result;
     }
 
-    public UserDashboardDTO getUserDashboard(Long userId) {
-        List<UnifiedContractDto> contracts = getAllContractsForUser(userId);
+    public UserDashboardDTO getUserDashboard(Long userId, Long receiverUserId) {
+        List<UnifiedContractDto> contracts = getAllContractsForUser(userId, receiverUserId);
         LocalDate today = LocalDate.now();
 
         long total = contracts.size();

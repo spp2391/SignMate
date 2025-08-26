@@ -34,7 +34,7 @@ const Header = () => {
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/lawcomponent">
                                         <span>법적효력</span>
                                     </Link>
                                 </li>

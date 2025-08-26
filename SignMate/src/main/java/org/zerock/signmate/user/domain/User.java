@@ -64,6 +64,8 @@ public class User implements UserDetails {
 
     private Long kakaoId;
 
+//    private Long receiverUserId;
+
 
 
     // ===== UserDetails 구현 =====
