@@ -20,6 +20,8 @@ import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
 
 
+
+
 export default function App() {
   const token = localStorage.getItem("accessToken");
   let userId = null;
@@ -77,4 +79,4 @@ export default function App() {
     );
 }
 
-// export default App;
+

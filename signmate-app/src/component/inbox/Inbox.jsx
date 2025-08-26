@@ -2,69 +2,85 @@
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
 import { ContractStatus, ContractType } from "./inboxUtils";
-// import Dashboard from "../../components/Dashboard";
 
+function decodeUserIdFromToken() {
+  try {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.id ?? null;
+  } catch {
+    return null;
+  }
+}
 
-export default function Inbox() {
-    const [contract, setContract]= useState([]);
-    const [setDashboard]= useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    
-    useEffect (() => {
-      fetch("http://localhost:8080/contracts/user/2") // 백엔드 API 주소
-        .then((res) => res.json())
-        .then((json) => {
-          setContract(json.contracts);
-          setDashboard(json.dashboard);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setIsLoading(false);
-        });
-    }, [])
+export default function Inbox({ userId: userIdProp }) {
+  const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
-  // 항상 배열로 보장
-  // const data = Array.isArray(rawData) ? rawData : [];
+  const [contracts, setContracts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [contractType, setContractType] = useState("all");
-  const [sort, setSort] = useState("recent"); // recent | title
+  const [sort, setSort] = useState("recent");
   const [onlyCompleted, setOnlyCompleted] = useState(false);
-  const [view, setView] = useState("list"); // list | grid
+  const [view, setView] = useState("list");
   const [selected, setSelected] = useState({});
 
+  useEffect(() => {
+   console.log("로그인 유저아이디는:"+resolvedUserId);
+    setIsLoading(true);
+    fetch(`http://localhost:8080/contracts/user/${resolvedUserId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((json) => {
+        const items = Array.isArray(json) ? json : (json?.contracts ?? []);
+        setContracts(items);
+      })
+      .catch((err) => {
+        console.error(err);
+        setContracts([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, [resolvedUserId]);
+
   const filtered = useMemo(() => {
-    if (!Array.isArray(contract)) return [];
+    const q = (query ?? "").toLowerCase().trim();
 
-    let out = contract.filter(
-      (d) =>
-        (d.title?.toLowerCase().includes(query.toLowerCase()) ||
-          d.participants?.toLowerCase().includes(query.toLowerCase()))
-    );
+    let out = (Array.isArray(contracts) ? contracts : []).filter((d) => {
+      const title = (d.title ?? "").toLowerCase();
+      const participantsText = Array.isArray(d.participants)
+        ? d.participants.map((p) => (p?.name || p?.email || "")).join(" ").toLowerCase()
+        : (d.participants ?? "").toString().toLowerCase();
 
-    if (status !== "all") out = out.filter((d) => d.status === status);
-    if (contractType !== "all") out = out.filter((d) => d.contractType === contractType);
-    if (onlyCompleted) out = out.filter((d) => d.status === ContractStatus.COMPLETED);
+      const queryOk = !q || title.includes(q) || participantsText.includes(q);
+      const statusOk = status === "all" || d.status === status;
+      const typeOk = contractType === "all" || d.contractType === contractType;
+      const completedOk = !onlyCompleted || d.status === ContractStatus.COMPLETED;
+      return queryOk && statusOk && typeOk && completedOk;
+    });
 
-    if (sort === "title") out = [...out].sort((a, b) => a.title.localeCompare(b.title));
-    if (sort === "recent") out = [...out].sort(
-      (a, b) => new Date(b.lastEdited) - new Date(a.lastEdited)
-    );
+    if (sort === "title") {
+      out = [...out].sort((a, b) => (a.title || "").localeCompare(b.title || ""));
+    } else {
+      out = [...out].sort(
+        (a, b) =>
+          new Date(b.lastEdited || b.updatedAt || b.contractEndDate || 0).getTime() -
+          new Date(a.lastEdited || a.updatedAt || a.contractEndDate || 0).getTime()
+      );
+    }
 
     return out;
-  }, [contract, query, status, contractType, onlyCompleted, sort]);
+  }, [contracts, query, status, contractType, onlyCompleted, sort]);
 
   const anyChecked = Object.values(selected).some(Boolean);
   const clearSelection = () => setSelected({});
 
   return (
     <div className="w-full p-4 md:p-8">
-      {/* ✅ 대시보드 섹션 */}
-      {/* <Dashboard docs={contract} isLoading={isLoading} /> */}
-
-      {/* 헤더 */}
       <div className="mb-4 flex items-center justify-between">
         <div className="text-xl md:text-2xl font-semibold">계약서 보관함</div>
         <div className="flex items-center gap-2">
@@ -80,11 +96,9 @@ export default function Inbox() {
         </div>
       </div>
 
-      {/* 필터 바 */}
       <div className="mb-4 rounded-xl border">
         <div className="p-4">
           <div className="grid gap-3 md:grid-cols-12">
-            {/* 검색 */}
             <div className="md:col-span-4">
               <div className="relative w-full">
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-neutral-400" />
@@ -97,7 +111,6 @@ export default function Inbox() {
               </div>
             </div>
 
-            {/* 상태 */}
             <div className="md:col-span-2">
               <select
                 className="h-9 w-full rounded-md border px-3 text-sm"
@@ -112,7 +125,6 @@ export default function Inbox() {
               </select>
             </div>
 
-            {/* 계약서 유형 */}
             <div className="md:col-span-2">
               <select
                 className="h-9 w-full rounded-md border px-3 text-sm"
@@ -120,15 +132,14 @@ export default function Inbox() {
                 onChange={(e) => setContractType(e.target.value)}
               >
                 <option value="all">전체 유형</option>
-                <option value={ContractType.EMPLOYMENT}>근로 계약서</option>
-                <option value={ContractType.OUTSOURCING}>업무위탁 계약서</option>
+                <option value={ContractType.STANDARD}>근로 계약서</option>
+                <option value={ContractType.BUSINESS_OUTSOURCING}>업무위탁 계약서</option>
                 <option value={ContractType.SECRET}>비밀유지계약서</option>
                 <option value={ContractType.SERVICE}>용역 계약서</option>
                 <option value={ContractType.SUPPLY}>자재/물품 공급계약서</option>
               </select>
             </div>
 
-            {/* 정렬 */}
             <div className="md:col-span-2">
               <select
                 className="h-9 w-full rounded-md border px-3 text-sm"
@@ -140,7 +151,6 @@ export default function Inbox() {
               </select>
             </div>
 
-            {/* 추가 필터 */}
             <div className="md:col-span-2 flex items-center justify-end">
               <label className="inline-flex items-center gap-2 text-sm">
                 <input
@@ -155,7 +165,6 @@ export default function Inbox() {
         </div>
       </div>
 
-      {/* 일괄 작업 바 */}
       {anyChecked && (
         <div className="mb-3 flex items-center justify-between rounded-xl border p-3 bg-neutral-50">
           <div className="text-sm text-neutral-600">
@@ -171,7 +180,6 @@ export default function Inbox() {
         </div>
       )}
 
-      {/* 본문 */}
       {isLoading ? (
         <div className="flex h-48 items-center justify-center text-neutral-500">
           <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -195,14 +203,13 @@ export default function Inbox() {
           </div>
 
           {view === "list" ? (
-            <ListView docs={contract} selected={selected} setSelected={setSelected} />
+            <ListView docs={filtered} selected={selected} setSelected={setSelected} />
           ) : (
-            <GridView docs={contract} selected={selected} setSelected={setSelected} />
+            <GridView docs={filtered} selected={selected} setSelected={setSelected} />
           )}
         </>
       )}
 
-      {/* 페이지네이션(목업) */}
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-neutral-600">총 {filtered.length}건</div>
         <div className="flex items-center gap-2">

@@ -1,18 +1,10 @@
-// inboxUtils.js
-// ContractStatus : 계약 상태(enum)
-// ContractType : 계약 종류(enum)
-// CONTRACT_TYPE_LABEL : 한글 라벨 매핑
-// STATUS_META : 상태별 색상/아이콘 정의
-// formatLocalDateTime : 날짜 포맷 함수
-// useContracts : 실제 API용 계약 데이터 훅
-
 import { CheckCircle2, Clock, Pencil, Tag } from "lucide-react";
 
-// 1) 상태(enum) & 계약서 종류(enum)
 export const ContractStatus = {
   DRAFT: "DRAFT",
-  COMPLETED: "COMPLETED",
+  PENDING: "PENDING",
   IN_PROGRESS: "IN_PROGRESS",
+  COMPLETED: "COMPLETED",
 };
 
 export const ContractType = {
@@ -23,7 +15,6 @@ export const ContractType = {
   SUPPLY: "SUPPLY",
 };
 
-// 2) 한글 라벨 매핑
 export const CONTRACT_TYPE_LABEL = {
   [ContractType.STANDARD]: "근로 계약서",
   [ContractType.OUTSOURCING]: "업무위탁 계약서",
@@ -32,7 +23,14 @@ export const CONTRACT_TYPE_LABEL = {
   [ContractType.SUPPLY]: "자재/물품 공급계약서",
 };
 
-// 3) 상태 배지 스타일 메타
+export const CONTRACT_TYPE_PATH = {
+  [ContractType.STANDARD]: "employment",
+  [ContractType.BUSINESS_OUTSOURCING]: "outsourcing",
+  [ContractType.SECRET]: "secret",
+  [ContractType.SERVICE]: "service",
+  [ContractType.SUPPLY]: "supply",
+};
+
 export const STATUS_META = {
   [ContractStatus.DRAFT]: {
     label: "작성 중",
@@ -56,6 +54,9 @@ export const STATUS_META = {
   },
 };
 
-// 4) 날짜 포맷 함수
-export const formatLocalDateTime = (iso) =>
-  new Date(iso).toLocaleString();
+export const formatLocalDateTime = (iso) => {
+  if (!iso) return "-";
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return "-";
+  return d.toLocaleString();
+};

@@ -1,22 +1,26 @@
-// useContracts.js
 import { useEffect, useState } from "react";
 
-export function useContracts() {
+export function useContracts(userId ) {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8080/contracts/user/1") // 백엔드 API 주소
-      .then((res) => res.json())
+    setIsLoading(true);
+    fetch(`http://localhost:8080/contracts/user/${userId}`)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
       .then((json) => {
-        setData(json);
-        setIsLoading(false);
+        const items = Array.isArray(json) ? json : (json?.contracts ?? []);
+        setData(items);
       })
       .catch((err) => {
         console.error(err);
-        setIsLoading(false);
-      });
-  }, []);
+        setData([]);
+      })
+      .finally(() => setIsLoading(false));
+  }, [userId]);
 
   return { data, isLoading };
 }
