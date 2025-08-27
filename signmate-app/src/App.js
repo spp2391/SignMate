@@ -19,6 +19,8 @@ import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
 import LawComponent from "./components/LawComponent";
+import UploadNotice from "./pages/NoticeList";
+import NoticeList from "./pages/UploadNotice";
 
 
 
@@ -76,6 +78,8 @@ export default function App() {
                 <Route path="/notice" element={<NoticePage />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
+                <Route path="/uploadnotice" element={<UploadNotice />} />
+                <Route path="noticeList" element={<NoticeList />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

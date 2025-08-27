@@ -108,7 +108,7 @@ const Header = () => {
                     <div className="fullmenu-wrapper">
                         <div className="fullmenu-head">
                             <h4 className="fullmenu-title">
-                                <Link to="javascript:void(0)">
+                                <Link to="/">
                                      <img height="82" src={logo} alt="SIGN MATE" />
                                 </Link>
                             </h4>
