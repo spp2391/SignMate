@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import Mailbox from "../component/Mailbox";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faBell } from '@fortawesome/free-solid-svg-icons';
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
@@ -71,7 +73,7 @@ export default function NotificationBell() {
         }}
         title="알림"
       >
-        🔔
+        <FontAwesomeIcon icon={faBell} />
         {unreadCount > 0 && (
           <span style={{
             position: 'absolute',
