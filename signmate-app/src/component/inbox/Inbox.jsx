@@ -14,7 +14,7 @@ function decodeUserIdFromToken() {
   }
 }
 
-export default function Inbox({ resolvedUserId: userIdProp }) {
+export default function Inbox({ userId: userIdProp }) {
   const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
   const [contracts, setContracts] = useState([]);
@@ -37,6 +37,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
         return res.json();
       })
       .then((json) => {
+         console.log("서버에서 받은 원본 JSON:", json);
         const items = Array.isArray(json) ? json : (json?.contracts ?? []);
         setContracts(items);
       })
@@ -52,10 +53,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
 
     let out = (Array.isArray(contracts) ? contracts : []).filter((d) => {
       const title = (d.title ?? "").toLowerCase();
-      const participantsText = Array.isArray(d.participants)
-        ? d.participants.map((p) => (p?.name || p?.email || "")).join(" ").toLowerCase()
-        : (d.participants ?? "").toString().toLowerCase();
-
+      const participantsText = `${d.writerName || ""} ${d.receiverName || ""}`.toLowerCase();
       const queryOk = !q || title.includes(q) || participantsText.includes(q);
       const statusOk = status === "all" || d.status === status;
       const typeOk = contractType === "all" || d.contractType === contractType;
@@ -132,7 +130,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
                 onChange={(e) => setContractType(e.target.value)}
               >
                 <option value="all">전체 유형</option>
-                <option value={ContractType.STANDARD}>근로 계약서</option>
+                <option value={ContractType.EMPLOYMENT}>근로 계약서</option>
                 <option value={ContractType.OUTSOURCING}>업무위탁 계약서</option>
                 <option value={ContractType.SECRET}>비밀유지계약서</option>
                 <option value={ContractType.SERVICE}>용역 계약서</option>

@@ -122,7 +122,7 @@ public class BusinessOutsourcingContractService {
                 notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
             }
         } else {
-            String msg = "업무위탁 계약서가 작성/수정되었습니다.";
+            String msg = dto.getClientName()+"이 업무위탁 계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
             notificationService.notifyUser(contract.getWriter(), contract, msg, now);
             if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
                 notificationService.notifyUser(contract.getReceiver(), contract, msg, now);

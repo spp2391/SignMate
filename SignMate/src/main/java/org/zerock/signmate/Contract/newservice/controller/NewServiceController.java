@@ -19,7 +19,7 @@ public class NewServiceController {
     @PostMapping
     public ResponseEntity<?> createOrUpdateService(@RequestBody NewServiceDTO dto) {
         try {
-            NewServiceDTO savedDto = newServiceService.addOrUpdateDocument(dto);
+            NewServiceDTO savedDto = newServiceService.saveContractByContract(dto);
             return ResponseEntity.ok(savedDto);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));
@@ -30,7 +30,7 @@ public class NewServiceController {
     public ResponseEntity<?> updateService(@PathVariable Long contractId, @RequestBody NewServiceDTO dto) {
         try {
             dto.setContractId(contractId); // URL의 contractId 적용
-            NewServiceDTO updatedDto = newServiceService.addOrUpdateDocument(dto);
+            NewServiceDTO updatedDto = newServiceService.saveContractByContract(dto);
             return ResponseEntity.ok(updatedDto);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(Map.of("message", "서버 오류: " + e.getMessage()));

@@ -28,11 +28,11 @@ function StatusBadge({ status }) {
 
 export function ListView({ docs, selected, setSelected }) {
   const navigate = useNavigate();
-  const allChecked = docs.length > 0 && docs.every((d) => selected[d.id]);
+  const allChecked = docs.length > 0 && docs.every((d) => selected[d.contractId]);
 
   const toggleAll = (checked) => {
     const next = {};
-    docs.forEach((d) => (next[d.id] = !!checked));
+    docs.forEach((d) => (next[d.contractId] = !!checked));
     setSelected(next);
   };
 
@@ -40,7 +40,7 @@ export function ListView({ docs, selected, setSelected }) {
     const seg =
       CONTRACT_TYPE_PATH[d.contractType] ||
       String(d.contractType || "").toLowerCase();
-    navigate(`/${seg}/${d.id}`);
+    navigate(`/${seg}/${d.contractId}`);
   };
 
   return (
@@ -61,15 +61,15 @@ export function ListView({ docs, selected, setSelected }) {
 
       {docs.map((d) => (
         <div
-          key={d.id}
+          key={d.contractId}
           className="grid grid-cols-12 items-center gap-2 border-b p-3 hover:bg-neutral-50"
         >
           <div className="col-span-6 flex items-center gap-3">
             <input
               type="checkbox"
-              checked={!!selected[d.id]}
+              checked={!!selected[d.contractId]}
               onChange={(e) =>
-                setSelected((s) => ({ ...s, [d.id]: e.target.checked }))
+                setSelected((s) => ({ ...s, [d.contractId]: e.target.checked }))
               }
             />
             <div className="flex items-start gap-3">
@@ -87,7 +87,8 @@ export function ListView({ docs, selected, setSelected }) {
                   </span>
                 </div>
                 <div className="text-xs text-neutral-500 mt-0.5">
-                  {d.receiverName || "-"}
+                  {d.writerName+","+ d.receiverName|| "-"}
+               
                   {d.address ? `, ${d.address}` : ""}
                 </div>
               </div>
