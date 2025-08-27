@@ -134,7 +134,8 @@ public class StandardService {
             contractRepository.save(contract);
             msg = "고용계약서가 완료되었습니다.";
         } else {
-            msg = "고용계약서가 작성/수정되었습니다.";
+            msg = dto.getEmployeeName()+"이 고용계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
+
         }
 
         notificationService.notifyUser(contract.getWriter(), contract, msg, now);

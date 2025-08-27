@@ -1,6 +1,6 @@
 // src/App.js
 import React from "react";
-import { Link } from "react-router-dom";
+// import { Link } from "react-router-dom";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
@@ -18,11 +18,16 @@ import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
-import AdminApp from "./admin/AdminApp";
+import LawComponent from "./components/LawComponent";
+
+
+
+
 
 export default function App() {
   const token = localStorage.getItem("accessToken");
   let userId = null;
+
 
   if (token) {
     try {
@@ -38,11 +43,11 @@ export default function App() {
 
     <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
-        <Link to="/secret">비밀유지서약서</Link>
+        {/* <Link to="/secret">비밀유지서약서</Link>
         <Link to="/employment">표준근로계약서</Link>
         <Link to="/service">용역계약서</Link>
         <Link to="/supply">자재/물품 공급계약서</Link>
-        <Link to="/outsourcing">업무위탁 계약서</Link>
+        <Link to="/outsourcing">업무위탁 계약서</Link> */}
         <Header />
       {/* </nav> */}
 
@@ -70,7 +75,7 @@ export default function App() {
                 <Route path="/inbox" element={<Inbox />} />
                 <Route path="/notice" element={<NoticePage />} />
                 <Route path="/join" element={<Join />} />
-                <Route path="/admin/*" element={<AdminApp />} />
+                <Route path="/lawcomponent" element={<LawComponent />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

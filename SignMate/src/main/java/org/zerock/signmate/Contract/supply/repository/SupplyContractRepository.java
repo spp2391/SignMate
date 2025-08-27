@@ -15,5 +15,7 @@ public interface SupplyContractRepository extends JpaRepository<SupplyContract, 
     // Contract 객체 기준 조회
     Optional<SupplyContract> findByContract(Contract contract);
 
+//    Iterable<SupplyContract> findByContract_Writer_UserIdOrContract_Receiver_UserId(Long userId, Long receiverUserId);
     Iterable<SupplyContract> findByContract_Writer_UserId(Long userId);
+    Iterable<SupplyContract> findByContract_Receiver_UserId(Long userId);
 }

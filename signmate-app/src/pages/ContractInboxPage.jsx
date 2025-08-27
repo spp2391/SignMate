@@ -1,6 +1,7 @@
 // src/pages/ContractInboxPage.jsx
+import { Inbox } from "lucide-react";
 import React from "react";
-import Inbox from "../component/inbox/Inbox";
+
 
 export default function ContractInboxPage() {
   return <Inbox />;

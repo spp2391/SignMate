@@ -10,5 +10,7 @@ import java.util.Optional;
 public interface BusinessOutsourcingContractRepository extends JpaRepository<BusinessOutsourcingContract, Long> {
     Optional<BusinessOutsourcingContract> findByContract(Contract contract);
 
+//    Iterable<BusinessOutsourcingContract> findByContract_Writer_UserIdOrContract_Receiver_UserId(Long userId, Long receiverUserId);
     Iterable<BusinessOutsourcingContract> findByContract_Writer_UserId(Long userId);
+    Iterable<BusinessOutsourcingContract> findByContract_Receiver_UserId(Long userId);
 }

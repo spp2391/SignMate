@@ -101,7 +101,7 @@ public class SecretService {
             }
         } else {
             // 작성/수정 중
-            String msg = "비밀유지계약서가 작성/수정되었습니다.";
+            String msg = dto.getWriterName()+"이 비밀유지계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
             notificationService.notifyUser(contract.getWriter(), contract, msg, now);
             if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
                 notificationService.notifyUser(contract.getReceiver(), contract, msg, now);

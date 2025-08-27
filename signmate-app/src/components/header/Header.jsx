@@ -16,7 +16,7 @@ const Header = () => {
                     <div className="header-left">
                         <h2 className="header-title">
                             <Link to="/">
-                                {/* <img height="1" src={logo} alt="SIGN MATE" /> */}
+                                <img height="1" src={logo} alt="SIGN MATE" />
                             </Link>
                         </h2>
                     </div>
@@ -24,7 +24,7 @@ const Header = () => {
                         <div className="header-gnb">
                             <ul className="header-gnblist">
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/contracts">
                                         <span>서비스</span>
                                     </Link>
                                 </li>
@@ -34,12 +34,12 @@ const Header = () => {
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/lawcomponent">
                                         <span>법적효력</span>
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/notice">
                                         <span>공지사항</span>
                                     </Link>
                                 </li>

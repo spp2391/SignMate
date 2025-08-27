@@ -114,18 +114,18 @@ const JoinInputArea = () => {
                     placeholder="company name"
                 />
                 <div>
+                    userType USER/ADMIN
                     <input
                         type="text"
                         value={state.userType}
                         onChange={handleChangeUserType}
-                        placeholder="usertype PRIVATE/COMPANY"
                     />
                 </div>
                 <input
                     type="text"
                     value={state.userRole}
                     onChange={handleChangeUserRole}
-                    placeholder="userRole USER/ADMIN"
+                    placeholder="userRole PRIVATE/COMPANY"
                 />
                 {/* <div>
                     {state.status}

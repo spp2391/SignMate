@@ -125,7 +125,7 @@ const LoginInputArea = () => {
                     {/* <button onClick={handleJoin}>Join</button> */}
                     <button onClick={handleLogin} className="login-btn">Submit</button>
                     <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button>
-                    <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a>
+                    {/* <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a> */}
                     <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
                     <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
                 </div>
