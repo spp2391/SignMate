@@ -19,7 +19,7 @@ import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
 import LawComponent from "./components/LawComponent";
-
+import AdminApp from "./admin/AdminApp";
 
 
 
@@ -76,6 +76,7 @@ export default function App() {
                 <Route path="/notice" element={<NoticePage />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
+                <Route path="/admin/*" element={<AdminApp />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

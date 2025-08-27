@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.zerock.signmate.admin.dto.UpdateUserRequest;
 import org.zerock.signmate.admin.dto.UserDetailDto;
 import org.zerock.signmate.admin.dto.UserListDto;
-import org.zerock.signmate.admin.service.adminUserService;
-
-import java.util.Map;
+import org.zerock.signmate.admin.service.AdminUserService;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -21,40 +19,44 @@ import java.util.Map;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminUserController {
 
-    private final adminUserService adminUserService;
+    private final AdminUserService userService;
 
-    // 회원 목록 + 검색
+    /** 목록 (이름/이메일 keyword 검색) */
     @GetMapping
-    public Page<UserListDto> list(@RequestParam(required = false) String q,
-                                  @PageableDefault(size = 20, sort = "createdAt") Pageable pageable) {
-        return adminUserService.list(q, pageable);
+    public ResponseEntity<Page<UserListDto>> list(
+            @RequestParam(required = false, defaultValue = "") String keyword,
+            @PageableDefault(size = 10) Pageable pageable
+    ) {
+        String k = keyword != null ? keyword.trim() : "";
+        return ResponseEntity.ok(userService.list(k, pageable));
     }
 
-    // 회원 상세
+    /** 상세 */
     @GetMapping("/{id}")
-    public UserDetailDto get(@PathVariable("id") Long userId) {
-        return adminUserService.get(userId);
+    public ResponseEntity<UserDetailDto> get(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.get(id));
     }
 
-    // 회원 수정
+    /** 수정(PATCH; 필요한 필드만 수정) */
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> update(@PathVariable("id") Long userId,
-                                       @Valid @RequestBody UpdateUserRequest req) {
-        adminUserService.update(userId, req);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserDetailDto> update(
+            @PathVariable Long id,
+            @RequestBody @Valid UpdateUserRequest req
+    ) {
+        return ResponseEntity.ok(userService.update(id, req));
     }
 
-    // 회원 삭제
+    /** 삭제 */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable("id") Long userId) {
-        adminUserService.delete(userId);
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userService.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // 비밀번호 초기화
+    /** 비밀번호 초기화 (임시) */
     @PostMapping("/{id}/reset-password")
-    public Map<String, String> resetPassword(@PathVariable("id") Long userId) {
-        String temp = adminUserService.resetPw(userId);
-        return Map.of("temporaryPassword", temp);
+    public ResponseEntity<String> resetPassword(@PathVariable Long id) {
+        String temp = userService.resetPw(id);
+        return ResponseEntity.ok(temp);
     }
 }
