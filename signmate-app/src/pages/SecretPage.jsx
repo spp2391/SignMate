@@ -23,10 +23,10 @@ const ndaTemplate = {
   ],
 
   defaults: {
-    writerName : "김철수",
+    writerName : "",
     discloserRepresentative :"" ,
     discloserAddress :"" ,
-    receiverName :"이영희" ,
+    receiverName :"" ,
     receiverRepresentative :"" ,
     receiverAddress :"" ,
     effectiveDate: "",

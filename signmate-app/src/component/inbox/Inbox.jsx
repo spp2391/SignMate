@@ -37,6 +37,7 @@ export default function Inbox({ userId: userIdProp }) {
         return res.json();
       })
       .then((json) => {
+         console.log("서버에서 받은 원본 JSON:", json);
         const items = Array.isArray(json) ? json : (json?.contracts ?? []);
         setContracts(items);
       })
@@ -52,10 +53,7 @@ export default function Inbox({ userId: userIdProp }) {
 
     let out = (Array.isArray(contracts) ? contracts : []).filter((d) => {
       const title = (d.title ?? "").toLowerCase();
-      const participantsText = Array.isArray(d.participants)
-        ? d.participants.map((p) => (p?.name || p?.email || "")).join(" ").toLowerCase()
-        : (d.participants ?? "").toString().toLowerCase();
-
+      const participantsText = `${d.writerName || ""} ${d.receiverName || ""}`.toLowerCase();
       const queryOk = !q || title.includes(q) || participantsText.includes(q);
       const statusOk = status === "all" || d.status === status;
       const typeOk = contractType === "all" || d.contractType === contractType;
