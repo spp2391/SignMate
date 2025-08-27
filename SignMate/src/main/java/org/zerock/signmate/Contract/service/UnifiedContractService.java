@@ -16,6 +16,7 @@ import org.zerock.signmate.Contract.standard.domain.Standard;
 import org.zerock.signmate.Contract.supply.domain.SupplyContract;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,7 +73,7 @@ public class UnifiedContractService {
 
     public UserDashboardDTO getUserDashboard(Long userId) {
         List<UnifiedContractDto> contracts = getAllContractsForUser(userId);
-        LocalDate today = LocalDate.now();
+        LocalDateTime today = LocalDateTime.now();
 
         long total = contracts.size();
         long active = contracts.stream()

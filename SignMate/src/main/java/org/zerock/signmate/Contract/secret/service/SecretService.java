@@ -79,7 +79,7 @@ public class SecretService {
         secret.setReceiverRepresentative(dto.getReceiverRepresentative());
         secret.setReceiverAddress(dto.getReceiverAddress());
         secret.setPurpose(dto.getPurpose());
-        secret.setEffectiveDate(dto.getEffectiveDate());
+        secret.setEffectiveDate(dto.getEffectiveDate() != null ? dto.getEffectiveDate() : contract.getCreatedAt());
         secret.setContractDurationMonths(dto.getContractDurationMonths());
         secret.setConfidentialityDurationYears(dto.getConfidentialityDurationYears());
         secret.setGoverningLaw(dto.getGoverningLaw());
@@ -120,12 +120,19 @@ public class SecretService {
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 Secret이 존재하지 않습니다. contractId=" + contractId));
         return SecretDTO.fromEntity(secret);
     }
+    @Transactional
+    public void deleteByContractId(Long contractId, Authentication authentication) {
+        String username = authentication.getName();
+        User loginUser = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("로그인 유저가 없습니다"));
 
-    public void deleteByContractId(Long contractId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 계약서 ID: " + contractId));
-        Secret secret = secretRepository.findByContract(contract)
+        Secret secret = secretRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 Secret이 존재하지 않습니다. contractId=" + contractId));
+
+        // 3. writer 권한 체크
+        if (!secret.getContract().getWriter().equals(loginUser)) {
+            throw new RuntimeException("삭제 권한이 없습니다. 작성자만 삭제할 수 있습니다.");
+        }
         secretRepository.delete(secret);
     }
 }

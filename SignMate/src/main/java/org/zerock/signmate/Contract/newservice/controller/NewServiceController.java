@@ -2,6 +2,7 @@ package org.zerock.signmate.Contract.newservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.signmate.Contract.newservice.dto.NewServiceDTO;
 import org.zerock.signmate.Contract.newservice.service.NewServiceService;
@@ -44,14 +45,15 @@ public class NewServiceController {
         return ResponseEntity.ok(dto);
     }
 
-    // ContractId 기준 삭제
-//    @DeleteMapping("/{contractId}")
-//    public ResponseEntity<?> deleteService(@PathVariable Long contractId) {
-//        try {
-//            newServiceService.deleteByContractId(contractId);
-//            return ResponseEntity.ok(Map.of("message", "서비스 계약서가 삭제되었습니다."));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
-//        }
-//    }
+
+    @DeleteMapping("/{contractId}")
+    public ResponseEntity<?> deleteService(@PathVariable Long contractId, Authentication authentication) {
+        try {
+            NewServiceDTO dto = newServiceService.findByContractId(contractId);
+            newServiceService.deleteByContractId(dto.getId(), authentication);
+            return ResponseEntity.ok(Map.of("message", "서비스 계약서가 삭제되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
+        }
+    }
 }

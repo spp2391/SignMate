@@ -2,6 +2,7 @@ package org.zerock.signmate.Contract.dto;
 
 import lombok.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -22,8 +23,8 @@ public class UnifiedContractDto {
 //    private String clientName;        // 서비스/공급/기타 계약 시 필요
 //    private String projectName;       // 프로젝트명 등
 
-    private LocalDate contractStartDate;
-    private LocalDate contractEndDate;
+    private LocalDateTime contractStartDate;
+    private LocalDateTime contractEndDate;
 
 //    private String workDescription;   // 업무 내용
 //    private Boolean deliverOriginalFiles; // 서비스 계약 특화
@@ -37,7 +38,7 @@ public class UnifiedContractDto {
     private String paymentMethod;
 
     private String status;            // 계약 상태 문자열
-    private LocalDate contractDate;
+    private LocalDateTime contractDate;
 
     private Long writerId;
     private Long receiverId;

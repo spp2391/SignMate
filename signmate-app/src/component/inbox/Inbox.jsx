@@ -38,6 +38,7 @@ export default function Inbox({ userId: userIdProp }) {
       })
       .then((json) => {
          console.log("서버에서 받은 원본 JSON:", json);
+         
         const items = Array.isArray(json) ? json : (json?.contracts ?? []);
         setContracts(items);
       })
@@ -75,10 +76,66 @@ export default function Inbox({ userId: userIdProp }) {
   }, [contracts, query, status, contractType, onlyCompleted, sort]);
 
   const anyChecked = Object.values(selected).some(Boolean);
-  const clearSelection = () => setSelected({});
+
+  const handleDeleteSelected = async () => {
+  const selectedIds = Object.keys(selected).filter((id) => selected[id]);
+  if (selectedIds.length === 0) return;
+
+  try {
+    for (const contractId of selectedIds) {
+      // 선택된 계약 가져오기
+      const doc = contracts.find((c) => String(c.contractId) === contractId);
+      if (!doc) continue;
+
+      // 계약 유형별 URL 결정
+      let url = "";
+      switch (doc.contractType) {
+        case ContractType.SECRET:
+          url = `/api/secret/${contractId}`;
+          break;
+        case ContractType.OUTSOURCING:
+          url = `/api/outsourcing/${contractId}`;
+          break;
+        case ContractType.EMPLOYMENT:
+          url = `/api/employment/${contractId}`;
+          break;
+        case ContractType.SERVICE:
+          url = `/api/service/${contractId}`;
+          break;
+        case ContractType.SUPPLY:
+          url = `/api/supply/${contractId}`;
+          break;
+        default:
+          console.warn("알 수 없는 계약 유형:", doc.contractType);
+          continue;
+      }
+
+      // DELETE 요청
+      const res = await fetch(url, { method: "DELETE",headers: {
+    "Authorization": "Bearer " + localStorage.getItem("accessToken"),
+    "Content-Type": "application/json"
+  } });
+      if (!res.ok) throw new Error(`삭제 실패: 작성자 본인만 삭제 할 수있습니다.`);
+    }
+
+    // 선택 초기화 & 리스트 갱신
+    setSelected({});
+    setContracts((prev) => prev.filter((c) => !selectedIds.includes(String(c.contractId))));
+    alert("선택한 계약 삭제 완료!");
+  } catch (err) {
+    console.error(err);
+    alert(err.message);
+  }
+};
+
 
   return (
-    <div className="w-full p-4 md:p-8">
+    <div className="w-full p-4 md:p-8"  style={{
+    paddingLeft: "400px",
+    paddingRight: "400px",
+    
+   
+  }} >
       <div className="mb-4 flex items-center justify-between">
         <div className="text-xl md:text-2xl font-semibold">계약서 보관함</div>
         <div className="flex items-center gap-2">
@@ -102,7 +159,7 @@ export default function Inbox({ userId: userIdProp }) {
                 <Search className="absolute left-2 top-2.5 h-4 w-4 text-neutral-400" />
                 <input
                   className="h-9 w-full rounded-md border pl-8 pr-3 text-sm"
-                  placeholder="문서 제목·참여자 검색"
+                  placeholder="참여자 검색"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
@@ -171,9 +228,12 @@ export default function Inbox({ userId: userIdProp }) {
           <div className="flex items-center gap-2">
             <button className="rounded-md border px-3 py-2 text-sm">다운로드</button>
             <button className="rounded-md border px-3 py-2 text-sm">계약서 유형 변경</button>
-            <button className="rounded-md bg-red-600 text-white px-3 py-2 text-sm" onClick={clearSelection}>
-              삭제
-            </button>
+           <button
+  className="rounded-md bg-red-600 text-white px-3 py-2 text-sm"
+  onClick={handleDeleteSelected}
+>
+  삭제
+</button>
           </div>
         </div>
       )}

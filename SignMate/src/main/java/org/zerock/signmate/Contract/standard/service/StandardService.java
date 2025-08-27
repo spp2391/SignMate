@@ -134,7 +134,7 @@ public class StandardService {
             contractRepository.save(contract);
             msg = "고용계약서가 완료되었습니다.";
         } else {
-            msg = dto.getEmployeeName()+"이 고용계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
+            msg = dto.getEmployerName()+"이 고용계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
 
         }
 
@@ -162,7 +162,22 @@ public class StandardService {
     }
 
     // ID로 삭제
-    public void deleteById(Long id) {
-        standardRepository.deleteById(id);
+    @Transactional
+    public void deleteById(Long id, Authentication authentication) {
+        // 1. 로그인 유저 조회
+        String username = authentication.getName();
+        User loginUser = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("로그인 유저가 없습니다"));
+
+        // 2. 삭제할 Standard 조회
+        Standard standard = standardRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제할 Standard가 없습니다. id=" + id));
+
+        // 3. writer 권한 체크
+        if (!standard.getContract().getWriter().equals(loginUser)) {
+            throw new RuntimeException("삭제 권한이 없습니다. 작성자만 삭제할 수 있습니다.");
+        }
+        // 5. Standard 삭제
+        standardRepository.delete(standard);
     }
 }

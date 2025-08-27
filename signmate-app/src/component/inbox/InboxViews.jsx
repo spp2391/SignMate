@@ -106,7 +106,8 @@ export function ListView({ docs, selected, setSelected }) {
           </div>
 
           <div className="col-span-2 text-sm">
-            {formatLocalDateTime(d.lastEdited || d.updatedAt || d.contractEndDate)}
+            
+             {formatLocalDateTime(d.contractEndDate)}
           </div>
         </div>
       ))}
@@ -115,10 +116,18 @@ export function ListView({ docs, selected, setSelected }) {
 }
 
 export function GridView({ docs, selected, setSelected }) {
+  const navigate = useNavigate();
+
+  const goDetail = (d) => {
+    const seg =
+      CONTRACT_TYPE_PATH[d.contractType] ||
+      String(d.contractType || "").toLowerCase();
+    navigate(`/${seg}/${d.contractId}`);
+  };
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
       {docs.map((d) => (
-        <div key={d.id} className="rounded-xl border">
+        <div key={d.contractId} onClick={() => goDetail(d)} className="rounded-xl border">
           <div className="p-4">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2">
@@ -126,29 +135,36 @@ export function GridView({ docs, selected, setSelected }) {
                 <StatusBadge status={d.status} />
               </div>
             </div>
-
+          
             <div className="mt-3 font-medium leading-tight line-clamp-2">
-              {d.title || CONTRACT_TYPE_LABEL[d.contractType] || "-"}
+               {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}
             </div>
             <div className="mt-1 text-xs text-neutral-500 line-clamp-1">
-              {d.receiverName || "-"}
+              {d.writerName+","+ d.receiverName|| "-"}
             </div>
 
-            <div className="mt-3 flex items-center justify-between">
-              <span className="rounded-full border px-2 py-0.5 text-xs">
-                {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}
-              </span>
-              <div className="text-xs text-neutral-500">
-                {formatLocalDateTime(d.lastEdited || d.updatedAt || d.contractEndDate)}
-              </div>
-            </div>
+            <div className="col-span-2 text-sm">
+  {(() => {
+    const time =
+      d.effectiveDate ||
+      d.contractStartDate ||
+      d.contractEndDate ||
+      d.updatedAt;
+    if (!time) return "-";
+
+    // YYYY-MM-DD 형태일 경우 T00:00:00 붙이기
+    const isoTime = /^\d{4}-\d{2}-\d{2}$/.test(time) ? time + "T00:00:00" : time;
+    return formatLocalDateTime(isoTime);
+  })()}
+</div>
+
 
             <div className="mt-3 flex items-center gap-2">
               <input
                 type="checkbox"
-                checked={!!selected[d.id]}
+                checked={!!selected[d.contractId]}
                 onChange={(e) =>
-                  setSelected((s) => ({ ...s, [d.id]: e.target.checked }))
+                  setSelected((s) => ({ ...s, [d.contractId]: e.target.checked }))
                 }
               />
               <span className="text-xs text-neutral-500">선택</span>

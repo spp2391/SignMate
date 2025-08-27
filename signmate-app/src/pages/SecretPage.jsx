@@ -219,6 +219,7 @@ export default function SecretPage() {
       setFormData(prev => ({
         ...prev,
         ...data,
+        effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : prev.effectiveDate,
         sign: {
           discloser: data.writerSignature || prev.sign.discloser,
           recipient: data.receiverSignature || prev.sign.recipient

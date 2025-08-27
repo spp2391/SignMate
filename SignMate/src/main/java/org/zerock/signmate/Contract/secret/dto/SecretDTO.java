@@ -4,6 +4,7 @@ import lombok.*;
 import org.zerock.signmate.Contract.secret.domain.Secret;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -27,7 +28,7 @@ public class SecretDTO {
     private String purpose;
 
     // 6. 계약기간 - 발효일 (#8), 계약기간 개월수 (#9)
-    private LocalDate effectiveDate;
+    private LocalDateTime effectiveDate;
     private Integer contractDurationMonths;
 
     // 7. 존속기간 (#10)
@@ -53,7 +54,7 @@ public class SecretDTO {
                 .receiverRepresentative(entity.getReceiverRepresentative())
                 .receiverAddress(entity.getReceiverAddress())
                 .purpose(entity.getPurpose())
-                .effectiveDate(entity.getEffectiveDate())
+                .effectiveDate(entity.getEffectiveDate() != null ? entity.getEffectiveDate() : entity.getContract().getCreatedAt())
                 .contractDurationMonths(entity.getContractDurationMonths())
                 .confidentialityDurationYears(entity.getConfidentialityDurationYears())
                 .governingLaw(entity.getGoverningLaw())

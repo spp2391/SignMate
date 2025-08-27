@@ -60,7 +60,18 @@ export const STATUS_META = {
 
 export const formatLocalDateTime = (iso) => {
   if (!iso) return "-";
-  const d = new Date(iso);
+  let d = new Date(iso);
+  if (isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    d = new Date(iso + "T00:00:00");
+  }
   if (isNaN(d.getTime())) return "-";
-  return d.toLocaleString();
+  return d.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 };
