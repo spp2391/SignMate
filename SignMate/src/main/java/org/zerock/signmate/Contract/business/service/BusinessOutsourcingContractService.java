@@ -139,12 +139,18 @@ public class BusinessOutsourcingContractService {
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 BusinessOutsourcingContract가 존재하지 않습니다. contractId=" + contractId));
         return BusinessOutsourcingContractDTO.fromEntity(boc);
     }
+    @Transactional
+    public void deleteByContractId(Long contractId, Authentication authentication) {
+        String username = authentication.getName();
+        User loginUser = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("로그인 유저가 없습니다"));
 
-    public void deleteByContractId(Long contractId) {
-        Contract contract = mainContractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + contractId));
-        BusinessOutsourcingContract boc = contractRepository.findByContract(contract)
+        BusinessOutsourcingContract boc = contractRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 BusinessOutsourcingContract가 존재하지 않습니다. contractId=" + contractId));
+        if (!boc.getContract().getWriter().equals(loginUser)) {
+            throw new RuntimeException("삭제 권한이 없습니다. 작성자만 삭제할 수 있습니다.");
+        }
+
         contractRepository.delete(boc);
     }
 

@@ -128,11 +128,17 @@ public class NewServiceService {
         return NewServiceDTO.fromEntity(document);
     }
 
-    public void deleteByContractId(Long contractId) {
-        Contract contract = contractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + contractId));
-        ServiceContractDocument document = documentRepository.findByContract(contract)
+    @Transactional
+    public void deleteByContractId(Long contractId, Authentication authentication) {
+        String username = authentication.getName();
+        User loginUser = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("로그인 유저가 없습니다"));
+
+        ServiceContractDocument document = documentRepository.findById(contractId)
                 .orElseThrow(() -> new RuntimeException("해당 계약서에 ServiceContractDocument가 존재하지 않습니다. contractId=" + contractId));
+        if (!document.getContract().getWriter().equals(loginUser)) {
+            throw new RuntimeException("삭제 권한이 없습니다. 작성자만 삭제할 수 있습니다.");
+        }
         documentRepository.delete(document);
     }
 

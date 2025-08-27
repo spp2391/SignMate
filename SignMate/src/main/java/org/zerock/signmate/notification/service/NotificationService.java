@@ -46,4 +46,16 @@ public class NotificationService {
         notification.setRead(true);
         notificationRepository.save(notification);
     }
+
+    public void deleteNotificationsByContractId(Long contractId) {
+        if (contractId == null) return;
+
+        // 계약과 연결된 모든 알림 조회
+        List<Notification> notifications = notificationRepository.findByContractId(contractId);
+
+        // 존재하면 삭제
+        if (!notifications.isEmpty()) {
+            notificationRepository.deleteAll(notifications);
+        }
+    }
 }

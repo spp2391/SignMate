@@ -46,8 +46,13 @@ export default function NotificationBell() {
 
   useEffect(() => {
     fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 5000); // 5초마다 갱신
-    return () => clearInterval(interval);
+    let interval = null
+    if(localStorage.getItem("accessToken")){
+      interval = setInterval(fetchUnreadCount, 60*1000);// 5초마다 갱신
+    }
+     
+    return () => {
+      if(interval != null) clearInterval(interval);}
   }, []);
 
   const togglePanel = () => setOpen((v) => !v);
