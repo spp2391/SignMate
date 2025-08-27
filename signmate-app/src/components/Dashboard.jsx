@@ -67,7 +67,7 @@ export default function Dashboard({ userId:userIdProp , contracts: contractsProp
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3  gap-4">
         {Object.values(ContractStatus).map((status) => {
           const meta = STATUS_META[status];
           return (
@@ -80,7 +80,7 @@ export default function Dashboard({ userId:userIdProp , contracts: contractsProp
         })}
       </div>
 
-      <div className="rounded-xl border p-6">
+      <div className="rounded-xl border p-6" style={{ width: "400px" }}>
         <h2 className="text-lg font-semibold mb-4">계약서 유형 분포</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -95,4 +95,6 @@ export default function Dashboard({ userId:userIdProp , contracts: contractsProp
       </div>
     </div>
   );
+  
 }
+

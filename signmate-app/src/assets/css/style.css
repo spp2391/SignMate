@@ -700,14 +700,22 @@
   }
 }
 /* temhabank-N3 */
-.temhabank-N3 {
+/* .temhabank-N3 {
   position: relative;
   overflow: hidden;
   background: url(../images/temhabank_N3_01.png) no-repeat center/cover;
+} */
+.temhabank-N3 {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 800px; /* 원하는 높이로 조절 */
+  background-size: cover;
+  background-position: center;
 }
 
 .temhabank-N3 .contents-container {
-  height: 60rem;
+  height: 100rem;
 }
 
 .temhabank-N3 .contents-inner {
@@ -725,12 +733,12 @@
 
 .temhabank-N3 .textset .textset-tit {
   margin-bottom: 3.3rem;
-  color: var(--white);
+  color: #ffffff;
 }
 
 .temhabank-N3 .textset .textset-subtit {
   margin-bottom: 0;
-  color: var(--white);
+  color: #fff;
 }
 
 @media (max-width: 992px) {
@@ -751,11 +759,11 @@
   overflow: hidden;
   transform: translateY(-6.4rem);
   position: relative;
-  padding-bottom: 6rem;
 }
 
 .temhabank-N4 .contents-inner {
   width: 100%;
+  padding-top: 4px;
 }
 
 .temhabank-N4 .tabset {
@@ -837,7 +845,7 @@
 }
 
 .temhabank-N4 .secondary {
-  background: #1a937d;
+  background: #e9e9e9;
 }
 
 .temhabank-N4 .secondary-alpha {
@@ -864,7 +872,7 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: var(--white);
+  color: var(#111111);
   font-weight: var(--fw-bold);
 }
 
@@ -1431,7 +1439,7 @@ body:has(.fullmenu-active) .temhabank-N6 {
   color: #000;
 }
 .temhabank-N1 .header-gnblink span {
-  color: #195180;
+  color: #111111;
 }
 
 .temhabank-N2 .footer-modal {
