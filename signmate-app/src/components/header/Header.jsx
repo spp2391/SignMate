@@ -115,8 +115,8 @@ const Header = () => {
                         </div>
                         <ul className="fullmenu-gnblist">
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>개인뱅킹</span>
+                                <Link className="h5 fullmenu-gnblink" to="/contracts">
+                                    <span>서비스</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -128,7 +128,7 @@ const Header = () => {
                             </li>
                             <li className="fullmenu-gnbitem">
                                 <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>기업뱅킹</span>
+                                    <span>이용안내</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -139,8 +139,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>금융상품</span>
+                                <Link className="h5 fullmenu-gnblink" to="/lawcomponent">
+                                    <span>법적효력</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -151,8 +151,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>외환</span>
+                                <Link className="h5 fullmenu-gnblink" to="/notice">
+                                    <span>공지사항</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -163,8 +163,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink"  to="javascript:void(0)">
-                                    <span>오픈뱅킹</span>
+                                <Link className="h5 fullmenu-gnblink"  to="/inbox">
+                                    <span>내 문서 조회</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">

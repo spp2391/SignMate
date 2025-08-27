@@ -27,7 +27,7 @@ const Footer = () => {
                                         <span>개인정보처리방침</span>
                                     </Link>
                                 </li>
-                                <li className="footer-menulink">
+                                {/* <li className="footer-menulink">
                                     <Link to="javascript:void(0)">
                                         <span>푸터메뉴1</span>
                                     </Link>
@@ -36,7 +36,7 @@ const Footer = () => {
                                     <Link to="javascript:void(0)">
                                         <span>푸터메뉴2</span>
                                     </Link>
-                                </li>
+                                </li> */}
                             </ul>
                             <div className="footer-txtgroup">
                                 <address class="footer-txt">
