@@ -11,7 +11,7 @@ const contracts = [
   { title: "용역계약서", desc: ["서비스/용역 계약용", "업무 범위, 제공 서비스, 대가 등을 명확히 규정합니다."], path: "/service", color: "#d1e7dd" },
   { title: "자재/물품 공급계약서", desc: ["물품/자재 공급 계약", "물품 규격, 수량, 납기, 결제 조건 등을 명확히 합니다."], path: "/supply", color: "#fff3cd" },
   { title: "업무위탁 계약서", desc: ["업무 위탁 계약용", "외주 업무 범위와 책임을 명확히 하고 안전한 진행을 보장합니다."], path: "/outsourcing", color: "#e2e3e5" },
-  { title: "직접 작성", desc: ["계약서를 직접 작성해보세요", "템플릿에 없는 맞춤 계약서를 자유롭게 작성할 수 있습니다."], path: "/custom", color: "#c9b6d3" },
+  // { title: "직접 작성", desc: ["계약서를 직접 작성해보세요", "템플릿에 없는 맞춤 계약서를 자유롭게 작성할 수 있습니다."], path: "/custom", color: "#c9b6d3" },
 ];
 
 const featuresData = [

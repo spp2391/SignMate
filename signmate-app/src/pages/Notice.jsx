@@ -53,7 +53,7 @@ export default function NoticePage() {
     );
 
   return (
-    <div className="max-w-[140rem] mx-auto px-6 py-16">
+    <div className="max-w-[140rem] mx-auto px-6 py-16" style={{marginBottom: "300px"}}>
       <h1 className="text-center font-bold mb-12 text-[40px]">공지사항</h1>
 
       {/* 검색 + 글쓰기 */}

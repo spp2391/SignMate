@@ -488,7 +488,7 @@ const Index = () => {
                     </div>
                 </div>
                 {/* 퀵 메뉴 */}
-        <div className="temhabank-N6" id="izmDzppO1O">
+        {/* <div className="temhabank-N6" id="izmDzppO1O">
           <div className="contents-container">
             <button
               type="button"
@@ -531,7 +531,7 @@ const Index = () => {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
         {/* 🔵 SIGNMATE 배너 */}
         <SignmateHeroBanner
