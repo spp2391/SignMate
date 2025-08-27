@@ -34,7 +34,7 @@ public class UserRegisterService {
                 .nickname(dto.getNickname())
                 .name(dto.getName())
                 .userType("USER") // ✅ 기본값 설정
-                .userRole("USER")
+//                .userRole("USER")
                 .companyName(dto.getCompanyName())
                 .build();
 
@@ -44,14 +44,21 @@ public class UserRegisterService {
     public User editUser(CustomOAuth2User user, EditUserRequest dto) throws Exception {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         User userPrimary = user.getUser();
-//        User userEdit = User.builder()
-//                .userId(userPrimary.getUserId())
-//                .name(dto.getName()!=null ? dto.getName() : userPrimary.getName())
-//                .nickname(dto.getNickname()!=null ? dto.getNickname() : userPrimary.getNickname())
-//                .password(dto.getPassword()!=null ? passwordEncoder.encode(dto.getPassword()) : userPrimary.getPassword())
-//                .
-
-
+        User userEdit = User.builder()
+                .userId(userPrimary.getUserId())
+                .name(dto.getName()!=null ? dto.getName() : userPrimary.getName())
+                .nickname(dto.getNickname()!=null ? dto.getNickname() : userPrimary.getNickname())
+                .email(userPrimary.getEmail())
+                .googleId(userPrimary.getGoogleId())
+                .naverId(userPrimary.getNaverId())
+                .kakaoId(userPrimary.getKakaoId())
+                .password(dto.getPassword()!=null ? passwordEncoder.encode(dto.getPassword()) : userPrimary.getPassword())
+                .companyName(dto.getCompanyName()!=null ? dto.getCompanyName() : userPrimary.getCompanyName())
+//                .userRole(dto.getUserRole()!=null ? dto.getUserRole() : userPrimary.getUserRole())
+                .userType(userPrimary.getUserType())
+                .authType(userPrimary.getAuthType())
+                .build();
+        userRepository.save(userEdit);
         return null;
 
     }

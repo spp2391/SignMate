@@ -122,7 +122,7 @@ public class UserRestController {
             return ResponseEntity.ok(user.getUser());
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            return ResponseEntity.ok(null);
+            return ResponseEntity.noContent().build();
         }
     }
 }

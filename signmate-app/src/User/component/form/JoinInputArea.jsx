@@ -10,9 +10,10 @@ const JoinInputArea = () => {
         nickname: "",
         companyName: "",
         userType: "USER",
-        userRole: "PRIVATE",
+        userRole: "COMPANY",
     })
     const navigate = useNavigate();
+    // const [isCompanyNameDisabled, setIsCompanyNameDisabled] = useState(true);
     const handleChangeEmail = (event) => {
         setState({
             ...state,
@@ -49,17 +50,20 @@ const JoinInputArea = () => {
     //         userType: event.target.value,
     //     })
     // }
-    const handleChangeUserRole = (event) => {
-        setState({
-            ...state,
-            userRole: event.target.value,
-        })
-    }
+    // const handleChangeUserRole = (event) => {
+    //     setState({
+    //         ...state,
+    //         userRole: event.target.value,
+    //     })
+    //     console.log(event.target.value);
+    //     if (state.userRole === "COMPANY") {
+    //         setIsCompanyNameDisabled(true);        
+    //     } else {
+    //         setIsCompanyNameDisabled(false);        
+    //     }
+    // }
     const handleJoin = (event) => {
         event.preventDefault();
-        if (state.userRole === "PRIVATE") {
-            state.companyName = "";
-        }
         const joinRequest = {
             email: state.email,
             password: state.pw,
@@ -69,6 +73,9 @@ const JoinInputArea = () => {
             userType: state.userType,
             userRole: state.userRole,
         }
+        // if (state.userRole === "PRIVATE") {
+        //     joinRequest.companyName = "";
+        // }
         fetch("http://localhost:8080/api/user/join", {
             method: "POST",
             credentials: "include",
@@ -134,7 +141,7 @@ const JoinInputArea = () => {
                     value={state.companyName}
                     onChange={handleChangeCompanyName}
                     placeholder="company name"
-                    disabled="True"
+                    // disabled={isCompanyNameDisabled}
                 />
                 {/* <div>
                     userType USER/ADMIN
@@ -144,12 +151,29 @@ const JoinInputArea = () => {
                         onChange={handleChangeUserType}
                     />
                 </div> */}
-                <input
+                {/* <input
                     type="text"
                     value={state.userRole}
                     onChange={handleChangeUserRole}
                     placeholder="userRole PRIVATE/COMPANY"
-                />
+                /> */}
+                {/* <fieldset>
+                    <input
+                        type="radio"
+                        value="PRIVATE"
+                        name="userRole"
+                        checked={state.userRole==="PRIVATE"}
+                        onChange={handleChangeUserRole}
+                        defaultChecked
+                    /> 개인회원     
+                    <input 
+                        type="radio"
+                        value="COMPANY"
+                        name="userRole"
+                        checked={state.userRole==="COMPANY"}
+                        onChange={handleChangeUserRole}
+                    /> 기업회원
+                </fieldset> */}
             </div>
             <div className="options">
                 <label><input type="checkbox" id="terms" required /> [필수] 약관 전체 동의</label>
