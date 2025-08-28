@@ -117,7 +117,6 @@ export default function Inbox({ userId: userIdProp }) {
               >
                 <option value="all">모든 상태</option>
                 <option value={ContractStatus.DRAFT}>작성 중</option>
-                <option value={ContractStatus.PENDING}>서명 대기</option>
                 <option value={ContractStatus.IN_PROGRESS}>진행 중</option>
                 <option value={ContractStatus.COMPLETED}>서명 완료</option>
               </select>

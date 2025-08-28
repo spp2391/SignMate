@@ -9,20 +9,38 @@ export default function AdminSidebar({ onNavigate }) {
   const handleGo = () => onNavigate && onNavigate();
 
   return (
-    <Box sx={{ height: "100%" }}>
+    <Box sx={{ height: "100%", bgcolor: "#0d1b2a", color: "white" }}>
       <Toolbar sx={{ px: 2 }}>
-        <Typography variant="h6" sx={{ fontWeight: 700 }}>SignMate Admin</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, fontSize: 20 }}>
+          SignMate Admin
+        </Typography>
       </Toolbar>
       <Divider sx={{ borderColor: "rgba(255,255,255,0.15)" }} />
 
-      <List dense>
-        <ListItemButton component={Link} to="/admin/users" onClick={handleGo} selected={pathname.startsWith("/admin/users")}>
-          <ListItemIcon sx={{ color: "white" }}><GroupIcon /></ListItemIcon>
+      <List sx={{ mt: 1 }}>
+        <ListItemButton
+          component={Link}
+          to="/admin/users"
+          onClick={handleGo}
+          selected={pathname.startsWith("/admin/users")}
+          sx={{ "& .MuiTypography-root": { fontSize: 16 } }}
+        >
+          <ListItemIcon sx={{ color: "white", minWidth: 40 }}>
+            <GroupIcon fontSize="medium" />
+          </ListItemIcon>
           <ListItemText primary="회원 관리" />
         </ListItemButton>
 
-        <ListItemButton component={Link} to="/admin/contracts" onClick={handleGo} selected={pathname.startsWith("/admin/contracts")}>
-          <ListItemIcon sx={{ color: "white" }}><DescriptionIcon /></ListItemIcon>
+        <ListItemButton
+          component={Link}
+          to="/admin/contracts"
+          onClick={handleGo}
+          selected={pathname.startsWith("/admin/contracts")}
+          sx={{ "& .MuiTypography-root": { fontSize: 16 } }}
+        >
+          <ListItemIcon sx={{ color: "white", minWidth: 40 }}>
+            <DescriptionIcon fontSize="medium" />
+          </ListItemIcon>
           <ListItemText primary="계약 관리" />
         </ListItemButton>
       </List>
