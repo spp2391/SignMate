@@ -21,7 +21,6 @@ import Join from './User/pages/Join';
 import Edit from "./User/pages/Edit";
 import LawComponent from "./components/LawComponent";
 import UploadNotice from "./pages/UploadNotice";
-import NoticeList from "./pages/UploadNotice";
 import AdminApp from "./admin/AdminApp";
 import MyPage from "./User/pages/MyPage";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
