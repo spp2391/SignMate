@@ -20,6 +20,7 @@ import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
 import LawComponent from "./components/LawComponent";
 import AdminApp from "./admin/AdminApp";
+import GuidePage from "./pages/GuidePage";
 
 
 
@@ -77,6 +78,7 @@ export default function App() {
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/admin/*" element={<AdminApp />} />
+                <Route path="/guide/*" element={<GuidePage />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

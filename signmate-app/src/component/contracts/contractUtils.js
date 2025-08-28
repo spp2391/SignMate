@@ -1,8 +1,8 @@
 // 계약서에서 자주 쓰는 공통 유틸 모음
 // 데이터 경로를 다루는 함수들만 분리해둠
-// ContractBase.jsx에서 불러다 씀.
+// ContractBase.jsx에서 불러다 씀
 
-/* ===== 경로 유틸 ===== */
+//경로 유틸 
 // "a.b[0].c" → ["a","b","0","c"]
 export const pathToParts = (path) =>
   String(path || "").replace(/\[(\d+)\]/g, ".$1").split(".").filter(Boolean);
@@ -41,11 +41,11 @@ export function deepMerge(target = {}, source = {}) {
   return out;
 }
 
-/* ===== 표시 유틸 ===== */
+// 표시 유틸 
 export const pretty = (v) => (typeof v === "boolean" ? (v ? "예" : "아니오") : v == null ? "" : String(v));
 export const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-/* === 테이블 HTML 렌더러 (미리보기에서 표로 보이게) === */
+// 테이블 HTML 렌더러 (미리보기에서 표로 보이게)
 export function renderTableHTML(tableFieldDef, rows = []) {
   const cols = tableFieldDef.columns || [];
   const safe = (x) => esc(pretty(x ?? ""));
@@ -83,8 +83,8 @@ export function renderTableHTML(tableFieldDef, rows = []) {
     </div>`;
 }
 
-/* === 본문 치환 — table인 경우 표로 렌더 === */
-/* 린트(no-useless-escape) 회피: 문자셋 명시 */
+// 본문 치환 — table인 경우 표로 렌더 
+// 린트(no-useless-escape) 회피: 문자셋 명시 
 export function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName) {
   return template.replace(/{{\s*([A-Za-z0-9_.[\]]+)\s*}}/g, (_, rawKey) => {
     const key = rawKey.trim();
@@ -127,7 +127,7 @@ export function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName
   });
 }
 
-/* ===== 서명 키 도우미 ===== */
+// 서명 키 도우미 
 export const counterpartOf = (k) => {
   const m = String(k || "");
   if (m.endsWith(".sender")) return "sign.receiver";
@@ -145,7 +145,7 @@ export const counterpartOf = (k) => {
   return null;
 };
 
-/** 내 서명 경로 계산 */
+// 내 서명 경로 계산 
 export function getMySignPath(role, template, signKeys) {
   const map = template?.signMap;
   if (map) {
