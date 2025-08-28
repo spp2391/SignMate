@@ -81,12 +81,16 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 }
                                 {isLoggedIn ?
                                     <li className="auth-menu">
-                                        <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
+                                        <Link className="header-gnblink" to="/mypage"><span>마이페이지</span></Link>
                                     </li> : ""
                                 }
                                 {isLoggedIn ? 
                                     <li className="auth-menu" >
-                                        <Link className="header-gnblink" to="/logout"><span>로그아웃</span></Link>
+                                        <Link className="header-gnblink" onClick={() => {
+                                                                                            localStorage.removeItem("accessToken");
+                                                                                            cookieStore.delete("refreshToken");
+                                                                                            alert("로그아웃 되었습니다.")
+                                                                                        }}><span>로그아웃</span></Link>
                                     </li> : ""
                                 }
                                 {/* {loginUser.userType==="ADMIN" ?
