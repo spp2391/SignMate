@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ContractBase from "../component/contracts/ContractBase";
 import { debounce } from "lodash";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 import { getLoginUserName } from "./util";
 
 /** 업무위탁 계약서
@@ -127,6 +127,7 @@ export default function OutsourcingContractPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
+  const navigate = useNavigate(); 
   
   const handleChange = useCallback((updated) => {
       debouncedSetValue(updated);
@@ -239,6 +240,7 @@ if (res.status === 409) {
       const result = await res.json();
       alert("계약서 제출 완료!");
       console.log("서버 응답:", result);
+      navigate("/");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {

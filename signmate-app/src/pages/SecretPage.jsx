@@ -1,7 +1,7 @@
 // SecretPage.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 
@@ -102,7 +102,7 @@ export default function SecretPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
   }, []);
@@ -227,6 +227,7 @@ export default function SecretPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
       if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
     } catch (err) {

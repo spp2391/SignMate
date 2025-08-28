@@ -1,5 +1,5 @@
 // ServiceContractPage.jsx
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState,useNavigate } from "react";
 import ContractBase from "../component/contracts/ContractBase";
 import { debounce } from "lodash";
 import { getLoginUserName } from "./util";
@@ -206,7 +206,7 @@ export default function ServiceContractPage() {
       const result = await res.json();
       alert("계약서 제출 완료!");
       console.log("서버 응답:", result);
-
+      navigate("/");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {

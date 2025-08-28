@@ -111,7 +111,7 @@ export default function SupplyContractPage() {
   const [currentUserRole, setCurrentUserRole] = useState("sender");
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
-
+  const navigate = useNavigate(); 
   useEffect(() => {
       if (!contractId) return;
   
@@ -218,6 +218,7 @@ export default function SupplyContractPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.supplierSignature) writerSigRef.current?.fromDataURL(data.supplierSignature);
       if (data.demanderSignature) receiverSigRef.current?.fromDataURL(data.demanderSignature);
     } catch (err) {
