@@ -115,7 +115,6 @@ export default function App() {
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/uploadnotice" element={<UploadNotice />} />
-                <Route path="noticeList" element={<NoticeList />} />
                 <Route path="/mypage" element={<MyPage isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                  <Route path="/admin/*" element={<AdminApp />} />
