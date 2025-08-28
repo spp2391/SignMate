@@ -22,6 +22,7 @@ import Edit from "./User/pages/Edit";
 import LawComponent from "./components/LawComponent";
 import UploadNotice from "./pages/NoticeList";
 import NoticeList from "./pages/UploadNotice";
+import AdminApp from "./admin/AdminApp";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
@@ -110,6 +111,7 @@ export default function App() {
                 <Route path="/uploadnotice" element={<UploadNotice />} />
                 <Route path="noticeList" element={<NoticeList />} />
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
+                 <Route path="/admin/*" element={<AdminApp />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />
