@@ -20,8 +20,7 @@ import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
 import Edit from "./User/pages/Edit";
 import LawComponent from "./components/LawComponent";
-import UploadNotice from "./pages/NoticeList";
-import NoticeList from "./pages/UploadNotice";
+import UploadNotice from "./pages/UploadNotice";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
@@ -108,7 +107,6 @@ export default function App() {
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/uploadnotice" element={<UploadNotice />} />
-                <Route path="noticeList" element={<NoticeList />} />
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 {/* 기본 라우트 */}
             </Routes>

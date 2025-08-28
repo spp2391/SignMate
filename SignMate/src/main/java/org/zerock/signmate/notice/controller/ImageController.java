@@ -18,25 +18,25 @@ import java.nio.file.Paths;
 public class ImageController {
     private final String UPLOAD_DIR = "uploads/";
 
-    @PostMapping("/upload")
-    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
-        try {
-            // 업로드 디렉토리 생성
-            File dir = new File(UPLOAD_DIR);
-            if (!dir.exists()) dir.mkdirs();
-
-            // 저장할 파일명
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path filePath = Paths.get(UPLOAD_DIR, fileName);
-            Files.write(filePath, file.getBytes());
-
-            // DB에는 fileName 또는 URL 저장
-            return ResponseEntity.ok("/api/images/view/" + fileName);
-
-        } catch (IOException e) {
-            return ResponseEntity.status(500).body("파일 업로드 실패");
-        }
-    }
+//    @PostMapping("/upload")
+//    public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
+//        try {
+//            // 업로드 디렉토리 생성
+//            File dir = new File(UPLOAD_DIR);
+//            if (!dir.exists()) dir.mkdirs();
+//
+//            // 저장할 파일명
+//            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+//            Path filePath = Paths.get(UPLOAD_DIR, fileName);
+//            Files.write(filePath, file.getBytes());
+//
+//            // DB에는 fileName 또는 URL 저장
+//            return ResponseEntity.ok("/api/images/view/" + fileName);
+//
+//        } catch (IOException e) {
+//            return ResponseEntity.status(500).body("파일 업로드 실패");
+//        }
+//    }
 
     // 이미지 출력
     @GetMapping("/view/{fileName}")

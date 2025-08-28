@@ -211,17 +211,17 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8080/contracts/user/3")
-      .then((res) => res.json())
-      .then((json) => {
-        setContract(json.contracts);
-        setDashboard(json.dashboard);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsLoading(false);
-      });
+    // fetch("http://localhost:8080/contracts/user/3")
+    //   .then((res) => res.json())
+    //   .then((json) => {
+    //     setContract(json.contracts);
+    //     setDashboard(json.dashboard);
+    //     setIsLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     setIsLoading(false);
+    //   });
 
     fetch("/api/notices", {
       headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
