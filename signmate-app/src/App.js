@@ -1,7 +1,7 @@
 // src/App.js
 import React, { useEffect, useState } from "react";
 import { Link, useLocation  } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {  Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Index from "./components/index/index";
@@ -73,8 +73,6 @@ export default function App() {
     
   return (
       <div>
-
-    <Router>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
       {/*  <Link to="/secret">비밀유지서약서</Link>*/}
       {/*  <Link to="/employment">표준근로계약서</Link>*/}
@@ -115,7 +113,7 @@ export default function App() {
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />
-        </Router>
+
     </div>
     );
     } else {

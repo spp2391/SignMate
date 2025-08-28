@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/style.css";
 import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
