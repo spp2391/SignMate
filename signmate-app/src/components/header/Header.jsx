@@ -88,8 +88,9 @@ const Header = ({isLoggedIn, loginUser}) => {
                                     <li className="auth-menu" >
                                         <Link className="header-gnblink" onClick={() => {
                                                                                             localStorage.removeItem("accessToken");
-                                                                                            cookieStore.delete("refreshToken");
-                                                                                            alert("로그아웃 되었습니다.")
+                                                                                            cookieStore.delete("refresh_token");
+                                                                                            // fetch("http://localhost:8080/api/user/logout");
+                                                                                            alert("로그아웃 되었습니다.");
                                                                                         }}><span>로그아웃</span></Link>
                                     </li> : ""
                                 }
