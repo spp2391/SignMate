@@ -1,7 +1,7 @@
 // src/App.js
-import React from "react";
-// import { Link } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation  } from "react-router-dom";
+import {  Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Index from "./components/index/index";
@@ -18,38 +18,68 @@ import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
 import NoticePage from "./pages/Notice";
 import Join from './User/pages/Join';
+import Edit from "./User/pages/Edit";
 import LawComponent from "./components/LawComponent";
-import UploadNotice from "./pages/UploadNotice";
-
-
-
+import UploadNotice from "./pages/NoticeList";
+import NoticeList from "./pages/UploadNotice";
+// import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
 export default function App() {
-  const token = localStorage.getItem("accessToken");
-  let userId = null;
+    // const token = localStorage.getItem("accessToken");
+    // let userId = null;
 
+    // if (token) {
+    //   try {
+    //     // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
+    //     const payload = JSON.parse(atob(token.split(".")[1]));
+    //     userId = payload.id; // claim에 저장된 userId
+    //   } catch (err) {
+    //     console.error("JWT 파싱 실패:", err);
+    //   }
+    // }
+    // const {isLoggedIn, loginUser} = useCheckLoggedIn();
+    const [userId, setUserId] = useState("");
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [loginUser, setLoginUser] = useState({});
+    const [isLoaded, setIsLoaded] = useState(false);
+    const pathName = useLocation();
+    
+    useEffect(()=>{
+        fetch("http://localhost:8080/api/user/checkloginuser", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}`
+            }
+        })
+            .then(async (response) => {
+                if (response.status !== 204) {
+                    setIsLoggedIn(true);
+                    let user = await response.json();
+                    setLoginUser(user);
+                    setUserId(user.name);
+                } else {
+                    setIsLoggedIn(false);
+                    setLoginUser({name:""});
+                }
+            })
+            .finally(() => {
+                setIsLoaded(true);
+            })
+    },[pathName]);
 
-  if (token) {
-    try {
-      // TokenProvider.getUserId와 같은 로직을 프론트에서 JS로 구현
-      const payload = JSON.parse(atob(token.split(".")[1]));
-      userId = payload.id; // claim에 저장된 userId
-    } catch (err) {
-      console.error("JWT 파싱 실패:", err);
-    }
-  }
+    if (isLoaded) {
+    
   return (
-
-
-    <Router>
+      <div>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
-        {/* <Link to="/secret">비밀유지서약서</Link>
-        <Link to="/employment">표준근로계약서</Link>
-        <Link to="/service">용역계약서</Link>
-        <Link to="/supply">자재/물품 공급계약서</Link>
-        <Link to="/outsourcing">업무위탁 계약서</Link> */}
-        <Header />
+      {/*  <Link to="/secret">비밀유지서약서</Link>*/}
+      {/*  <Link to="/employment">표준근로계약서</Link>*/}
+      {/*  <Link to="/service">용역계약서</Link>*/}
+      {/*  <Link to="/supply">자재/물품 공급계약서</Link>*/}
+      {/*  <Link to="/outsourcing">업무위탁 계약서</Link>*/}
+        <Header  isLoggedIn={isLoggedIn} loginUser={loginUser} />
       {/* </nav> */}
 
 
@@ -78,11 +108,21 @@ export default function App() {
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/uploadnotice" element={<UploadNotice />} />
+                <Route path="noticeList" element={<NoticeList />} />
+                <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />
-        </Router>
+
+    </div>
     );
+    } else {
+        return (
+            <div>
+                로딩중입니다...
+            </div>
+        );
+    }
 }
 
 // export default App;

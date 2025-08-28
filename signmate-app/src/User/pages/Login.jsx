@@ -5,9 +5,7 @@ const Login = () => {
 
     return (
         <div>
-            
             <LoginInputArea />
-            {/* Footer */}
         </div>
     )
 }

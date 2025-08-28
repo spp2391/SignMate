@@ -8,13 +8,14 @@ function decodeUserIdFromToken() {
     const token = localStorage.getItem("accessToken");
     if (!token) return null;
     const payload = JSON.parse(atob(token.split(".")[1]));
+    
     return payload?.id ?? null;
   } catch {
     return null;
   }
 }
 
-export default function Inbox({ userId: userIdProp }) {
+export default function Inbox({ resolvedUserId: userIdProp }) {
   const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
   const [contracts, setContracts] = useState([]);

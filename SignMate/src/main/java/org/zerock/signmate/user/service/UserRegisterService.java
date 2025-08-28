@@ -6,8 +6,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.zerock.signmate.user.OAuth2User.CustomOAuth2User;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.dto.AddUserRequest;
+import org.zerock.signmate.user.dto.EditUserRequest;
 import org.zerock.signmate.user.dto.LoginUserRequest;
 import org.zerock.signmate.user.repository.UserRepository;
 
@@ -32,11 +34,33 @@ public class UserRegisterService {
                 .nickname(dto.getNickname())
                 .name(dto.getName())
                 .userType("USER") // ✅ 기본값 설정
-                .userRole("USER")
+//                .userRole("USER")
                 .companyName(dto.getCompanyName())
                 .build();
 
         return userRepository.save(user);
+    }
+
+    public User editUser(CustomOAuth2User user, EditUserRequest dto) throws Exception {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        User userPrimary = user.getUser();
+        User userEdit = User.builder()
+                .userId(userPrimary.getUserId())
+                .name(dto.getName()!=null ? dto.getName() : userPrimary.getName())
+                .nickname(dto.getNickname()!=null ? dto.getNickname() : userPrimary.getNickname())
+                .email(userPrimary.getEmail())
+                .googleId(userPrimary.getGoogleId())
+                .naverId(userPrimary.getNaverId())
+                .kakaoId(userPrimary.getKakaoId())
+                .password(dto.getPassword()!=null ? passwordEncoder.encode(dto.getPassword()) : userPrimary.getPassword())
+                .companyName(dto.getCompanyName()!=null ? dto.getCompanyName() : userPrimary.getCompanyName())
+//                .userRole(dto.getUserRole()!=null ? dto.getUserRole() : userPrimary.getUserRole())
+                .userType(userPrimary.getUserType())
+                .authType(userPrimary.getAuthType())
+                .build();
+        userRepository.save(userEdit);
+        return null;
+
     }
 
     public User findUserByEmailAndPassword(LoginUserRequest dto) throws Exception{
