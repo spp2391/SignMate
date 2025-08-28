@@ -79,6 +79,8 @@ const ndaTemplate = {
 10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
+서명일: {{effectiveDate}}
+
 갑: {{discloser.name}} (서명)
 {{sign.discloser}}
 
@@ -193,7 +195,10 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-        effectiveDate: formData.effectiveDate || null,
+        effectiveDate: formData.effectiveDate 
+    ? formData.effectiveDate + "T00:00:00"
+    : null,
+
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
         governingLaw: formData.governingLaw,

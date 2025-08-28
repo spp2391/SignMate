@@ -68,7 +68,7 @@ const outsourcingTemplate = {
     { type: "text", name: "totalPaymentAmount", label: "합계(총 지급액)" },
 
     { type: "section", label: "서명" },
-    { type: "date", name: "signDate", label: "서명일" },
+    // { type: "date", name: "signDate", label: "서명일" },
     { type: "text", name: "governingLaw", label: "대한민국 법" },
     { type: "date", name: "signatureDate", label: "서명일" },
   ],
@@ -157,6 +157,7 @@ export default function OutsourcingContractPage() {
           setFormData(prev => ({
             ...prev,
             ...data,
+            signatureDate:data.signatureDate,
             sign: {
               discloser: data.writerSignature || prev.sign.discloser,
               recipient: data.receiverSignature || prev.sign.recipient
@@ -201,7 +202,9 @@ export default function OutsourcingContractPage() {
         contractEndDate: formData.contractEndDate || null,
         taskDescription: formData.taskDescription,
         totalPaymentAmount: formData.totalPaymentAmount,
-        signatureDate: formData.signatureDate,
+         signatureDate: formData.signatureDate || null
+        ?formData.signatureDate + "T00:00:00"
+        : null,
         governingLaw:formData.governingLaw,
         tasks: formData.tasks.map(item => ({
           category: item.category,

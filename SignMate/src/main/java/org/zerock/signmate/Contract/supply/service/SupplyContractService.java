@@ -72,7 +72,7 @@ public class SupplyContractService {
         contractRepository.save(contract);
 
         // SupplyContract 생성 또는 조회
-        SupplyContract supplyContract = dto.getId() == null
+        SupplyContract supplyContract = dto.getContractId() == null
                 ? SupplyContract.builder().contract(contract).build()
                 : supplyContractRepository.findById(dto.getId())
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 SupplyContract ID: " + dto.getId()));
