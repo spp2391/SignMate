@@ -63,6 +63,7 @@ const LoginInputArea = () => {
         })
     }
     // const handleKakaoLogin = () => {
+
     //     fetch("/oauth2/authorization/kakao", {
     //         method: "GET",
     //         credentials: "include",

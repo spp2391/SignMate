@@ -23,6 +23,7 @@ import LawComponent from "./components/LawComponent";
 import UploadNotice from "./pages/NoticeList";
 import NoticeList from "./pages/UploadNotice";
 import AdminApp from "./admin/AdminApp";
+import MyPage from "./User/pages/MyPage";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
@@ -45,7 +46,13 @@ export default function App() {
     const [loginUser, setLoginUser] = useState({});
     const [isLoaded, setIsLoaded] = useState(false);
     const pathName = useLocation();
-    
+    useEffect(()=>{
+        const queryParams = new URLSearchParams(location.search);
+        const token = queryParams.get('token');  // 'react'
+        if(token){
+            localStorage.setItem("accessToken", token);
+        }
+    },[])
     useEffect(()=>{
         fetch("http://localhost:8080/api/user/checkloginuser", {
             method: "POST",
@@ -110,6 +117,7 @@ export default function App() {
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/uploadnotice" element={<UploadNotice />} />
                 <Route path="noticeList" element={<NoticeList />} />
+                <Route path="/mypage" element={<MyPage isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                  <Route path="/admin/*" element={<AdminApp />} />
                 {/* 기본 라우트 */}
