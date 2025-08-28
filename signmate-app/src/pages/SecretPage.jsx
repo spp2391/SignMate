@@ -51,7 +51,7 @@ const ndaTemplate = {
     { type: "text", name: "receiverAddress", label: "을 주소" },
 
     { type: "section", label: "기간/목적" },
-    { type: "date", name: "effectiveDate",   label: "발효일" },
+    // { type: "date", name: "effectiveDate",   label: "발효일" },
     { type: "textarea", name: "purpose", label: "정보 제공 목적" },
     { type: "text", name: "contractDurationMonths",    label: "계약기간(개월)" },
     { type: "text", name: "confidentialityDurationYears", label: "비밀유지 존속기간(년)" },
@@ -79,8 +79,6 @@ const ndaTemplate = {
 10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
-서명일: {{effectiveDate}}
-
 갑: {{discloser.name}} (서명)
 {{sign.discloser}}
 
@@ -195,9 +193,9 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-        effectiveDate: formData.effectiveDate 
-    ? formData.effectiveDate + "T00:00:00"
-    : null,
+    //     effectiveDate: formData.effectiveDate 
+    // ? formData.effectiveDate + "T00:00:00"
+    // : null,
 
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
@@ -224,7 +222,7 @@ export default function SecretPage() {
       setFormData(prev => ({
         ...prev,
         ...data,
-        effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : prev.effectiveDate,
+        // effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : prev.effectiveDate,
         sign: {
           discloser: data.writerSignature || prev.sign.discloser,
           recipient: data.receiverSignature || prev.sign.recipient

@@ -24,7 +24,6 @@ import UploadNotice from "./pages/NoticeList";
 import NoticeList from "./pages/UploadNotice";
 import AdminApp from "./admin/AdminApp";
 import MyPage from "./User/pages/MyPage";
-import UploadNotice from "./pages/UploadNotice";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
