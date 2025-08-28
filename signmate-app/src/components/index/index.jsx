@@ -29,6 +29,8 @@ import kakao from "../../assets/icons/kakao_icon.png"
 import naver from "../../assets/icons/naver_icon.png"
 import { motion } from "framer-motion";
 import UseCases from "../../components/UseCases";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 
 // 🔵 SignmateHeroBanner 컴포넌트 + AlertCard 내부 포함
@@ -368,13 +370,17 @@ const Index = () => {
                                                 </Link>
                                                 </div>
                                                 <div className="notice-list">
-                                                {notices.slice(0, 2).map((notice) => (
+                                                  {notices.slice(0, 10).map((notice) => (
                                                     <Link key={notice.nbno} to={`/notice/${notice.nbno}`}>
-                                                    <p>{notice.title}</p>
-                                                    <span>{notice.regdate}</span>
+                                                      <p>{notice.title}</p>
+                                                        <span>
+                                                          {notice.regdate
+                                                            ? format(new Date(notice.regdate), "yyyy.MM.dd HH:mm", { locale: ko })
+                                                            : ""}
+                                                        </span>
                                                     </Link>
-                                                ))}
-                                                </div>
+                                              ))}
+                                            </div>
                                             </div>
                                         {/* <div className="menu-wrap">
                                             <div className="menu-item gray-alpha">

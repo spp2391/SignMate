@@ -2,6 +2,7 @@ package org.zerock.signmate.notice.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zerock.signmate.notice.dto.NoticeBoardDTO;
@@ -19,6 +20,7 @@ public class NoticeBoardController {
 
     // 공지사항 등록
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public NoticeBoardDTO createNotice(
             @RequestParam String title,
             @RequestParam String content,
