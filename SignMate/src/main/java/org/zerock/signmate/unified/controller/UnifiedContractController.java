@@ -1,12 +1,12 @@
 // src/main/java/org/zerock/signmate/Contract/controller/UnifiedContractController.java
-package org.zerock.signmate.Contract.controller;
+package org.zerock.signmate.unified.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.zerock.signmate.Contract.dto.UnifiedContractDto;
+import org.zerock.signmate.unified.dto.UnifiedContractDto;
 import org.zerock.signmate.Contract.dto.UserDashboardDTO;
-import org.zerock.signmate.Contract.service.UnifiedContractService;
+import org.zerock.signmate.unified.service.UnifiedContractService;
 
 import java.util.HashMap;
 import java.util.List;
