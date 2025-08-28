@@ -9,20 +9,11 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddUserRequest {
-    private Long userId;
-    @NotBlank
+public class EditUserRequest {
     private String name;
-    @NotBlank
     private String nickname;
-    @Email
-    @NotBlank
-    private String email;
-    @NotBlank
     private String password;
     private String companyName;
-    @NotBlank
     private String userType;
-    @NotBlank
     private String userRole;
 }

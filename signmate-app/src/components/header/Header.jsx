@@ -6,9 +6,19 @@ import "../../assets/css/templatehouse.css";
 import logo from "../../assets/images/logo.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
 import NotificationBell from "../../pages/NotificationBell";
+import { useEffect, useState } from "react";
 
 
-const Header = () => {
+const Header = ({isLoggedIn, loginUser}) => {
+    const [requireLoggedIn, setRequireLoggedIn] = useState(false);
+    const navigate = useNavigate();
+    useEffect(() => {
+        setRequireLoggedIn(false);
+        if (requireLoggedIn && !isLoggedIn) {
+            alert("로그인.");
+            navigate("/login");
+        }
+    },[])
     return (
         <header className="th-layout-header">
             <div className="temhabank-N1" id="LKMdzPpn9D">
@@ -62,27 +72,41 @@ const Header = () => {
                                     </button>
                                     </li> */}
                                 {/* 로그인 상태일 때 */}
-                                {/* <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
-                                </li> */}
-                                {/* style="padding-right: 30px;" */}
-                                {/* <li className="auth-menu" >
-                                    <Link className="header-gnblink" to="@{/member/logout}"><span>로그아웃</span></Link>
-                                </li> */}
-                                {/* <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/admin/panel}"><span>관리자 페이지</span></Link>
-                                </li> */}
-                                {/* 비로그인 상태일 때 */}
-                                <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
-                                </li>
-                                 {/* style="padding-right: 30px;" */}
-                                <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
-                                </li>
+                                {isLoggedIn ? 
+                                    <li className="auth-menu" >
+                                        <Link className="header-gnblink" to="/">
+                                            <span>{loginUser.name}</span>
+                                        </Link>
+                                    </li> : ""
+                                }
+                                {isLoggedIn ?
                                     <li className="auth-menu">
-                                    <NotificationBell />
+                                        <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
+                                    </li> : ""
+                                }
+                                {isLoggedIn ? 
+                                    <li className="auth-menu" >
+                                        <Link className="header-gnblink" to="/logout"><span>로그아웃</span></Link>
+                                    </li> : ""
+                                }
+                                {/* {loginUser.userType==="ADMIN" ?
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/admin/panel"><span>관리자 페이지</span></Link>
+                                    </li> : ""
+                                } */}
+                                {isLoggedIn ? "" : 
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
                                     </li>
+                                }
+                                {isLoggedIn ? "" : 
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
+                                    </li>
+                                }
+                                <li className="auth-menu">
+                                    <NotificationBell />
+                                </li>
                                 <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>

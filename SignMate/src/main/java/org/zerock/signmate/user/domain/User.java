@@ -59,8 +59,8 @@ public class User implements UserDetails {
     private String userType;
 
     // PRIVATE, COMPANY
-    @Column(name = "user_role", length = 10)
-    private String userRole;
+//    @Column(name = "user_role", length = 10)
+//    private String userRole;
 
     @Column(name = "auth_type", length = 10)
     private String authType;

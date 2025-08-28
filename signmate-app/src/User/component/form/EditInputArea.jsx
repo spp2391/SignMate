@@ -1,25 +1,25 @@
-import { useNavigate } from "react-router-dom";
-import "./login.css";
 import { useState } from "react";
+import "./login.css";
+// import { useNavigate } from "react-router-dom";
 
-const JoinInputArea = () => {
+const EditInputArea = ({loginUser}) => {
     const [state, setState] = useState({
-        email: "",
-        pw: "",
-        name: "",
-        nickname: "",
-        companyName: "",
-        userType: "USER",
-        userRole: "COMPANY",
-    })
-    const navigate = useNavigate();
+            email: loginUser.email,
+            pw: "",
+            name: loginUser.name,
+            nickname: loginUser.nickname,
+            companyName: loginUser.companyName,
+            userType: loginUser.userType,
+            userRole: "COMPANY",
+        })    
+    // const navigate = useNavigate();
     // const [isCompanyNameDisabled, setIsCompanyNameDisabled] = useState(true);
-    const handleChangeEmail = (event) => {
-        setState({
-            ...state,
-            email: event.target.value,
-        })
-    }
+    // const handleChangeEmail = (event) => {
+    //     setState({
+    //         ...state,
+    //         email: event.target.value,
+    //     })
+    // }
     const handleChangePw = (event) => {
         setState({
             ...state,
@@ -44,12 +44,6 @@ const JoinInputArea = () => {
             companyName: event.target.value,
         })
     }
-    // const handleChangeUserType = (event) => {
-    //     setState({
-    //         ...state,
-    //         userType: event.target.value,
-    //     })
-    // }
     // const handleChangeUserRole = (event) => {
     //     setState({
     //         ...state,
@@ -62,9 +56,9 @@ const JoinInputArea = () => {
     //         setIsCompanyNameDisabled(false);        
     //     }
     // }
-    const handleJoin = (event) => {
+    const handleEdit = (event) => {
         event.preventDefault();
-        const joinRequest = {
+        const editRequest = {
             email: state.email,
             password: state.pw,
             name: state.name,
@@ -74,15 +68,16 @@ const JoinInputArea = () => {
             userRole: state.userRole,
         }
         // if (state.userRole === "PRIVATE") {
-        //     joinRequest.companyName = "";
+        //     editRequest.companyName = "";
         // }
-        fetch("http://localhost:8080/api/user/join", {
+        fetch("http://localhost:8080/api/user/edit", {
             method: "POST",
             credentials: "include",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("accessToken")}` 
             },
-            body: JSON.stringify(joinRequest),
+            body: JSON.stringify(editRequest),
         })
         .then(async (response) => {
             if (!response.ok) {
@@ -91,29 +86,28 @@ const JoinInputArea = () => {
             response.text()
         })
         .then(()=>{
-            alert("회원가입에 성공했습니다.");
-            navigate("/login")
+            alert("회원 내용 변경에 성공했습니다.");
+            // navigate("/mypage")
         })
         .catch((e) => {
             alert(e.message);
             // console.log(e.message);
         })
     }
-
     return (
         <div className="login-container">
         <div className="login-card">
             <div className="logo">
-                <h1>Join</h1>
+                <h1>Edit</h1>
             </div>
             <div className="input-group">
                 {/* Email */}
-                <input
-                        type="email"
+                {/* <input
+                        type="hidden"
                         value={state.email}
                         onChange={handleChangeEmail}
                         placeholder="email"
-                />
+                /> */}
                 {/* Password */}
                 <input
                     type="password"
@@ -127,6 +121,7 @@ const JoinInputArea = () => {
                     value={state.name}
                     onChange={handleChangeName}
                     placeholder="name"
+                    defaultValue={loginUser.name}
                 />
                 {/* Nickname */}
                 <input
@@ -134,6 +129,7 @@ const JoinInputArea = () => {
                     value={state.nickname}
                     onChange={handleChangeNickname}
                     placeholder="nickname"
+                    defaultValue={loginUser.nickname}
                 />
                 {/* Company Name (if Exists) */}
                 <input
@@ -142,6 +138,7 @@ const JoinInputArea = () => {
                     onChange={handleChangeCompanyName}
                     placeholder="company name"
                     // disabled={isCompanyNameDisabled}
+                    defaultValue={loginUser.companyName}
                 />
                 {/* <div>
                     userType USER/ADMIN
@@ -157,36 +154,58 @@ const JoinInputArea = () => {
                     onChange={handleChangeUserRole}
                     placeholder="userRole PRIVATE/COMPANY"
                 /> */}
-                {/* <fieldset>
-                    <input
-                        type="radio"
-                        value="PRIVATE"
-                        name="userRole"
-                        checked={state.userRole==="PRIVATE"}
-                        onChange={handleChangeUserRole}
-                        defaultChecked
-                    /> 개인회원     
-                    <input 
-                        type="radio"
-                        value="COMPANY"
-                        name="userRole"
-                        checked={state.userRole==="COMPANY"}
-                        onChange={handleChangeUserRole}
-                    /> 기업회원
-                </fieldset> */}
+                {/* {
+                    loginUser.userRole==="PRIVATE" ?
+                    <fieldset>
+                        <input
+                            type="radio"
+                            value="PRIVATE"
+                            name="userRole"
+                            checked={state.userRole==="PRIVATE"}
+                            onChange={handleChangeUserRole}
+                            defaultChecked
+                        /> 개인회원     
+                        <input 
+                            type="radio"
+                            value="COMPANY"
+                            name="userRole"
+                            checked={state.userRole==="COMPANY"}
+                            onChange={handleChangeUserRole}
+                        /> 기업회원
+                    </fieldset> :
+                    <fieldset>
+                        <input
+                            type="radio"
+                            value="PRIVATE"
+                            name="userRole"
+                            checked={state.userRole==="PRIVATE"}
+                            onChange={handleChangeUserRole}
+                        /> 개인회원     
+                        <input 
+                            type="radio"
+                            value="COMPANY"
+                            name="userRole"
+                            checked={state.userRole==="COMPANY"}
+                            onChange={handleChangeUserRole}
+                            defaultChecked
+                        /> 기업회원
+                    </fieldset>
+
+                } */}
+                
             </div>
-            <div className="options">
+            {/* <div className="options">
                 <label><input type="checkbox" id="terms" required /> [필수] 약관 전체 동의</label>
-            </div>         
+            </div> */}
             <div>
-                <button className="login-btn" onClick={handleJoin}>Join</button>
+                <button className="login-btn" onClick={handleEdit}>Edit</button>
             </div>
-            <div className="helper-links">
+            {/* <div className="helper-links">
                 <a href="/">이미 계정이 있으신가요? 로그인</a>
-            </div>
+            </div> */}
         </div>
         </div>
     )
 }
 
-export default JoinInputArea;
+export default EditInputArea;
