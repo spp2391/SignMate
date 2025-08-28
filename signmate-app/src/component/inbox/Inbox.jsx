@@ -79,7 +79,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
   const anyChecked = Object.values(selected).some(Boolean);
 
   const handleDeleteSelected = async () => {
-  const selectedIds = Object.keys(selected).filter((id) => selected[id]);
+  const selectedIds = Object.keys(selected).filter((contractId) => selected[contractId]);
   if (selectedIds.length === 0) return;
 
   try {
@@ -178,7 +178,6 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
               >
                 <option value="all" >모든 상태</option>
                 <option value={ContractStatus.DRAFT}>작성 중</option>
-                <option value={ContractStatus.PENDING}>서명 대기</option>
                 <option value={ContractStatus.IN_PROGRESS}>진행 중</option>
                 <option value={ContractStatus.COMPLETED}>서명 완료</option>
               </select>

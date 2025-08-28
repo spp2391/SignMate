@@ -84,9 +84,6 @@ export function ListView({ docs, selected, setSelected }) {
                     {d.title || CONTRACT_TYPE_LABEL[d.contractType] || "-"}
                   </span>
                   <StatusBadge status={d.status} />
-                  <span className="rounded-full border px-3 py-2 text-xs bg-neutral-100" style={{fontSize:"15px"}}>
-                    요청자
-                  </span>
                 </div>
                 <div className="text-xs text-neutral-500 mt-0.5" style={{fontSize:"12px"}}>
                   {d.writerName+","+ d.receiverName|| "-"}

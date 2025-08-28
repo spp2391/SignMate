@@ -51,7 +51,7 @@ public class SupplyContractController {
     public ResponseEntity<?> deleteSupply(@PathVariable Long contractId, Authentication authentication) {
         try {
             SupplyContractDTO dto= supplyContractService.findByContractId(contractId);
-            supplyContractService.deleteByContractId(dto.getId() , authentication);
+            supplyContractService.deleteById(dto.getId() , authentication);
             notificationService.deleteNotificationsByContractId(contractId);
             return ResponseEntity.ok(Map.of("message", "자재/물품 공급계약서가 삭제되었습니다."));
         } catch (Exception e) {

@@ -5,13 +5,9 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.zerock.signmate.Contract.domain.ServiceContract;
-import org.zerock.signmate.Contract.secret.domain.Secret;
-import org.zerock.signmate.Contract.standard.domain.Standard;
 
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -58,9 +54,9 @@ public class User implements UserDetails {
     @Column(name = "user_type", length = 10)
     private String userType;
 
-    // PRIVATE, COMPANY
-//    @Column(name = "user_role", length = 10)
-//    private String userRole;
+     //PRIVATE, COMPANY
+    @Column(name = "user_role", length = 10)
+    private String userRole;
 
     @Column(name = "auth_type", length = 10)
     private String authType;

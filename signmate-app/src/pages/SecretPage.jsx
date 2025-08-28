@@ -1,7 +1,7 @@
 // SecretPage.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 
@@ -79,6 +79,8 @@ const ndaTemplate = {
 10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
+서명일: {{effectiveDate}}
+
 갑: {{discloser.name}} (서명)
 {{sign.discloser}}
 
@@ -102,7 +104,7 @@ export default function SecretPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
   }, []);
@@ -193,7 +195,10 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-        effectiveDate: formData.effectiveDate || null,
+        effectiveDate: formData.effectiveDate 
+    ? formData.effectiveDate + "T00:00:00"
+    : null,
+
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
         governingLaw: formData.governingLaw,
@@ -227,6 +232,7 @@ export default function SecretPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
       if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
     } catch (err) {
@@ -238,8 +244,8 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} />
-      <button
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} onSubmit={handleSave} submitting={loadingSubmit}   />
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -254,7 +260,7 @@ export default function SecretPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }

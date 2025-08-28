@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./login.css";
-// import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const EditInputArea = ({loginUser}) => {
     const [state, setState] = useState({
@@ -12,7 +12,7 @@ const EditInputArea = ({loginUser}) => {
             userType: loginUser.userType,
             userRole: "COMPANY",
         })    
-    // const navigate = useNavigate();
+    const navigate = useNavigate();
     // const [isCompanyNameDisabled, setIsCompanyNameDisabled] = useState(true);
     // const handleChangeEmail = (event) => {
     //     setState({
@@ -87,7 +87,7 @@ const EditInputArea = ({loginUser}) => {
         })
         .then(()=>{
             alert("회원 내용 변경에 성공했습니다.");
-            // navigate("/mypage")
+            navigate("/mypage")
         })
         .catch((e) => {
             alert(e.message);
