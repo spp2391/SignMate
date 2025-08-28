@@ -238,8 +238,8 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} />
-      <button
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} onSubmit={handleSave} submitting={loadingSubmit}   />
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -254,7 +254,7 @@ export default function SecretPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }

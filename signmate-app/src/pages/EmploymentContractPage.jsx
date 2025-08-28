@@ -257,8 +257,10 @@ export default function EmploymentContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave}
+         submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -273,7 +275,7 @@ export default function EmploymentContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "계약서 저장"}
-      </button>
+      </button> */}
     </div>
   );
 }

@@ -79,7 +79,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
   const anyChecked = Object.values(selected).some(Boolean);
 
   const handleDeleteSelected = async () => {
-  const selectedIds = Object.keys(selected).filter((id) => selected[id]);
+  const selectedIds = Object.keys(selected).filter((contractId) => selected[contractId]);
   if (selectedIds.length === 0) return;
 
   try {

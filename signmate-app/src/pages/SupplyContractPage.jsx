@@ -234,8 +234,10 @@ export default function SupplyContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave}
+         submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -250,7 +252,7 @@ export default function SupplyContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }
