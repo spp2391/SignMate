@@ -8,7 +8,7 @@ const MyPage = ({ isLoggedIn, loginUser }) => {
 
   useEffect(() => {
     if (!isLoggedIn) {
-      alert("로그인 해주세요.");
+      alert("로그인이 필요한 서비스입니다..");
       navigate("/login");
     } else {
       if (loginUser.kakaoId) {
