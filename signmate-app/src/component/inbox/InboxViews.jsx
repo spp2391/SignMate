@@ -87,8 +87,6 @@ export function ListView({ docs, selected, setSelected }) {
                 </div>
                 <div className="text-xs text-neutral-500 mt-0.5" style={{fontSize:"12px"}}>
                   {d.writerName+","+ d.receiverName|| "-"}
-               
-                  {d.address ? `, ${d.address}` : ""}
                 </div>
               </div>
             </div>

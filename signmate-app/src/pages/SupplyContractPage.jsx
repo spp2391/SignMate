@@ -82,12 +82,12 @@ const supplyTemplate = {
 
 공급자(갑) {{supplierName}}(대표 {{supplierRepresentative}}) 과(와) 수요자(을) {{demanderName}}(대표 {{demanderRepresentative}})은 다음 조건으로 물품 공급에 합의한다.
 
-제1조(계약일자·장소) 계약일자는 {{contractDate}} 이며, 인도 장소는 {{place}} 로 한다.
+제1조(계약일자·장소) 계약일자는 {{contractDate}} 이며, 인도 장소는 {{deliveryLocation}} 로 한다.
 제2조(품목·수량·대금) 아래 표 기재 내역을 기준으로 한다.
 [품목 내역 표는 본문 하단에 표시]
 
 제3조(인도조건) {{deliveryTerms}}
-제4조(검수·하자보수) {{inspeinspectionAndWarrantyctTerms}}
+제4조(검수·하자보수) {{inspectionAndWarranty}}
 제5조(대금 및 지급) {{paymentTerms}}
 제6조(품질보증 등) {{qualityGuaranteeTerms}}
 제7조(기타) {{otherTerms}}

@@ -297,13 +297,13 @@ const Index = () => {
                                             </Link>
                                         </div>
                                         <div className="menu-item secondary-alpha">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/lawcomponent">
                                                 <img src={logo3} alt="법적효력" />
                                                 <span className="h6">법적효력</span>
                                             </Link>
                                         </div>
                                         <div className="menu-item secondary">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/mypage">
                                                 <img src={logo14} alt="마이페이지" />
                                                 <span className="h6">마이페이지</span>
                                             </Link>
