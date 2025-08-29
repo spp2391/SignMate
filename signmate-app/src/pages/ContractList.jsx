@@ -1,6 +1,6 @@
 // ContractListWithFeatures.jsx
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React, { useState,useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
@@ -54,7 +54,34 @@ const AccordionItem = ({ item }) => {
   );
 };
 
-const ContractListWithFeatures = () => {
+const ContractListWithFeatures = ({ isLoggedIn, loginUser }) => {
+   const navigate = useNavigate();
+  const [memberType, setMemberType] = useState();
+
+  useEffect(() => {
+      if (!isLoggedIn) {
+        alert("로그인이 필요한 서비스입니다..");
+        navigate("/login", { replace: true });
+      } else {
+        if (loginUser.kakaoId) {
+          setMemberType("kakao");
+        } else if (loginUser.googleId) {
+          setMemberType("google");
+        } else if (loginUser.naverId) {
+          setMemberType("naver");
+        } else {
+          setMemberType("normal");
+        }
+      }
+    }, []);
+     const typeLabel =
+    memberType === "kakao"
+      ? "카카오 회원"
+      : memberType === "google"
+      ? "구글 회원"
+      : memberType === "naver"
+      ? "네이버 회원"
+      : "일반 회원";
   return (
     <div style={{ maxWidth: 1200, margin: "0 auto", padding: 24 }}>
       {/* 슬로건 */}

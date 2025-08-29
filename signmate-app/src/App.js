@@ -12,7 +12,7 @@ import ServiceContractPage from "./pages/ServiceContractPage";
 import SupplyContractPage from "./pages/SupplyContractPage";
 import OutsourcingContractPage from "./pages/OutsourcingContractPage";
 import CompanyStatisticsPage from './pages/CompanyStatisticsPage';
-import ContractInboxPage from './pages/ContractInboxPage';
+// import ContractInboxPage from './pages/ContractInboxPage';
 import Login from "./User/pages/Login";
 import Mailbox from "./component/Mailbox";
 import Inbox from "./component/inbox/Inbox";
@@ -93,7 +93,7 @@ export default function App() {
 
             <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/contracts" element={<ContractList />} />
+                <Route path="/contracts" element={<ContractList isLoggedIn={isLoggedIn} loginUser={loginUser} />} />
                 <Route path="/secret" element={<SecretPage />} />
                 <Route path="/employment" element={<EmploymentContractPage />} />
                 <Route path="/service" element={<ServiceContractPage />} />
@@ -101,8 +101,8 @@ export default function App() {
                 <Route path="/outsourcing" element={<OutsourcingContractPage />} />
                 <Route path="/company-statistics" element={<CompanyStatisticsPage />} />
                 <Route path="*" element={<Index />} />
-                <Route path="/inbox" element={<Inbox userId={userId} />} />
-                <Route path="/inbox" element={<ContractInboxPage />} />
+                <Route path="/inbox" element={<Inbox userId={userId} isLoggedIn={isLoggedIn} loginUser={loginUser} />} />
+                {/* <Route path="/inbox" element={<ContractInboxPage />} /> */}
                 <Route path="/secret/:contractId" element={<SecretPage signerId="" />} />
                <Route path="/employment/:contractId" element={<EmploymentContractPage />} />
                <Route path="/supply/:contractId" element={<SupplyContractPage signerId="" />} />
@@ -111,7 +111,6 @@ export default function App() {
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/inbox" element={<Inbox />} />
                 <Route path="/notice" element={<NoticePage />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />

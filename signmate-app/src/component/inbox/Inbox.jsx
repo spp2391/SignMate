@@ -2,7 +2,7 @@
 import { Search, ShieldCheck, Loader2 } from "lucide-react";
 import { ListView, GridView } from "./InboxViews";
 import { ContractStatus, ContractType } from "./inboxUtils";
-
+import {   useNavigate } from "react-router-dom";
 function decodeUserIdFromToken() {
   try {
     const token = localStorage.getItem("accessToken");
@@ -15,7 +15,11 @@ function decodeUserIdFromToken() {
   }
 }
 
-export default function Inbox({ resolvedUserId: userIdProp }) {
+export default function Inbox({ resolvedUserId: userIdProp,isLoggedIn, loginUser }) {
+
+  const navigate = useNavigate();
+  const [memberType, setMemberType] = useState();
+  
   const resolvedUserId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
   const [contracts, setContracts] = useState([]);
@@ -30,6 +34,20 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
   const [selected, setSelected] = useState({});
 
   useEffect(() => {
+    if (!isLoggedIn) {
+      alert("로그인이 필요한 서비스입니다..");
+      navigate("/login", { replace: true });
+    } else {
+      if (loginUser.kakaoId) {
+        setMemberType("kakao");
+      } else if (loginUser.googleId) {
+        setMemberType("google");
+      } else if (loginUser.naverId) {
+        setMemberType("naver");
+      } else {
+        setMemberType("normal");
+      }
+    }
    console.log("로그인 유저아이디는:"+resolvedUserId);
     setIsLoading(true);
     fetch(`http://localhost:8080/contracts/user/${resolvedUserId}`)
@@ -49,6 +67,7 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
       })
       .finally(() => setIsLoading(false));
   }, [resolvedUserId]);
+  
 
   const filtered = useMemo(() => {
     const q = (query ?? "").toLowerCase().trim();
@@ -286,4 +305,4 @@ export default function Inbox({ resolvedUserId: userIdProp }) {
       </div>
     </div>
   );
-}
+};
