@@ -120,13 +120,13 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 <li className="auth-menu">
                                     <NotificationBell />
                                 </li>
-                                <li className="allmenu">
+                                {/* <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                     </button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <button className="btn-momenu">

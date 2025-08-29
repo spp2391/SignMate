@@ -1,5 +1,5 @@
 -- -- 1. 먼저 user 데이터 넣기
-INSERT INTO user (user_id, name, nickname, email, password, company_name, user_type, regdate, moddate, deleted, kakao_id)
+INSERT ignore INTO user (user_id, name, nickname, email, password, company_name, user_type, regdate, moddate, deleted, kakao_id)
 VALUES
     (1, '김철수', '철수', '1@naver.com', '$2a$10$hQrjSLeH4wR8KoHv2u0cIOmW9ULZA3Tgd9hwTNe7i9kMkaqWGpmyC', '철수컴퍼니', 'ADMIN', NOW(), NOW(), false, NULL),
     (2, '이영희', '영희', '2@naver.com', '$2a$10$hQrjSLeH4wR8KoHv2u0cIOmW9ULZA3Tgd9hwTNe7i9kMkaqWGpmyC', '영희상사', 'USER', NOW(), NOW(), false, NULL),
