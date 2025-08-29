@@ -155,7 +155,7 @@ export default function SecretPage() {
           ...prev,
           ...data,
            effectiveDate: data.effectiveDate 
-    ? data.effectiveDate.split("T")[0]  // 🔥 여기서 "2025-08-19" 형식만 추출
+    ? data.effectiveDate.split("T")[0]  
     : "",
           sign: {
             discloser: data.writerSignature || prev.sign.discloser,

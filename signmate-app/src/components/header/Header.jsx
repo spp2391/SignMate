@@ -92,6 +92,13 @@ const Header = ({isLoggedIn, loginUser}) => {
                                         <Link className="header-gnblink" to="/mypage"><span>마이페이지</span></Link>
                                     </li> : ""
                                 }
+                                 {isLoggedIn && loginUser?.userType === "ADMIN" && (
+                        <li className="auth-menu">
+                            <Link className="header-gnblink" to="/admin">
+                                <span>관리자 페이지</span>
+                            </Link>
+                        </li>
+                    )}
                                 {isLoggedIn ? 
                                     <li className="auth-menu" >
                                         <Link className="header-gnblink" onClick={() => {
