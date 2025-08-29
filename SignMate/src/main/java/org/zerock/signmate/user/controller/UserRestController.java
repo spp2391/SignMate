@@ -102,8 +102,14 @@ public class UserRestController {
     }
 
     @PostMapping("/logout")
-    public void logout(HttpSession session) {
-        session.invalidate();
+    public HttpServletResponse logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setDomain("localhost");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+        return response;
     }
 
     @PostMapping("/checklogin")
