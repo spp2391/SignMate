@@ -1,211 +1,140 @@
 import { useState } from "react";
-import "./login.css";
 import { useNavigate } from "react-router-dom";
+import { User, Mail, Building2, Lock, Edit3 } from "lucide-react";
 
-const EditInputArea = ({loginUser}) => {
-    const [state, setState] = useState({
-            email: loginUser.email,
-            pw: "",
-            name: loginUser.name,
-            nickname: loginUser.nickname,
-            companyName: loginUser.companyName,
-            userType: loginUser.userType,
-            userRole: "COMPANY",
-        })    
-    const navigate = useNavigate();
-    // const [isCompanyNameDisabled, setIsCompanyNameDisabled] = useState(true);
-    // const handleChangeEmail = (event) => {
-    //     setState({
-    //         ...state,
-    //         email: event.target.value,
-    //     })
-    // }
-    const handleChangePw = (event) => {
-        setState({
-            ...state,
-            pw: event.target.value,
-        })
-    }
-    const handleChangeName = (event) => {
-        setState({
-            ...state,
-            name: event.target.value,
-        })
-    }
-    const handleChangeNickname = (event) => {
-        setState({
-            ...state,
-            nickname: event.target.value,
-        })
-    }
-    const handleChangeCompanyName = (event) => {
-        setState({
-            ...state,
-            companyName: event.target.value,
-        })
-    }
-    // const handleChangeUserRole = (event) => {
-    //     setState({
-    //         ...state,
-    //         userRole: event.target.value,
-    //     })
-    //     console.log(event.target.value);
-    //     if (state.userRole === "COMPANY") {
-    //         setIsCompanyNameDisabled(true);        
-    //     } else {
-    //         setIsCompanyNameDisabled(false);        
-    //     }
-    // }
-    const handleEdit = (event) => {
-        event.preventDefault();
-        const editRequest = {
-            email: state.email,
-            password: state.pw,
-            name: state.name,
-            nickname: state.nickname,
-            companyName: state.companyName,
-            userType: state.userType,
-            userRole: state.userRole,
+const EditInputArea = ({ loginUser }) => {
+  const [state, setState] = useState({
+    email: loginUser.email,
+    pw: "",
+    name: loginUser.name,
+    nickname: loginUser.nickname,
+    companyName: loginUser.companyName,
+    userType: loginUser.userType,
+    userRole: "COMPANY",
+  });
+
+  const navigate = useNavigate();
+
+  const handleChange = (field) => (event) => {
+    setState({ ...state, [field]: event.target.value });
+  };
+
+  const handleEdit = (event) => {
+    event.preventDefault();
+
+    const editRequest = {
+      email: state.email,
+      password: state.pw,
+      name: state.name,
+      nickname: state.nickname,
+      companyName: state.companyName,
+      userType: state.userType,
+      userRole: state.userRole,
+    };
+
+    fetch("http://localhost:8080/api/user/edit", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+      },
+      body: JSON.stringify(editRequest),
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(await response.text());
         }
-        // if (state.userRole === "PRIVATE") {
-        //     editRequest.companyName = "";
-        // }
-        fetch("http://localhost:8080/api/user/edit", {
-            method: "POST",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${localStorage.getItem("accessToken")}` 
-            },
-            body: JSON.stringify(editRequest),
-        })
-        .then(async (response) => {
-            if (!response.ok) {
-                throw new Error(await response.text());
-            }
-            response.text()
-        })
-        .then(()=>{
-            alert("회원 내용 변경에 성공했습니다.");
-            navigate("/mypage")
-        })
-        .catch((e) => {
-            alert(e.message);
-            // console.log(e.message);
-        })
-    }
-    return (
-        <div className="login-container">
-        <div className="login-card">
-            <div className="logo">
-                <h1>Edit</h1>
-            </div>
-            <div className="input-group">
-                {/* Email */}
-                {/* <input
-                        type="hidden"
-                        value={state.email}
-                        onChange={handleChangeEmail}
-                        placeholder="email"
-                /> */}
-                {/* Password */}
-                <input
-                    type="password"
-                    value={state.pw}
-                    onChange={handleChangePw}
-                    placeholder="password"
-                />
-                {/* Name */}
-                <input
-                    type="text"
-                    value={state.name}
-                    onChange={handleChangeName}
-                    placeholder="name"
-                    defaultValue={loginUser.name}
-                />
-                {/* Nickname */}
-                <input
-                    type="text"
-                    value={state.nickname}
-                    onChange={handleChangeNickname}
-                    placeholder="nickname"
-                    defaultValue={loginUser.nickname}
-                />
-                {/* Company Name (if Exists) */}
-                <input
-                    type="text"
-                    value={state.companyName}
-                    onChange={handleChangeCompanyName}
-                    placeholder="company name"
-                    // disabled={isCompanyNameDisabled}
-                    defaultValue={loginUser.companyName}
-                />
-                {/* <div>
-                    userType USER/ADMIN
-                    <input
-                        type="text"
-                        value={state.userType}
-                        onChange={handleChangeUserType}
-                    />
-                </div> */}
-                {/* <input
-                    type="text"
-                    value={state.userRole}
-                    onChange={handleChangeUserRole}
-                    placeholder="userRole PRIVATE/COMPANY"
-                /> */}
-                {/* {
-                    loginUser.userRole==="PRIVATE" ?
-                    <fieldset>
-                        <input
-                            type="radio"
-                            value="PRIVATE"
-                            name="userRole"
-                            checked={state.userRole==="PRIVATE"}
-                            onChange={handleChangeUserRole}
-                            defaultChecked
-                        /> 개인회원     
-                        <input 
-                            type="radio"
-                            value="COMPANY"
-                            name="userRole"
-                            checked={state.userRole==="COMPANY"}
-                            onChange={handleChangeUserRole}
-                        /> 기업회원
-                    </fieldset> :
-                    <fieldset>
-                        <input
-                            type="radio"
-                            value="PRIVATE"
-                            name="userRole"
-                            checked={state.userRole==="PRIVATE"}
-                            onChange={handleChangeUserRole}
-                        /> 개인회원     
-                        <input 
-                            type="radio"
-                            value="COMPANY"
-                            name="userRole"
-                            checked={state.userRole==="COMPANY"}
-                            onChange={handleChangeUserRole}
-                            defaultChecked
-                        /> 기업회원
-                    </fieldset>
+        response.text();
+      })
+      .then(() => {
+        alert("회원 내용 변경에 성공했습니다.");
+        navigate("/mypage");
+      })
+      .catch((e) => {
+        alert(e.message);
+      });
+  };
 
-                } */}
-                
-            </div>
-            {/* <div className="options">
-                <label><input type="checkbox" id="terms" required /> [필수] 약관 전체 동의</label>
-            </div> */}
-            <div>
-                <button className="login-btn" onClick={handleEdit}>Edit</button>
-            </div>
-            {/* <div className="helper-links">
-                <a href="/">이미 계정이 있으신가요? 로그인</a>
-            </div> */}
-        </div>
-        </div>
-    )
-}
+  return (
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-6">
+      <div className="bg-white shadow-lg rounded-2xl p-10 w-[600px] h-[600px]">
+        <h1
+          className="text-2xl font-bold text-blue-700 mb-6 text-center"
+          style={{ fontSize: "50px", marginBottom: "60px", marginTop: "30px" }}
+        >
+          회원 정보 수정
+        </h1>
+
+        <form className="space-y-5">
+          {/* Password */}
+          <div className="flex items-center gap-3">
+            <Lock className="text-blue-500" size={30} />
+            <input
+              type="password"
+              value={state.pw}
+              onChange={handleChange("pw")}
+              placeholder="비밀번호"
+              className="flex-1 border rounded-lg px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={{fontSize:"25px", margin:"10px"}}
+            />
+          </div>
+
+          {/* Name */}
+          <div className="flex items-center gap-3">
+            <User className="text-blue-500" size={30} />
+            <input
+              type="text"
+              value={state.name}
+              onChange={handleChange("name")}
+              placeholder="이름"
+              className="flex-1 border rounded-lg px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={{fontSize:"25px", margin:"10px"}}
+            />
+          </div>
+
+          {/* Nickname */}
+          <div className="flex items-center gap-3">
+            <User className="text-blue-500" size={30} />
+            <input
+              type="text"
+              value={state.nickname}
+              onChange={handleChange("nickname")}
+              placeholder="닉네임"
+              className="flex-1 border rounded-lg px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={{fontSize:"25px", margin:"10px"}}
+            />
+          </div>
+
+          {/* Company Name */}
+          <div className="flex items-center gap-3">
+            <Building2 className="text-blue-500" size={30} />
+            <input
+              type="text"
+              value={state.companyName}
+              onChange={handleChange("companyName")}
+              placeholder="회사명"
+              className="flex-1 border rounded-lg px-4 py-2 text-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+              style={{fontSize:"25px", margin:"10px"}}
+            />
+          </div>
+
+          {/* 버튼 */}
+          <div className="text-center pt-6">
+            <button
+              type="submit"
+              onClick={handleEdit}
+              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
+              style={{ fontSize: "15px", margin: "10px" }}
+            >
+              <Edit3 size={20} />
+              수정하기
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
 
 export default EditInputArea;
