@@ -23,6 +23,7 @@ import LawComponent from "./components/LawComponent";
 import UploadNotice from "./pages/UploadNotice";
 import AdminApp from "./admin/AdminApp";
 import MyPage from "./User/pages/MyPage";
+import GuidePage from "./pages/GuidePage";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
@@ -118,6 +119,7 @@ export default function App() {
                 <Route path="/mypage" element={<MyPage isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                  <Route path="/admin/*" element={<AdminApp />} />
+                  <Route path="/guide/*" element={<GuidePage />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />

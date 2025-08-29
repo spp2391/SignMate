@@ -1,4 +1,3 @@
-// src/admin/pages/UsersPage.jsx
 import * as React from "react";
 import {
   Box, Card, CardContent, Typography, TextField, Button,
@@ -12,7 +11,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import { fetchUsers, getUserDetail, updateUser, deleteUser } from "../services/adminApi.js";
 
-/** 라벨/유틸 */
+// 라벨/유틸 
 const ROLE_LABEL = { ADMIN: "관리자", USER: "일반" };
 const toRole = (u) => (u?.userType ?? u?.role ?? "").toUpperCase();
 
@@ -29,7 +28,7 @@ function formatDate(d) {
   }
 }
 
-/** ─────────────────────────  회원 상세 다이얼로그  ───────────────────────── **/
+//회원 상세 다이얼로그  
 function UserDetailDialog({ open, onClose, user, onSave }) {
   const normalize = (u) => ({
     ...u,
@@ -103,7 +102,7 @@ function UserDetailDialog({ open, onClose, user, onSave }) {
   );
 }
 
-/** ─────────────────────────────  회원 목록  ───────────────────────────── **/
+// 회원 목록  
 export default function UsersPage() {
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(0);

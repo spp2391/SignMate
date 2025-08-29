@@ -1,4 +1,3 @@
-// src/admin/pages/ContractsPage.jsx
 import * as React from "react";
 import {
   Box, Card, CardContent, Typography, TextField, Button,

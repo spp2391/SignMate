@@ -18,7 +18,7 @@ public class UserDetailDto {
     private String name;
     private String nickname;
     private String role;
-    private String type;
+
 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime regdate;
@@ -33,7 +33,6 @@ public class UserDetailDto {
                 .name(u.getName())
                 .nickname(u.getNickname())
                 .role(u.getUserRole())
-                .type(u.getUserType())
                 .regdate(u.getRegdate())
                 .moddate(u.getModdate())
                 .build();

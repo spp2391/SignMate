@@ -5,7 +5,7 @@
 import React from "react";
 import { getByPath, sigLabel } from "./contractUtils";
 
-/* ===== 좌측 입력 필드 ===== */
+// 좌측 입력 필드 
 export function FieldInput({ field, value, onChange, onFocusField }) {
   if (field.type === "section") {
     return (
@@ -98,7 +98,7 @@ export function FieldInput({ field, value, onChange, onFocusField }) {
   );
 }
 
-/* ===== 미리보기 하단 서명 섹션 ===== */
+// 미리보기 하단 서명 섹션 
 export function SignatureFooter({ signKeys, form }) {
   if (!signKeys?.length) return null;
   // 보기 좋은 정렬

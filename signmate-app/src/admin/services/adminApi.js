@@ -1,9 +1,8 @@
-// src/admin/services/adminApi.js
 import axios from "axios";
 
 const api = axios.create({ baseURL: "/api/admin", withCredentials: false });
 
-// ✅ 토큰 자동 첨부 (로컬스토리지 accessToken 사용)
+// 토큰 자동 첨부 (로컬스토리지 accessToken 사용)
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken");
   if (token) {
@@ -12,20 +11,19 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// ✅ 에러 처리 인터셉터 (선택: 필요 없으면 제거해도 무방)
+// 에러 처리 인터셉터 (필요 없으면 제거해도 무방)
 api.interceptors.response.use(
   (res) => res,
   (err) => {
     console.error("API Error:", err.response || err.message);
-    // 필요하면 사용자 친화적인 메시지 변환
     return Promise.reject(err);
   }
 );
 
-// ===== Users =====
+//Users
 export async function fetchUsers({ page = 0, size = 10, query = "" } = {}) {
   const params = { page, size };
-  if (query) params.keyword = query; // ✅ 백엔드와 파라미터명 일치
+  if (query) params.keyword = query; //  백엔드와 파라미터명 일치
   const { data } = await api.get("/users", { params });
   return data; // Page<UserListDto>
 }
@@ -44,12 +42,12 @@ export async function deleteUser(id) {
   await api.delete(`/users/${id}`);
 }
 
-// ===== Contracts =====
+// Contracts
 export async function fetchContracts({ page = 0, size = 10, query = "", status, type } = {}) {
   const params = { page, size };
   if (query) params.keyword = query;
   if (type && type !== "all") params.type = type;
-  if (status && status !== "all") params.status = status; // CSV 가능: "DRAFT,COMPLETED"
+  if (status && status !== "all") params.status = status; 
 
   const { data } = await api.get("/contracts", { params });
   return data; // Page<ContractListDto>
