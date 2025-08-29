@@ -1,7 +1,7 @@
 // src/App.js
-import React from "react";
-// import { Link } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation  } from "react-router-dom";
+import {  Routes, Route } from "react-router-dom";
 import Header from "./components/header/Header";
 import Footer from "./components/footer/Footer";
 import Index from "./components/index/index";
@@ -22,10 +22,8 @@ import Edit from "./User/pages/Edit";
 import LawComponent from "./components/LawComponent";
 import UploadNotice from "./pages/UploadNotice";
 import AdminApp from "./admin/AdminApp";
-import GuidePage from "./pages/GuidePage";
-
-
 import MyPage from "./User/pages/MyPage";
+import GuidePage from "./pages/GuidePage";
 // import { useCheckLoggedIn } from "./User/hooks/CheckLoggedIn";
 
 
@@ -80,7 +78,7 @@ export default function App() {
     },[pathName]);
 
     if (isLoaded) {
-
+    
   return (
       <div>
       {/* <nav style={{ padding: 12, display: "flex", gap: 10, flexWrap: "wrap" }}> */}
@@ -121,8 +119,7 @@ export default function App() {
                 <Route path="/mypage" element={<MyPage isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                 <Route path="/mypage/edit" element={<Edit isLoggedIn={isLoggedIn} loginUser={loginUser}/>}/>
                  <Route path="/admin/*" element={<AdminApp />} />
-                <Route path="/admin/*" element={<AdminApp />} />
-                <Route path="/guide/*" element={<GuidePage />} />
+                  <Route path="/guide/*" element={<GuidePage />} />
                 {/* 기본 라우트 */}
             </Routes>
             <Footer />
