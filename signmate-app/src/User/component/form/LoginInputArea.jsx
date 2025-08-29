@@ -81,36 +81,36 @@ const LoginInputArea = () => {
     //         alert(e);
     //     })
     // }
-    const handleGoogleLogin = () => {
-        fetch("/oauth2/authorization/google", {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((response) =>
-            response.text()
-        )
-        .then(text=>{
-            localStorage.setItem("accessToken", text);
-        })
-    }
-    const handleNaverLogin = () => {
-        fetch("/oauth2/authorization/naver", {
-            method: "GET",
-            credentials: "include",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-        .then((response) =>
-            response.text()
-        )
-        .then(text=>{
-            localStorage.setItem("accessToken", text);
-        })
-    }
+    // const handleGoogleLogin = () => {
+    //     fetch("/oauth2/authorization/google", {
+    //         method: "GET",
+    //         credentials: "include",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //     })
+    //     .then((response) =>
+    //         response.text()
+    //     )
+    //     .then(text=>{
+    //         localStorage.setItem("accessToken", text);
+    //     })
+    // }
+    // const handleNaverLogin = () => {
+    //     fetch("/oauth2/authorization/naver", {
+    //         method: "GET",
+    //         credentials: "include",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //     })
+    //     .then((response) =>
+    //         response.text()
+    //     )
+    //     .then(text=>{
+    //         localStorage.setItem("accessToken", text);
+    //     })
+    // }
     return (
         <div className="login-container">
             <div className="login-card">
@@ -141,8 +141,8 @@ const LoginInputArea = () => {
                     <button onClick={handleLogin} className="login-btn">Submit</button>
                     {/* <button className="kakao-btn" onClick={handleKakaoLogin}>Kakao</button> */}
                     <a href="http://localhost:8080/oauth2/authorization/kakao" className="kakao-btn">Kakao</a>
-                    <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
-                    <button className="naver-btn" onClick={handleNaverLogin}>Naver</button>
+                    {/* <button className="google-btn" onClick={handleGoogleLogin}>Google</button>
+                    <button className="naver-btn" onClick={handleNaverLogin}>Naver</button> */}
                 </div>
             </div>     
         </div>
