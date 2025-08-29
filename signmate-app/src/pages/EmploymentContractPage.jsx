@@ -116,11 +116,12 @@ const employmentTemplate = {
  - 본 계약서 사본 각 1부씩 교부·보관한다.
 
 [서명]
-(사업주) {{employerName}} / 대표자: {{employerRepresentative}} (서명) / 주소: {{employerAddress}}
+(사업주) {{employerName}} / 대표자: {{employerRepresentative}} (서명){{writerSignature}} / 주소: {{employerAddress}}
 {{sign.employer}}
 
-(근로자) 성명: {{employeeName}} (서명) / 주소: {{employeeAddress}} / 연락처: {{employeeContact}}
+(근로자) 성명: {{employeeName}} (서명){{receiverSignature}} / 주소: {{employeeAddress}} / 연락처: {{employeeContact}}
 {{sign.employee}}
+
   `,
   footerNote: "※ 취업규칙·인사규정과 함께 운영하면 좋습니다.",
 };

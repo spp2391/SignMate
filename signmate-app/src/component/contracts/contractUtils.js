@@ -122,6 +122,9 @@ export function renderBodyHTML(template, data, activeKey, orderMap, fieldsByName
     } else {
       html = esc(pretty(v ?? ""));
     }
+    if(html.includes("data:image")){
+      html = `<img src="${html}" alt="서명" width= "200" style = "display: inline;">`;
+    }
     const content = html || "<span class='placeholder'>[입력]</span>";
     return `<span class="anchor ${isActive ? "hit" : ""}" data-key="${esc(key)}">${badge}${content}</span>`;
   });

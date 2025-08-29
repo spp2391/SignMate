@@ -79,10 +79,10 @@ const ndaTemplate = {
 10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
-갑: {{discloser.name}} (서명)
+갑: {{writerName}} (서명){{writerSignature}}
 {{sign.discloser}}
 
-을: {{recipient.name}} (서명)
+을: {{receiverName}} (서명){{receiverSignature}}
 {{sign.recipient}}
   `,
 

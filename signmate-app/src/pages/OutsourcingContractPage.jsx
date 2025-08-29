@@ -110,10 +110,10 @@ const outsourcingTemplate = {
 [서명]
 서명일: {{signatureDate}}
 
-(갑) {{clientName}} / 대표자: {{clientRepresentative}} (서명)
+(갑) {{clientName}} / 대표자: {{clientRepresentative}} (서명){{writerSignature}}
 {{sign.discloser}}
 
-(을) {{contractorName}} / 대표자: {{contractorRepresentative}} (서명)
+(을) {{contractorName}} / 대표자: {{contractorRepresentative}} (서명){{receiverSignature}}
 {{sign.recipient}}
   `,
 

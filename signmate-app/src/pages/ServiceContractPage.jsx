@@ -95,10 +95,10 @@ const serviceTemplate = {
 [서명]
 서명일: {{signatureDate}}
 
-(갑) {{clientName}}  대표자: {{clientRepresentative}} (서명)
+(갑) {{clientName}}  대표자: {{clientRepresentative}} (서명){{writerSignature}}
 {{sign.discloser}}
 
-(을) {{contractorName}}  대표자: {{contractorRepresentative}} (서명)
+(을) {{contractorName}}  대표자: {{contractorRepresentative}} (서명){{receiverSignature}}
 {{sign.recipient}}
   `,
 
@@ -195,8 +195,11 @@ export default function ServiceContractPage() {
         receiverSignature: formData.sign.recipient
       };
 
-      const res = await fetch("/api/service", {
-        method: "POST",
+
+       const url = contractId ? `/api/service/${contractId}` : `/api/service`;
+      const method = contractId ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" ,
           "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
          },
@@ -205,6 +208,8 @@ export default function ServiceContractPage() {
 
       if (!res.ok) throw new Error(await res.text() || "서버 오류");
       const result = await res.json();
+      
+
       alert("계약서 제출 완료!");
       console.log("서버 응답:", result);
       navigate("/");

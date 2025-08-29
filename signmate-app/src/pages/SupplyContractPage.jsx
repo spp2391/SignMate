@@ -93,10 +93,10 @@ const supplyTemplate = {
 제7조(기타) {{otherTerms}}
 
 [서명]
-(갑) {{supplierName}} (서명)
+(갑) {{supplierName}} (서명){{supplierSignature}}
 {{sign.discloser}}
 
-(을) {{demanderName}} (서명)
+(을) {{demanderName}} (서명){{demanderSignature}}
 {{sign.recipient}}
   `,
 
