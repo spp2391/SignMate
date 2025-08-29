@@ -1,36 +1,38 @@
-package org.zerock.signmate.config;
-
-import lombok.RequiredArgsConstructor;
-import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.ProviderManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.util.AntPathMatcher;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
-
-@Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
-public class WebSecurityConfig implements WebMvcConfigurer {
+//package org.zerock.signmate.config;
+//
+//import lombok.RequiredArgsConstructor;
+//import org.springframework.beans.factory.annotation.Qualifier;
+//import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+//import org.springframework.context.annotation.Bean;
+//import org.springframework.context.annotation.Configuration;
+//import org.springframework.security.authentication.AuthenticationManager;
+//import org.springframework.security.authentication.ProviderManager;
+//import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+//import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+//import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+//import org.springframework.security.core.userdetails.UserDetailsService;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+//import org.springframework.security.web.SecurityFilterChain;
+//import org.springframework.security.web.util.matcher.RequestMatcher;
+//import org.springframework.util.AntPathMatcher;
+//import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+//import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+//import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+//
+//import static org.springframework.boot.autoconfigure.security.servlet.PathRequest.toH2Console;
+//
+//@Configuration
+//@EnableWebSecurity
+//@RequiredArgsConstructor
+//public class WebSecurityConfig implements WebMvcConfigurer {
 //    @Bean
 //    public WebSecurityCustomizer configure() {
 //        return (web) -> web.ignoring()
 //                // /h2-console의 접속에 스프링 시큐리티를 해제
 //                .requestMatchers(toH2Console())
-//                .requestMatchers(new AntPathMatcher("/static/**"));
+//                .requestMatchers((RequestMatcher) new AntPathMatcher("/static/**"))
 //                //resources/static폴더 접속에 스프링 시큐리티 해제
 //                .requestMatchers(PathRequest.toStaticResources().atCommonLocations());
 //    }
@@ -67,7 +69,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //    public AuthenticationManager authenticationManager(
 //            HttpSecurity http,
 //            BCryptPasswordEncoder bCryptPasswordEncoder,
-//            UserDetailsService userDetailsService
+//            @Qualifier("userDetailService") UserDetailsService userDetailsService
 //    ) throws Exception{
 //        //인증관리자
 //        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
@@ -81,11 +83,11 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 //    public BCryptPasswordEncoder bCryptPasswordEncoder() {
 //        return new BCryptPasswordEncoder();
 //    }
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        // C:/notice-uploads/ 폴더를 /uploads/** URL로 접근 가능하게 매핑
-        registry.addResourceHandler("/uploads/**")
-                .addResourceLocations("file:///C:/notice-uploads/");
-    }
-}
-
+//    @Override
+//    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+//        // C:/notice-uploads/ 폴더를 /uploads/** URL로 접근 가능하게 매핑
+//        registry.addResourceHandler("/uploads/**")
+//                .addResourceLocations("file:///C:/notice-uploads/");
+//    }
+//}
+//

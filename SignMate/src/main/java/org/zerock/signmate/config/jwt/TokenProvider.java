@@ -49,6 +49,7 @@ public class TokenProvider {
                 // 서명에서 사용할 암호화 알고리즘 및 키값
                 // "alg" : "HS256"
                 // HS256을 사용하여 secretKey를 암호화한 값을 서명 부분에 저장
+                .claim("role", user.getUserType())
                 .claim("id",user.getUserId().toString())
                 .signWith(SignatureAlgorithm.HS256, jwtProperties.getSecretKey())
                 .compact();
@@ -70,7 +71,8 @@ public class TokenProvider {
         Claims claims = getClaims(token);
         User user = userRepository.findByEmail(claims.getSubject()).orElseThrow(()->new UsernameNotFoundException("User not found"));
         // 권한을 ROLE_USER로 설정
-        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER"));
+        String role = claims.get("role", String.class);
+        Set<SimpleGrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority("ROLE_USER" + role));
         // Token을 이용하여 SpringSecurity 로그인 객체를 생성
         return new UsernamePasswordAuthenticationToken(
                 new CustomOAuth2User(user), token, authorities);

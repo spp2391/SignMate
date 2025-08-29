@@ -54,11 +54,11 @@ public class Secret {
 
     // 서명 이미지나 서명 텍스트
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature",columnDefinition = "TEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature",columnDefinition = "TEXT")
     private String receiverSignature; // base64
 
 //    @ManyToOne(fetch = FetchType.LAZY)

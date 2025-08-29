@@ -35,50 +35,47 @@ public class SupplyContractService {
 
     @Transactional
     public SupplyContractDTO addOrUpdateContract(SupplyContractDTO dto) {
-        // 로그인 사용자 (작성자 = 공급자)
+        // 1. 로그인 사용자 (작성자 = 공급자)
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loginUser = authentication.getName();
 
         User writer = userRepository.findByName(loginUser)
                 .orElseThrow(() -> new EntityNotFoundException("로그인한 유저를 찾을 수 없습니다: " + loginUser));
 
-        // 수요자 조회
+        // 2. 수요자 조회
         User receiver = null;
         if (dto.getDemanderName() != null && !dto.getDemanderName().isBlank()) {
             receiver = userRepository.findByName(dto.getDemanderName())
                     .orElseThrow(() -> new EntityNotFoundException("받는 사람 유저가 없습니다: " + dto.getDemanderName()));
         }
 
-        // Contract 생성 또는 조회
+        // 3. Contract 생성 또는 조회
         Contract contract;
-        if (dto.getContractId() == null) {
+        if (dto.getContractId() != null) {
+            contract = contractRepository.findById(dto.getContractId())
+                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
+            contract.setReceiver(receiver);
+        } else {
             contract = Contract.builder()
                     .contractType(ContractType.SUPPLY)
                     .writer(writer)
                     .receiver(receiver)
                     .status(enums.ContractStatus.DRAFT)
                     .build();
-        } else {
-            contract = contractRepository.findById(dto.getContractId())
-                    .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + dto.getContractId()));
-            contract.setWriter(writer);
-            contract.setReceiver(receiver);
+            contractRepository.save(contract);
         }
 
         // DRAFT → IN_PROGRESS 자동 전환
         if (contract.getStatus() == enums.ContractStatus.DRAFT) {
             contract.setStatus(enums.ContractStatus.IN_PROGRESS);
+            contractRepository.save(contract);
         }
-        contractRepository.save(contract);
 
-        // SupplyContract 생성 또는 조회
-        SupplyContract supplyContract = dto.getId() == null
-                ? SupplyContract.builder().contract(contract).build()
-                : supplyContractRepository.findById(dto.getId())
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 SupplyContract ID: " + dto.getId()));
+        // 4. SupplyContract 생성 또는 조회
+        SupplyContract supplyContract = supplyContractRepository.findByContract(contract)
+                .orElseGet(() -> SupplyContract.builder().contract(contract).build());
 
-        // 필드 복사
-        supplyContract.setContract(contract);
+        // 5. DTO → Entity 매핑
         supplyContract.setSupplierName(dto.getSupplierName());
         supplyContract.setSupplierRepresentative(dto.getSupplierRepresentative());
         supplyContract.setDemanderName(dto.getDemanderName());
@@ -90,10 +87,15 @@ public class SupplyContractService {
         supplyContract.setPaymentTerms(dto.getPaymentTerms());
         supplyContract.setQualityGuaranteeTerms(dto.getQualityGuaranteeTerms());
         supplyContract.setOtherTerms(dto.getOtherTerms());
-        supplyContract.setSupplierSignature(dto.getSupplierSignature());
-        supplyContract.setDemanderSignature(dto.getDemanderSignature());
 
-        // SupplyItem 처리
+        // 서명 처리
+        if (writer.equals(contract.getWriter())) {
+            supplyContract.setSupplierSignature(dto.getSupplierSignature());
+        } else if (writer.equals(contract.getReceiver())) {
+            supplyContract.setDemanderSignature(dto.getDemanderSignature());
+        }
+
+        // 6. SupplyItem 리스트 처리
         supplyContract.getItems().clear();
         if (dto.getItems() != null) {
             List<SupplyItem> items = dto.getItems().stream().map(itemDto ->
@@ -113,25 +115,31 @@ public class SupplyContractService {
 
         SupplyContract saved = supplyContractRepository.save(supplyContract);
 
-        // 상태별 알림 처리
+        // 7. 알림 처리
         LocalDateTime now = LocalDateTime.now();
+        String msg;
         if (supplyContract.getSupplierSignature() != null && supplyContract.getDemanderSignature() != null) {
             contract.setStatus(enums.ContractStatus.COMPLETED);
             contractRepository.save(contract);
-            String msg = "자재/물품 공급계약서가 완료되었습니다.";
-            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
-            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
-                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
-            }
+            msg = "자재/물품 공급계약서가 완료되었습니다.";
         } else {
-            String msg = dto.getDemanderName()+"이 자재/물품 공급계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
-            notificationService.notifyUser(contract.getWriter(), contract, msg, now);
-            if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
-                notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
-            }
+            msg = dto.getSupplierName() + "이 자재/물품 공급계약서를 작성하였습니다. 서명해 주시길 바랍니다.";
+        }
+
+        notificationService.notifyUser(contract.getWriter(), contract, msg, now);
+        if (contract.getReceiver() != null && !contract.getReceiver().equals(contract.getWriter())) {
+            notificationService.notifyUser(contract.getReceiver(), contract, msg, now);
         }
 
         return SupplyContractDTO.fromEntity(saved);
+    }
+
+    public SupplyContractDTO findByContractId(Long contractId) {
+        Contract contract = contractRepository.findById(contractId)
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 계약서 ID: " + contractId));
+        SupplyContract supplyContract = supplyContractRepository.findByContract(contract)
+                .orElseThrow(() -> new RuntimeException("해당 계약서에 SupplyContract가 존재하지 않습니다. contractId=" + contractId));
+        return SupplyContractDTO.fromEntity(supplyContract);
     }
 
     public SupplyContractDTO findById(Long id) {
@@ -141,23 +149,21 @@ public class SupplyContractService {
     }
 
     @Transactional
-    public void deleteByContractId(Long contractId, Authentication authentication) {
+    public void deleteById(Long id, Authentication authentication) {
+        // 로그인 유저 확인
         String username = authentication.getName();
         User loginUser = userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("로그인 유저가 없습니다"));
-        SupplyContract supplyContract = supplyContractRepository.findById(contractId)
-                .orElseThrow(() -> new RuntimeException("해당 계약서에 SupplyContract가 존재하지 않습니다. contractId=" + contractId));
+
+        // SupplyContract 조회
+        SupplyContract supplyContract = supplyContractRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("삭제할 SupplyContract가 없습니다. id=" + id));
+
+        // 작성자 검증
         if (!supplyContract.getContract().getWriter().equals(loginUser)) {
             throw new RuntimeException("삭제 권한이 없습니다. 작성자만 삭제할 수 있습니다.");
         }
-        supplyContractRepository.delete(supplyContract);
-    }
 
-    public SupplyContractDTO findByContractId(Long contractId) {
-        Contract contractEntity = contractRepository.findById(contractId)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 계약서 ID: " + contractId));
-        SupplyContract supplyContract = supplyContractRepository.findByContract(contractEntity)
-                .orElseThrow(() -> new RuntimeException("해당 계약서에 SupplyContract가 존재하지 않습니다. contractId=" + contractId));
-        return SupplyContractDTO.fromEntity(supplyContract);
+        supplyContractRepository.delete(supplyContract);
     }
 }

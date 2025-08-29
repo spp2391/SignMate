@@ -29,6 +29,8 @@ import kakao from "../../assets/icons/kakao_icon.png"
 import naver from "../../assets/icons/naver_icon.png"
 import { motion } from "framer-motion";
 import UseCases from "../../components/UseCases";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 
 // 🔵 SignmateHeroBanner 컴포넌트 + AlertCard 내부 포함
@@ -209,17 +211,17 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8080/contracts/user/3")
-      .then((res) => res.json())
-      .then((json) => {
-        setContract(json.contracts);
-        setDashboard(json.dashboard);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsLoading(false);
-      });
+    // fetch("http://localhost:8080/contracts/user/3")
+    //   .then((res) => res.json())
+    //   .then((json) => {
+    //     setContract(json.contracts);
+    //     setDashboard(json.dashboard);
+    //     setIsLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     setIsLoading(false);
+    //   });
 
     fetch("/api/notices", {
       headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
@@ -295,13 +297,13 @@ const Index = () => {
                                             </Link>
                                         </div>
                                         <div className="menu-item secondary-alpha">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/lawcomponent">
                                                 <img src={logo3} alt="법적효력" />
                                                 <span className="h6">법적효력</span>
                                             </Link>
                                         </div>
                                         <div className="menu-item secondary">
-                                            <Link to="javascript:void(0)">
+                                            <Link to="/mypage">
                                                 <img src={logo14} alt="마이페이지" />
                                                 <span className="h6">마이페이지</span>
                                             </Link>
@@ -368,13 +370,17 @@ const Index = () => {
                                                 </Link>
                                                 </div>
                                                 <div className="notice-list">
-                                                {notices.slice(0, 2).map((notice) => (
+                                                  {notices.slice(0, 10).map((notice) => (
                                                     <Link key={notice.nbno} to={`/notice/${notice.nbno}`}>
-                                                    <p>{notice.title}</p>
-                                                    <span>{notice.regdate}</span>
+                                                      <p>{notice.title}</p>
+                                                        <span>
+                                                          {notice.regdate
+                                                            ? format(new Date(notice.regdate), "yyyy.MM.dd HH:mm", { locale: ko })
+                                                            : ""}
+                                                        </span>
                                                     </Link>
-                                                ))}
-                                                </div>
+                                              ))}
+                                            </div>
                                             </div>
                                         {/* <div className="menu-wrap">
                                             <div className="menu-item gray-alpha">
@@ -488,7 +494,7 @@ const Index = () => {
                     </div>
                 </div>
                 {/* 퀵 메뉴 */}
-        <div className="temhabank-N6" id="izmDzppO1O">
+        {/* <div className="temhabank-N6" id="izmDzppO1O">
           <div className="contents-container">
             <button
               type="button"
@@ -531,7 +537,7 @@ const Index = () => {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
         {/* 🔵 SIGNMATE 배너 */}
         <SignmateHeroBanner

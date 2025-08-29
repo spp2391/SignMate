@@ -2,12 +2,17 @@ package org.zerock.signmate.notice.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.zerock.signmate.notice.dto.NoticeBoardDTO;
 import org.zerock.signmate.notice.service.NoticeBoardService;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -16,14 +21,27 @@ import java.util.List;
 public class NoticeBoardController {
 
     private final NoticeBoardService noticeService;
+    private final String UPLOAD_DIR = "uploads/";
 
     // 공지사항 등록
     @PostMapping
+//    @PreAuthorize("hasRole('ADMIN')")
     public NoticeBoardDTO createNotice(
             @RequestParam String title,
             @RequestParam String content,
             @RequestParam(value = "images", required = false) MultipartFile[] images
     ) throws IOException {
+        // 업로드 디렉토리 생성
+//        File dir = new File(UPLOAD_DIR);
+//        if (!dir.exists()) dir.mkdirs();
+//
+//        for (MultipartFile img : images) {
+//            // 저장할 파일명
+//            String fileName = System.currentTimeMillis() + "_" + img.getOriginalFilename();
+//            Path filePath = Paths.get(UPLOAD_DIR, fileName);
+//            Files.write(filePath, img.getBytes());
+//        }
+
         NoticeBoardDTO dto = NoticeBoardDTO.builder()
                 .title(title)
                 .content(content)

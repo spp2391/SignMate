@@ -7,6 +7,9 @@ import logo from "../../assets/images/logo.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
 import NotificationBell from "../../pages/NotificationBell";
 import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFaceSmile } from "@fortawesome/free-regular-svg-icons"; 
+import { faHandshake } from "@fortawesome/free-solid-svg-icons";
 
 
 const Header = ({isLoggedIn, loginUser}) => {
@@ -39,7 +42,7 @@ const Header = ({isLoggedIn, loginUser}) => {
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/guide">
                                         <span>이용안내</span>
                                     </Link>
                                 </li>
@@ -75,7 +78,12 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 {isLoggedIn ? 
                                     <li className="auth-menu" >
                                         <Link className="header-gnblink" to="/">
-                                            <span>{loginUser.name}</span>
+                                            <span>
+                                            {/* <FontAwesomeIcon icon={faHandshake} style={{ marginRight: "8px", color: "#ebd725ff" }} /> */}
+                                            <FontAwesomeIcon icon={faFaceSmile} style={{ marginRight: "8px", color: "#259cebff" }} size={40} />
+                                            {loginUser.name} 님 환영합니다.
+                                            
+                                            </span>
                                         </Link>
                                     </li> : ""
                                 }
@@ -156,7 +164,7 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
+                                <Link className="h5 fullmenu-gnblink" to="/guide">
                                     <span>이용안내</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">

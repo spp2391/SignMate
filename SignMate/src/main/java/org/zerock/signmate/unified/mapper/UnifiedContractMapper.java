@@ -1,14 +1,13 @@
-package org.zerock.signmate.Contract.mapper;
+package org.zerock.signmate.unified.mapper;
 
 import org.springframework.stereotype.Component;
 import org.zerock.signmate.Contract.domain.Contract;
-import org.zerock.signmate.Contract.dto.UnifiedContractDto;
+import org.zerock.signmate.unified.dto.UnifiedContractDto;
 import org.zerock.signmate.Contract.business.domain.BusinessOutsourcingContract;
 import org.zerock.signmate.Contract.newservice.domain.ServiceContractDocument;
 import org.zerock.signmate.Contract.secret.domain.Secret;
 import org.zerock.signmate.Contract.supply.domain.SupplyContract;
 import org.zerock.signmate.Contract.standard.domain.Standard;
-import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDate;
 

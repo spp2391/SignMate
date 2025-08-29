@@ -1,6 +1,7 @@
 // src/pages/NoticePage.jsx
 import React, { useState, useEffect } from "react";
-
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
 
 export default function NoticePage() {
   const [notices, setNotices] = useState([]);
@@ -53,7 +54,7 @@ export default function NoticePage() {
     );
 
   return (
-    <div className="max-w-[140rem] mx-auto px-6 py-16">
+    <div className="max-w-[140rem] mx-auto px-6 py-16" style={{ marginBottom: "300px" }}>
       <h1 className="text-center font-bold mb-12 text-[40px]">공지사항</h1>
 
       {/* 검색 + 글쓰기 */}
@@ -66,7 +67,7 @@ export default function NoticePage() {
           className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[20px]"
         />
         <a
-          href="/notice/create"
+          href="/uploadnotice"
           className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-[20px]"
         >
           공지사항 글쓰기
@@ -118,6 +119,11 @@ function NoticeCard({ notice, isExpanded, toggleExpand, openModal }) {
   const nextImage = () => setCurrentImg((prev) => (prev + 1) % images.length);
   const prevImage = () => setCurrentImg((prev) => (prev - 1 + images.length) % images.length);
 
+  // 날짜 포맷 적용
+  const formattedDate = notice.regdate
+    ? format(new Date(notice.regdate), "yyyy.MM.dd HH:mm", { locale: ko })
+    : "";
+
   return (
     <div className="bg-white border rounded-lg shadow hover:shadow-xl overflow-hidden transition cursor-pointer">
       {/* 이미지 슬라이더 */}
@@ -161,7 +167,7 @@ function NoticeCard({ notice, isExpanded, toggleExpand, openModal }) {
           <span className="text-orange-500 font-semibold">
             {notice.category || "공지사항"}
           </span>
-          <span className="text-gray-400">— {notice.regdate}</span>
+          <span className="text-gray-400">— {formattedDate}</span>
         </div>
 
         <h2

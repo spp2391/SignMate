@@ -1,19 +1,16 @@
 // src/main/java/org/zerock/signmate/Contract/service/UnifiedContractService.java
-package org.zerock.signmate.Contract.service;
+package org.zerock.signmate.unified.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.zerock.signmate.Contract.business.repository.BusinessOutsourcingContractRepository;
-import org.zerock.signmate.Contract.dto.UnifiedContractDto;
+import org.zerock.signmate.unified.dto.UnifiedContractDto;
 import org.zerock.signmate.Contract.dto.UserDashboardDTO;
 import org.zerock.signmate.Contract.newservice.repository.ServiceContractDocumentRepository;
 import org.zerock.signmate.Contract.secret.repository.SecretRepository;
 import org.zerock.signmate.Contract.standard.repository.StandardRepository;
 import org.zerock.signmate.Contract.supply.repository.SupplyContractRepository;
-import org.zerock.signmate.Contract.mapper.UnifiedContractMapper;
-import org.zerock.signmate.Contract.secret.domain.Secret;
-import org.zerock.signmate.Contract.standard.domain.Standard;
-import org.zerock.signmate.Contract.supply.domain.SupplyContract;
+import org.zerock.signmate.unified.mapper.UnifiedContractMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

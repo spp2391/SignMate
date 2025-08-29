@@ -18,7 +18,8 @@ function StatusBadge({ status }) {
   const Icon = meta.Icon;
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-medium ${meta.className}`}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-2 text-xs font-medium ${meta.className}`}
+      style={{fontSize:"15px"}}
     >
       <Icon className="h-3.5 w-3.5" />
       {meta.label}
@@ -52,17 +53,18 @@ export function ListView({ docs, selected, setSelected }) {
             checked={allChecked}
             onChange={(e) => toggleAll(e.target.checked)}
           />
-          <span>제목</span>
+          <span style={{fontSize:"15px"}}>제목</span>
         </div>
-        <div className="col-span-2">유형</div>
-        <div className="col-span-2">상태</div>
-        <div className="col-span-2">최근 수정</div>
+        <div className="col-span-2" style={{fontSize:"15px"}}>유형</div>
+        <div className="col-span-2" style={{fontSize:"15px"}}>상태</div>
+        <div className="col-span-2" style={{fontSize:"15px"}}>최근 수정</div>
       </div>
 
       {docs.map((d) => (
         <div
           key={d.contractId}
           className="grid grid-cols-12 items-center gap-2 border-b p-3 hover:bg-neutral-50"
+          style={{fontSize:"25px"}}
         >
           <div className="col-span-6 flex items-center gap-3">
             <input
@@ -73,30 +75,25 @@ export function ListView({ docs, selected, setSelected }) {
               }
             />
             <div className="flex items-start gap-3">
-              <div className="mt-0.5 hidden sm:block">
-                <FileText className="h-5 w-5 text-neutral-500" />
+              <div className="mt-3 hidden sm:block" >
+                <FileText className="h-10 w-7 text-neutral-600" />
               </div>
               <div className="cursor-pointer" onClick={() => goDetail(d)}>
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-medium leading-tight">
+                  <span className="font-medium leading-tight" >
                     {d.title || CONTRACT_TYPE_LABEL[d.contractType] || "-"}
                   </span>
                   <StatusBadge status={d.status} />
-                  <span className="rounded-full border px-2 py-0.5 text-xs bg-neutral-100">
-                    요청자
-                  </span>
                 </div>
-                <div className="text-xs text-neutral-500 mt-0.5">
+                <div className="text-xs text-neutral-500 mt-0.5" style={{fontSize:"12px"}}>
                   {d.writerName+","+ d.receiverName|| "-"}
-               
-                  {d.address ? `, ${d.address}` : ""}
                 </div>
               </div>
             </div>
           </div>
 
           <div className="col-span-2">
-            <span className="rounded-full border px-2 py-0.5 text-xs">
+            <span className="rounded-full border px-3 py-2 text-xs" style={{fontSize:"15px"}}>
               {CONTRACT_TYPE_LABEL[d.contractType] ?? d.contractType}
             </span>
           </div>
@@ -105,7 +102,7 @@ export function ListView({ docs, selected, setSelected }) {
             <StatusBadge status={d.status} />
           </div>
 
-          <div className="col-span-2 text-sm">
+          <div className="col-span-2 text-sm" style={{fontSize:"15px"}}>
             
              {formatLocalDateTime(d.contractEndDate)}
           </div>
