@@ -1,57 +1,84 @@
 package org.zerock.signmate.notice.controller;
 
-import org.springframework.http.ResponseEntity;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.zerock.signmate.notice.dto.NoticeBoardDTO;
 import org.zerock.signmate.notice.service.NoticeBoardService;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
-    @RequestMapping("/api/notices")
+@RequestMapping("/api/notices")
+@RequiredArgsConstructor
 public class NoticeBoardController {
 
-    private final NoticeBoardService noticeBoardService;
+    private final NoticeBoardService noticeService;
+    private final String UPLOAD_DIR = "uploads/";
 
-    public NoticeBoardController(NoticeBoardService noticeBoardService) {
-        this.noticeBoardService = noticeBoardService;
-    }
-
-    /** 전체 공지사항 목록 */
-    @GetMapping
-    public List<NoticeBoardDTO> getAll() {
-        return noticeBoardService.getList();
-    }
-
-    /** 공지사항 상세 조회 */
-    @GetMapping("/{nbno}")
-    public ResponseEntity<NoticeBoardDTO> getOne(@PathVariable Long nbno) {
-        NoticeBoardDTO dto = noticeBoardService.get(nbno);
-        return ResponseEntity.ok(dto);
-    }
-
-    /** 글 등록 처리 (ADMIN만 가능) */
-    @PreAuthorize("hasRole('ADMIN')")
+    // 공지사항 등록
     @PostMapping
-    public ResponseEntity<NoticeBoardDTO> create(@RequestBody NoticeBoardDTO dto) {
-        NoticeBoardDTO savedDto = noticeBoardService.register(dto); // DB 저장 후 DTO 반환
-        return ResponseEntity.ok(savedDto);
+//    @PreAuthorize("hasRole('ADMIN')")
+    public NoticeBoardDTO createNotice(
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam(value = "images", required = false) MultipartFile[] images
+    ) throws IOException {
+        // 업로드 디렉토리 생성
+//        File dir = new File(UPLOAD_DIR);
+//        if (!dir.exists()) dir.mkdirs();
+//
+//        for (MultipartFile img : images) {
+//            // 저장할 파일명
+//            String fileName = System.currentTimeMillis() + "_" + img.getOriginalFilename();
+//            Path filePath = Paths.get(UPLOAD_DIR, fileName);
+//            Files.write(filePath, img.getBytes());
+//        }
+
+        NoticeBoardDTO dto = NoticeBoardDTO.builder()
+                .title(title)
+                .content(content)
+                .build();
+        return noticeService.register(dto, images);
     }
 
-    /** 글 수정 처리 (ADMIN만 가능) */
-    @PreAuthorize("hasRole('ADMIN')")
+    // 공지사항 리스트 조회
+    @GetMapping
+    public List<NoticeBoardDTO> getNotices() {
+        return noticeService.getList();
+    }
+
+    // 공지사항 단일 조회
+    @GetMapping("/{nbno}")
+    public NoticeBoardDTO getNotice(@PathVariable Long nbno) {
+        return noticeService.get(nbno);
+    }
+
+    // 공지사항 수정
     @PutMapping("/{nbno}")
-    public ResponseEntity<NoticeBoardDTO> update(@PathVariable Long nbno, @RequestBody NoticeBoardDTO dto) {
-        NoticeBoardDTO updatedDto = noticeBoardService.modify(nbno, dto);
-        return ResponseEntity.ok(updatedDto);
+    public NoticeBoardDTO updateNotice(
+            @PathVariable Long nbno,
+            @RequestParam String title,
+            @RequestParam String content,
+            @RequestParam(value = "images", required = false) MultipartFile[] images
+    ) throws IOException {
+        NoticeBoardDTO dto = NoticeBoardDTO.builder()
+                .title(title)
+                .content(content)
+                .build();
+        return noticeService.modify(nbno, dto, images);
     }
 
-    /** 글 삭제 처리 (ADMIN만 가능) */
-    @PreAuthorize("hasRole('ADMIN')")
+    // 공지사항 삭제
     @DeleteMapping("/{nbno}")
-    public ResponseEntity<Void> delete(@PathVariable Long nbno) {
-        noticeBoardService.remove(nbno);
-        return ResponseEntity.noContent().build();
+    public void deleteNotice(@PathVariable Long nbno) {
+        noticeService.remove(nbno);
     }
 }

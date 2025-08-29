@@ -28,99 +28,60 @@ import Dashboard from "../../components/Dashboard";
 import kakao from "../../assets/icons/kakao_icon.png"
 import naver from "../../assets/icons/naver_icon.png"
 import { motion } from "framer-motion";
+import UseCases from "../../components/UseCases";
+import { format } from "date-fns";
+import { ko } from "date-fns/locale";
+
 
 // 🔵 SignmateHeroBanner 컴포넌트 + AlertCard 내부 포함
-// function SignmateHeroBanner({ kakaoSrc, mailSrc, className = "" }) {
-//   const textVariants = {
-//     hidden: { opacity: 0, y: 30 },
-//     visible: (i) => ({
-//       opacity: 1,
-//       y: 0,
-//       transition: { delay: i * 0.3, duration: 0.6 },
-//     }),
-//   };
-
-//   const lines = [
-//     "이메일, 카카오톡으로",
-//     "직접 서명해 보세요",
-//     "상대방의 서명을 체험해 보세요!",
-//     "회원가입 없이 간편하게 서명할 수 있어요."
-//   ];
-
-//   return (
-//     <section
-//       className={"w-full bg-gradient-to-br from-sky-100 via-cyan-100 to-teal-100" + " " + className}
-//       aria-label="SIGNMATE 소개 배너"
-//     >
-//       <div className="mx-auto max-w-[2000px] px-6 sm:px-10 lg:px-16 2xl:px-24 py-14 sm:py-20 lg:py-28">
-//         <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
-//           {/* Left */}
-//           <div>
-//             {lines.map((line, index) => (
-//               <motion.div
-//                 key={index}
-//                 custom={index}
-//                 initial="hidden"
-//                 whileInView="visible"
-//                 variants={textVariants}
-//                 viewport={{ once: true }}
-//                 className="block font-bold"
-//                 style={{
-//                   paddingLeft: index < 2 ? "300px" : "350px",
-//                   margin: "10px 0",
-//                   fontSize: index < 2 ? "65px" : "30px"
-//                 }}
-//               >
-//                 {line}
-//               </motion.div>
-//             ))}
-//           </div>
-
-//           {/* Right */}
-//           <div className="flex flex-col gap-6 items-start">
-//             <AlertCard
-//               imgSrc={kakaoSrc}
-//               imgAlt="KakaoTalk"
-//               title="SIGNMATE"
-//               message="근로계약서 서명 요청합니다."
-//               badgeText="알림"
-//             />
-//             <AlertCard
-//               imgSrc={mailSrc}
-//               imgAlt="메일"
-//               title="SIGNMATE"
-//               message="동의서에 서명할 차례입니다."
-//               badgeText="알림"
-//             />
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// }
 function SignmateHeroBanner({ kakaoSrc, mailSrc, className = "" }) {
+  const textVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      transition: { delay: i * 0.3, duration: 0.6 },
+    }),
+  };
+
+  const lines = [
+    "이메일, 카카오톡으로",
+    "직접 서명해 보세요",
+    "상대방의 서명을 체험해 보세요!",
+    "회원가입 없이 간편하게 서명할 수 있어요."
+  ];
+
   return (
     <section
-      className={
-        "w-full bg-gradient-to-br from-sky-100 via-cyan-100 to-teal-100" +
-        " " + className
-      }
+      className={"w-full bg-gradient-to-br from-sky-100 via-cyan-100 to-teal-100" + " " + className}
       aria-label="SIGNMATE 소개 배너"
     >
       <div className="mx-auto max-w-[2000px] px-6 sm:px-10 lg:px-16 2xl:px-24 py-14 sm:py-20 lg:py-28">
         <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
           {/* Left */}
           <div>
-            <h1 className="font-bold leading-tight text-slate-900 tracking-tight text-4xl sm:text-5xl lg:text-6xl 2xl:text-7xl">
-              <span className="block" style={{paddingLeft : "300px", margin : "10px", fontSize : "65px"}}>이메일, 카카오톡으로</span>
-              <span className="block" style={{paddingLeft : "300px", margin : "10px", marginBottom: "40px", fontSize : "60px"}}>직접 서명해 보세요</span>
-            </h1>
-            <span className="mt-8 text-slate-800 text-lg sm:text-xl lg:text-2xl" style={{paddingLeft : "350px", fontSize : "30px"}}>
-              상대방의 서명을 체험해 보세요! </span>
-              <span className="hidden sm:block" style={{paddingLeft : "350px", fontSize : "30px"}}>
-              회원가입 없이 간편하게 서명할 수 있어요. </span>
-            
+            {lines.map((line, index) => (
+              <motion.div
+                key={index}
+                custom={index}
+                initial="hidden"
+                whileInView="visible"
+                variants={textVariants}
+                viewport={{ once: true }}
+                className="block font-bold"
+                style={{
+                  paddingLeft: index < 2 ? "300px" : "350px",
+                  paddingTop: index < 2 ?  "20px" : "0px",
+                  paddingBottom: index < 2 ?  "20px" : "0px",
+                  margin: "10px 0",
+                  fontSize: index < 2 ? "65px" : "30px"
+                }}
+              >
+                {line}
+              </motion.div>
+            ))}
           </div>
+
           {/* Right */}
           <div className="flex flex-col gap-6 items-start">
             <AlertCard
@@ -143,6 +104,51 @@ function SignmateHeroBanner({ kakaoSrc, mailSrc, className = "" }) {
     </section>
   );
 }
+// function SignmateHeroBanner({ kakaoSrc, mailSrc, className = "" }) {
+//   return (
+//     <section
+//       className={
+//         "w-full bg-gradient-to-br from-sky-100 via-cyan-100 to-teal-100" +
+//         " " + className
+//       }
+//       aria-label="SIGNMATE 소개 배너"
+//     >
+//       <div className="mx-auto max-w-[2000px] px-6 sm:px-10 lg:px-16 2xl:px-24 py-14 sm:py-20 lg:py-28">
+//         <div className="grid items-center gap-10 lg:gap-16 lg:grid-cols-2">
+//           {/* Left */}
+//           <div>
+//             <h1 className="font-bold leading-tight text-slate-900 tracking-tight text-4xl sm:text-5xl lg:text-6xl 2xl:text-7xl">
+//               <span className="block" style={{paddingLeft : "300px", margin : "10px", fontSize : "65px"}}>이메일, 카카오톡으로</span>
+//               <span className="block" style={{paddingLeft : "300px", margin : "10px", marginBottom: "40px", fontSize : "60px"}}>직접 서명해 보세요</span>
+//             </h1>
+//             <span className="mt-8 text-slate-800 text-lg sm:text-xl lg:text-2xl" style={{paddingLeft : "350px", fontSize : "30px"}}>
+//               상대방의 서명을 체험해 보세요! </span>
+//               <span className="hidden sm:block" style={{paddingLeft : "350px", fontSize : "30px"}}>
+//               회원가입 없이 간편하게 서명할 수 있어요. </span>
+            
+//           </div>
+//           {/* Right */}
+//           <div className="flex flex-col gap-6 items-start">
+//             <AlertCard
+//               imgSrc={kakaoSrc}
+//               imgAlt="KakaoTalk"
+//               title="SIGNMATE"
+//               message="근로계약서 서명 요청합니다."
+//               badgeText="알림"
+//             />
+//             <AlertCard
+//               imgSrc={mailSrc}
+//               imgAlt="메일"
+//               title="SIGNMATE"
+//               message="동의서에 서명할 차례입니다."
+//               badgeText="알림"
+//             />
+//           </div>
+//         </div>
+//       </div>
+//     </section>
+//   );
+// }
 
 // AlertCard 내부 컴포넌트
 function AlertCard({ imgSrc, imgAlt, title, message, badgeText }) {
@@ -205,17 +211,17 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:8080/contracts/user/3")
-      .then((res) => res.json())
-      .then((json) => {
-        setContract(json.contracts);
-        setDashboard(json.dashboard);
-        setIsLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setIsLoading(false);
-      });
+    // fetch("http://localhost:8080/contracts/user/3")
+    //   .then((res) => res.json())
+    //   .then((json) => {
+    //     setContract(json.contracts);
+    //     setDashboard(json.dashboard);
+    //     setIsLoading(false);
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //     setIsLoading(false);
+    //   });
 
     fetch("/api/notices", {
       headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
@@ -364,13 +370,17 @@ const Index = () => {
                                                 </Link>
                                                 </div>
                                                 <div className="notice-list">
-                                                {notices.slice(0, 2).map((notice) => (
+                                                  {notices.slice(0, 10).map((notice) => (
                                                     <Link key={notice.nbno} to={`/notice/${notice.nbno}`}>
-                                                    <p>{notice.title}</p>
-                                                    <span>{notice.regdate}</span>
+                                                      <p>{notice.title}</p>
+                                                        <span>
+                                                          {notice.regdate
+                                                            ? format(new Date(notice.regdate), "yyyy.MM.dd HH:mm", { locale: ko })
+                                                            : ""}
+                                                        </span>
                                                     </Link>
-                                                ))}
-                                                </div>
+                                              ))}
+                                            </div>
                                             </div>
                                         {/* <div className="menu-wrap">
                                             <div className="menu-item gray-alpha">
@@ -484,7 +494,7 @@ const Index = () => {
                     </div>
                 </div>
                 {/* 퀵 메뉴 */}
-        <div className="temhabank-N6" id="izmDzppO1O">
+        {/* <div className="temhabank-N6" id="izmDzppO1O">
           <div className="contents-container">
             <button
               type="button"
@@ -527,13 +537,14 @@ const Index = () => {
               </li>
             </ul>
           </div>
-        </div>
+        </div> */}
 
         {/* 🔵 SIGNMATE 배너 */}
         <SignmateHeroBanner
           kakaoSrc={kakao}
           mailSrc={naver}
         />
+        <UseCases />
       </div>
     </main>
   );

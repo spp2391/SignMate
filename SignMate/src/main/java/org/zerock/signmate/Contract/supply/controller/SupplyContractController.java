@@ -2,9 +2,11 @@ package org.zerock.signmate.Contract.supply.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.signmate.Contract.supply.dto.SupplyContractDTO;
 import org.zerock.signmate.Contract.supply.service.SupplyContractService;
+import org.zerock.signmate.notification.service.NotificationService;
 
 import java.util.Map;
 
@@ -14,7 +16,7 @@ import java.util.Map;
 public class SupplyContractController {
 
     private final SupplyContractService supplyContractService;
-
+    private final NotificationService notificationService;
     // Contract 기준 저장 (POST = 새 작성, PUT = 수정)
     @PostMapping
     public ResponseEntity<?> createOrUpdateSupply(@RequestBody SupplyContractDTO dto) {
@@ -44,14 +46,16 @@ public class SupplyContractController {
         return ResponseEntity.ok(dto);
     }
 
-    // ContractId 기준 삭제
-//    @DeleteMapping("/{contractId}")
-//    public ResponseEntity<?> deleteSupply(@PathVariable Long contractId) {
-//        try {
-//            supplyContractService.deleteByContractId(contractId);
-//            return ResponseEntity.ok(Map.of("message", "자재/물품 공급계약서가 삭제되었습니다."));
-//        } catch (Exception e) {
-//            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
-//        }
-//    }
+
+    @DeleteMapping("/{contractId}")
+    public ResponseEntity<?> deleteSupply(@PathVariable Long contractId, Authentication authentication) {
+        try {
+            SupplyContractDTO dto= supplyContractService.findByContractId(contractId);
+            supplyContractService.deleteById(dto.getId() , authentication);
+            notificationService.deleteNotificationsByContractId(contractId);
+            return ResponseEntity.ok(Map.of("message", "자재/물품 공급계약서가 삭제되었습니다."));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("message", "삭제 중 오류: " + e.getMessage()));
+        }
+    }
 }

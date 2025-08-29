@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 import { getLoginUserName } from "./util";
@@ -132,7 +132,7 @@ export default function EmploymentContractPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   // handleChange: SecretPage처럼 debounced 처리
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
@@ -243,6 +243,7 @@ export default function EmploymentContractPage() {
       }));
 
       alert("계약서 제출 완료! ID = " + result.id);
+      navigate("/");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -257,8 +258,10 @@ export default function EmploymentContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave}
+         submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -273,7 +276,7 @@ export default function EmploymentContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "계약서 저장"}
-      </button>
+      </button> */}
     </div>
   );
 }

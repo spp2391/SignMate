@@ -9,6 +9,7 @@ import org.zerock.signmate.visualization.dto.UserDashboardDTO;
 import org.zerock.signmate.visualization.repository.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -28,10 +29,10 @@ public class UserDashboardService {
 
         long total = contracts.size();
         long active = contracts.stream()
-                .filter(c -> c.getContractEndDate() != null && c.getContractEndDate().isAfter(LocalDate.now()))
+                .filter(c -> c.getContractEndDate() != null && c.getContractEndDate().isAfter(LocalDateTime.now()))
                 .count();
         long completed = contracts.stream()
-                .filter(c -> c.getContractEndDate() != null && !c.getContractEndDate().isAfter(LocalDate.now()))
+                .filter(c -> c.getContractEndDate() != null && !c.getContractEndDate().isAfter(LocalDateTime.now()))
                 .count();
 
         long standardCount = contracts.stream().filter(c -> "STANDARD".equals(c.getType())).count();

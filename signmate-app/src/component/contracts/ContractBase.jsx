@@ -19,6 +19,8 @@ export default function ContractBase({
   role = "sender",
   data = {},
   handleChange = () => {},
+  onSubmit,             
+  submitting = false,
 }) {
   const [title, setTitle] = useState(template.name);
   const [form, setForm] = useState(() => JSON.parse(JSON.stringify(data || {})));
@@ -263,12 +265,22 @@ export default function ContractBase({
             <div style={{display:"flex", gap:8}}>
               <button className="btn" onClick={clearSignature}>지우기</button>
               <button className="btn primary" onClick={applySignature}>서명 적용</button>
+              {onSubmit && (
+                            <button 
+                              className="btn primary"
+                              onClick={onSubmit}
+                              disabled={submitting}
+                            >
+                              {submitting ? "제출 중..." : "제출하기"}
+                            </button>
+                          )}
             </div>
           </div>
 
           {/* PDF 버튼 — sender/receiver 모두 표시 */}
           <div className="mb" style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
             <button className="btn primary" onClick={savePDF}>PDF로 저장</button>
+            
           </div>
         </div>
 
@@ -318,7 +330,7 @@ export default function ContractBase({
         textarea.ipt{min-height:96px}
 
         .btn{border:1px solid #222;border-radius:10px;padding:8px 12px;background:#fff;cursor:pointer}
-        .btn.primary{background:#111;color:#fff}
+        .btn.primary{background:#4075BD;color:#fff}
 
         .preview{border:1px solid #e5e7eb;border-radius:12px;padding:0;background:#f9fafb}
         .sticky{position:sticky; top:12px; align-self:start; height:fit-content}

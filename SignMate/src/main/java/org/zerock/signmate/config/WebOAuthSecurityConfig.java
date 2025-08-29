@@ -72,7 +72,7 @@ public class WebOAuthSecurityConfig {
 //                )
                 .authorizeRequests(auth-> auth
                         //아무런 권한이 없어도 실행 가능한 Mapping설정
-                        .requestMatchers("/api/token","/api/user/**").permitAll()
+                        .requestMatchers("/api/token","/api/user/**", "/api/image/**").permitAll()
                         //로그인을 해야만 실행 가능한 매핑
                         .requestMatchers("/api/**").authenticated()
                         //위 두개를 제외한 모든 mapping은 권한 없어도 실행가능하도록

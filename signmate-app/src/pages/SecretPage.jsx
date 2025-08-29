@@ -1,7 +1,7 @@
 // SecretPage.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 
@@ -51,7 +51,7 @@ const ndaTemplate = {
     { type: "text", name: "receiverAddress", label: "을 주소" },
 
     { type: "section", label: "기간/목적" },
-    { type: "date", name: "effectiveDate",   label: "발효일" },
+    // { type: "date", name: "effectiveDate",   label: "발효일" },
     { type: "textarea", name: "purpose", label: "정보 제공 목적" },
     { type: "text", name: "contractDurationMonths",    label: "계약기간(개월)" },
     { type: "text", name: "confidentialityDurationYears", label: "비밀유지 존속기간(년)" },
@@ -102,7 +102,7 @@ export default function SecretPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
   }, []);
@@ -193,7 +193,10 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-        effectiveDate: formData.effectiveDate || null,
+    //     effectiveDate: formData.effectiveDate 
+    // ? formData.effectiveDate + "T00:00:00"
+    // : null,
+
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
         governingLaw: formData.governingLaw,
@@ -219,6 +222,7 @@ export default function SecretPage() {
       setFormData(prev => ({
         ...prev,
         ...data,
+        // effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : prev.effectiveDate,
         sign: {
           discloser: data.writerSignature || prev.sign.discloser,
           recipient: data.receiverSignature || prev.sign.recipient
@@ -226,6 +230,7 @@ export default function SecretPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
       if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
     } catch (err) {
@@ -237,8 +242,8 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} />
-      <button
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} onSubmit={handleSave} submitting={loadingSubmit}   />
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -253,7 +258,7 @@ export default function SecretPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }

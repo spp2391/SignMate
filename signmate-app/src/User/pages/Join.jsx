@@ -1,14 +1,9 @@
 import JoinInputArea from "../component/form/JoinInputArea";
-import Header from "../component/ui/Header";
 
 const Join = () => {
     return (
         <div>
-            <Header/>
-            <div>
-                <JoinInputArea />
-            </div>
-            {/* Footer */}
+            <JoinInputArea />
         </div>
     )
 }

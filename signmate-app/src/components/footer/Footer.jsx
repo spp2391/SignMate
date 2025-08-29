@@ -27,7 +27,7 @@ const Footer = () => {
                                         <span>개인정보처리방침</span>
                                     </Link>
                                 </li>
-                                <li className="footer-menulink">
+                                {/* <li className="footer-menulink">
                                     <Link to="javascript:void(0)">
                                         <span>푸터메뉴1</span>
                                     </Link>
@@ -36,20 +36,20 @@ const Footer = () => {
                                     <Link to="javascript:void(0)">
                                         <span>푸터메뉴2</span>
                                     </Link>
-                                </li>
+                                </li> */}
                             </ul>
                             <div className="footer-txtgroup">
-                                <address class="footer-txt">
-                                    <p class="p2">
+                                <address className="footer-txt">
+                                    <p className="p2">
                                         부산광역시 부산진구 중앙대로 708 부산파이낸스센터 4F, 5F 부산IT교육센터
                                     </p>
                                     <p>
-                                        <span class="p2">T_ 051.753.5600 </span>
-                                        <span class="p2">F_ 051.753.5117</span>
+                                        <span className="p2">T_ 051.753.5600 </span>
+                                        <span className="p2">F_ 051.753.5117</span>
                                     </p>
                                 </address>
-                                <div class="footer-txt">
-                                    <p class="p2">Ⓒ BUSAN HUMAN RESOURCES DEVELOPMENT INSTITUTE. ALL RIGHTS RESEVED</p>
+                                <div className="footer-txt">
+                                    <p className="p2">Ⓒ BUSAN HUMAN RESOURCES DEVELOPMENT INSTITUTE. ALL RIGHTS RESEVED</p>
                                 </div>
                             </div>
                         </div>

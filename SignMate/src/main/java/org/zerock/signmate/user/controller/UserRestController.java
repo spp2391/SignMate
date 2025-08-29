@@ -1,10 +1,12 @@
 package org.zerock.signmate.user.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import net.minidev.json.JSONObject;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,7 @@ import org.zerock.signmate.config.jwt.TokenProvider;
 import org.zerock.signmate.user.OAuth2User.CustomOAuth2User;
 import org.zerock.signmate.user.domain.User;
 import org.zerock.signmate.user.dto.AddUserRequest;
+import org.zerock.signmate.user.dto.EditUserRequest;
 import org.zerock.signmate.user.dto.LoginUserRequest;
 import org.zerock.signmate.user.service.UserRegisterService;
 import org.zerock.signmate.user.service.UserService;
@@ -43,15 +46,31 @@ public class UserRestController {
                                            BindingResult bindingResult ) {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.badRequest().body("회원정보를 올바르게 입력해주세요.");
         }
         try{
             User newUser = userRegisterService.register(dto);
 //            session.setAttribute("userId", newUser.getUserId());
-            return ResponseEntity.ok("success");
+            return ResponseEntity.ok("회원가입애 성공했습니다.");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("문제가 발생했습니다.");
+        }
+    }
+
+    @PostMapping("/edit")
+    public ResponseEntity<String> edit(@Valid @RequestBody EditUserRequest dto,
+                                       @AuthenticationPrincipal CustomOAuth2User user,
+                                       BindingResult bindingResult ) {
+        if (bindingResult.hasErrors()) {
+            bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
+            return ResponseEntity.badRequest().body("fail");
+        }
+        try {
+            userRegisterService.editUser(user, dto);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("fail");
         }
+        return null;
     }
 
     @PostMapping(value="/login",consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +78,7 @@ public class UserRestController {
                                         BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors().forEach(error -> System.out.println(error.getDefaultMessage()));
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.badRequest().body("이메일과 비밀번호를 올바르게 입력해주세요.");
         }
         try {
             User loginUser = userRegisterService.findUserByEmailAndPassword(dto);
@@ -75,16 +94,22 @@ public class UserRestController {
 
             return ResponseEntity.ok(accessToken);
         } catch (UsernameNotFoundException e) {
-            return ResponseEntity.badRequest().body("User not found");
+            return ResponseEntity.badRequest().body("이메일 또는 비밀번호가 일치하지 않습니다.");
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("fail");
+            return ResponseEntity.badRequest().body("문제가 발생했습니다.");
         }
     }
 
     @PostMapping("/logout")
-    public void logout(HttpSession session) {
-        session.invalidate();
+    public HttpServletResponse logout(HttpServletResponse response) {
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setMaxAge(0);
+        cookie.setPath("/");
+        cookie.setDomain("localhost");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+        return response;
     }
 
     @PostMapping("/checklogin")
@@ -99,6 +124,11 @@ public class UserRestController {
 
     @PostMapping("/checkloginuser")
     public ResponseEntity<User> checkLoginUser(@AuthenticationPrincipal CustomOAuth2User user) {
-        return ResponseEntity.ok(user.getUser());
+        try {
+            return ResponseEntity.ok(user.getUser());
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return ResponseEntity.noContent().build();
+        }
     }
 }

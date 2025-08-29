@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import ContractBase from "../component/contracts/ContractBase";
 import { debounce } from "lodash";
 import { getLoginUserName } from "./util";
-import { useParams } from "react-router-dom";
+import { useParams,useNavigate } from "react-router-dom";
 
 /** 용역계약서
  *  - 좌측 입력: 당사자, 과업기간, 금액, 범위/산출물, 지급, 하자/지체, 서명일
@@ -112,7 +112,7 @@ export default function ServiceContractPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   // 로그인 사용자 이름 추출
     const loginUserName = getLoginUserName();
   
@@ -130,6 +130,7 @@ export default function ServiceContractPage() {
           setFormData(prev => ({
             ...prev,
             ...data,
+            signatureDate:data.signatureDate,
             sign: {
               discloser: data.writerSignature || prev.sign.discloser,
               recipient: data.receiverSignature || prev.sign.recipient
@@ -206,7 +207,7 @@ export default function ServiceContractPage() {
       const result = await res.json();
       alert("계약서 제출 완료!");
       console.log("서버 응답:", result);
-
+      navigate("/");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -223,8 +224,10 @@ export default function ServiceContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave} 
+        submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -239,7 +242,7 @@ export default function ServiceContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }
