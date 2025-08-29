@@ -19,7 +19,6 @@ public class UserListDto {
     private String name;
     private String email;
     private String role;
-    private String type;
     private LocalDateTime regdate;
 
 
@@ -29,7 +28,6 @@ public class UserListDto {
                 .name(u.getName())
                 .email(u.getEmail())
                 .role(u.getUserRole())
-                .type(u.getUserType())
                 .regdate(u.getRegdate())
                 .build();
     }

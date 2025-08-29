@@ -42,7 +42,7 @@ const Header = ({isLoggedIn, loginUser}) => {
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/guide">
                                         <span>이용안내</span>
                                     </Link>
                                 </li>
@@ -164,7 +164,7 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
+                                <Link className="h5 fullmenu-gnblink" to="/guide">
                                     <span>이용안내</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
