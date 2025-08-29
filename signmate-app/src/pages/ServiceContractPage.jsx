@@ -130,7 +130,6 @@ export default function ServiceContractPage() {
           setFormData(prev => ({
             ...prev,
             ...data,
-            signatureDate:data.signatureDate,
             sign: {
               discloser: data.writerSignature || prev.sign.discloser,
               recipient: data.receiverSignature || prev.sign.recipient

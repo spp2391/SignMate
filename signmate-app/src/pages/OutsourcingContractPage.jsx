@@ -157,7 +157,7 @@ export default function OutsourcingContractPage() {
           setFormData(prev => ({
             ...prev,
             ...data,
-            signatureDate:data.signatureDate,
+           
             sign: {
               discloser: data.writerSignature || prev.sign.discloser,
               recipient: data.receiverSignature || prev.sign.recipient
@@ -203,8 +203,7 @@ export default function OutsourcingContractPage() {
         taskDescription: formData.taskDescription,
         totalPaymentAmount: formData.totalPaymentAmount,
          signatureDate: formData.signatureDate || null
-        ?formData.signatureDate + "T00:00:00"
-        : null,
+       ,
         governingLaw:formData.governingLaw,
         tasks: formData.tasks.map(item => ({
           category: item.category,
