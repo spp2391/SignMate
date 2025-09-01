@@ -121,7 +121,7 @@ export default function ServiceContractPage() {
   
       const fetchContract = async () => {
         try {
-          const res = await fetch(`/api/service/${contractId}`, {
+          const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/service/${contractId}`, {
             headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
           });
           if (!res.ok) throw new Error("계약서 로딩 실패");
@@ -195,7 +195,7 @@ export default function ServiceContractPage() {
       };
 
 
-       const url = contractId ? `/api/service/${contractId}` : `/api/service`;
+       const url = contractId ? process.env.REACT_APP_ABASE_URL+`/api/service/${contractId}` : `/api/service`;
       const method = contractId ? "PUT" : "POST";
       const res = await fetch(url, {
         method,

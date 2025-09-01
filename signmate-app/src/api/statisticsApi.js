@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/statistics';
+// const API_BASE_URL = 'http://springboot-developer-env.eba-jjxe7rgt.ap-northeast-2.elasticbeanstalk.com/api/statistics';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL+"/api/statistics";
 
 export const getCompanyStatistics = async (companyName) => {
   try {

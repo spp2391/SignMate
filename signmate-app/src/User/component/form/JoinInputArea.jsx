@@ -76,7 +76,7 @@ const JoinInputArea = () => {
         // if (state.userRole === "PRIVATE") {
         //     joinRequest.companyName = "";
         // }
-        fetch("http://localhost:8080/api/user/join", {
+        fetch(process.env.REACT_APP_ABASE_URL+`/api/user/join`, {
             method: "POST",
             credentials: "include",
             headers: {

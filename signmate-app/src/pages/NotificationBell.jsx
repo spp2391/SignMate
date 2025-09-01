@@ -32,7 +32,7 @@ export default function NotificationBell() {
   // 읽지 않은 알림 수 가져오기
   const fetchUnreadCount = async () => {
     try {
-      const res = await fetch("/api/notifications/unread-count", {
+      const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/notifications/unread-count`, {
         headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
       });
       if (res.ok) {

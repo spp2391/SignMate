@@ -32,7 +32,7 @@ const EditInputArea = ({ loginUser }) => {
       userRole: state.userRole,
     };
 
-    fetch("http://localhost:8080/api/user/edit", {
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/user/edit`, {
       method: "POST",
       credentials: "include",
       headers: {

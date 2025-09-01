@@ -8,7 +8,7 @@ export default function Mailbox({ refreshUnread }) {
   // 알림 목록 가져오기
   const fetchNotifications = async () => {
     try {
-      const res = await fetch("/api/notifications", {
+      const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/notifications`, {
         headers: {
           Authorization: "Bearer " + localStorage.getItem("accessToken"),
         },
@@ -34,7 +34,7 @@ export default function Mailbox({ refreshUnread }) {
     if (refreshUnread) refreshUnread();
 
     // 2. 서버에 읽음 처리 비동기 요청
-    fetch(`/api/notifications/read/${notificationId}`, {
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/notifications/read/${notificationId}`, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + localStorage.getItem("accessToken"),

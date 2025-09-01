@@ -223,7 +223,7 @@ const Index = () => {
     //     setIsLoading(false);
     //   });
 
-    fetch("/api/notices", {
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/notices`, {
       headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
     })
       .then((res) => res.json())

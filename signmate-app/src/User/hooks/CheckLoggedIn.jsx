@@ -4,7 +4,7 @@ export function useCheckLoggedIn() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [loginUser, setLoginUser] = useState("");
     // useEffect(() => {
-        fetch("http://localhost:8080/api/user/checklogin", {
+        fetch(process.env.REACT_APP_ABASE_URL+`/api/user/checklogin`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

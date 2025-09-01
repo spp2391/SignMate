@@ -14,13 +14,15 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-
+        working-directory: SignMate 
 
       - name: Build with Gradle
         run: ./gradlew clean build -x test
-
+        working-directory: SignMate
+      
       - name: Get current time
         uses: josStorer/get-current-time@v2.0.2
         id: current-time
@@ -29,7 +31,7 @@ jobs:
           utcOffset: "+09:00"
 
       - name: Set artifact
-        run: echo "artifact=$(ls ./build/libs)" >> $GITHUB_ENV
+        run: echo "artifact=$(ls ./SignMate/build/libs/SignMate-0.0.1-SNAPSHOT.jar)" >> $GITHUB_ENV
 
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v20
@@ -40,4 +42,4 @@ jobs:
           environment_name: springboot-developer-env
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
-          deployment_package: ./build/libs/${{env.artifact}}
+          deployment_package: ${{env.artifact}}

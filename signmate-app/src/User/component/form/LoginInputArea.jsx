@@ -26,7 +26,7 @@ const LoginInputArea = () => {
     e.preventDefault();
     const loginRequest = { email: state.id, password: state.pw };
 
-    fetch("http://localhost:8080/api/user/login", {
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/user/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },

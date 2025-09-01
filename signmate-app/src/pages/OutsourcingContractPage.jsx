@@ -146,7 +146,7 @@ export default function OutsourcingContractPage() {
   
       const fetchContract = async () => {
         try {
-          const res = await fetch(`/api/outsourcing/${contractId}`, {
+          const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/outsourcing/${contractId}`, {
             headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
           });
           if (!res.ok) throw new Error("계약서 로딩 실패");
@@ -218,7 +218,7 @@ export default function OutsourcingContractPage() {
         receiverSignature: formData.sign.recipient
       };
       const query = force ? "?force=true" : "";
-     const res = await fetch("/api/outsourcing" + query, {
+     const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/outsourcing` + query, {
   method: "POST",
   headers: { "Content-Type": "application/json",
     "Authorization" : "Bearer " + localStorage.getItem("accessToken"),

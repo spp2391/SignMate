@@ -18,11 +18,11 @@ const SignContract = () => {
     formData.append('email', form.email);
     formData.append('signature', signatureDataUrl);
 
-    const pdfFile = await fetch('/sample-agreement.pdf').then(res => res.blob());
+    const pdfFile = await fetch(process.env.REACT_APP_ABASE_URL+'/sample-agreement.pdf').then(res => res.blob());
     formData.append('pdf', pdfFile, 'original.pdf');
 
     try {
-      const res = await axios.post('/api/sign/submit', formData, {
+      const res = await axios.post(process.env.REACT_APP_ABASE_URL+'/api/sign/submit', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('제출 완료!');

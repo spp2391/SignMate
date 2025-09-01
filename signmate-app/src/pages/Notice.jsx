@@ -12,7 +12,7 @@ export default function NoticePage({ isLoggedIn, loginUser }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch("/api/notices", {
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/notices`, {
       headers: {
         Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },

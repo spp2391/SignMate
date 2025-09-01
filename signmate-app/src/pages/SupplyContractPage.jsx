@@ -117,7 +117,7 @@ export default function SupplyContractPage() {
   
       const fetchSecret = async () => {
         try {
-          const res = await fetch(`/api/supply/${contractId}`, {
+          const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/supply/${contractId}`, {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("accessToken"),
             },
@@ -196,7 +196,7 @@ export default function SupplyContractPage() {
       };
 
       console.log("payload.items:", payload.items);
-      const url = contractId ? `/api/supply/${contractId}` : `/api/supply`;
+      const url = contractId ? process.env.REACT_APP_ABASE_URL+`/api/supply/${contractId}` : `/api/supply`;
       const method = contractId ? "PUT" : "POST";
       const res = await fetch(url, {
         method,

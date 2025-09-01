@@ -50,7 +50,7 @@ export default function Inbox({ resolvedUserId: userIdProp,isLoggedIn, loginUser
     }
    console.log("로그인 유저아이디는:"+resolvedUserId);
     setIsLoading(true);
-    fetch(`http://localhost:8080/contracts/user/${resolvedUserId}`)
+    fetch(process.env.REACT_APP_ABASE_URL+`/contracts/user/${resolvedUserId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

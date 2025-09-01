@@ -54,7 +54,7 @@ export default function App() {
         }
     },[])
     useEffect(()=>{
-        fetch("http://localhost:8080/api/user/checkloginuser", {
+        fetch(`${process.env.REACT_APP_ABASE_URL}/api/user/checkloginuser`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

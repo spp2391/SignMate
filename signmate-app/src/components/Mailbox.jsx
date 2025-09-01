@@ -6,7 +6,7 @@ function Mailbox() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/mailbox")
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/mailbox`)
       .then(res => res.json())
       .then(data => setNotifications(data))
       .catch(err => console.error(err));

@@ -51,7 +51,7 @@ function CompanyStatistics({ companyName }) {
     if (!companyName) return;
     setLoading(true);
 
-    fetch(`http://localhost:8080/api/statistics/${encodeURIComponent(companyName)}`)
+    fetch(process.env.REACT_APP_ABASE_URL+`/api/statistics/${encodeURIComponent(companyName)}`)
       .then(res => {
         if (!res.ok) throw new Error("Failed to fetch");
         return res.json();

@@ -35,7 +35,7 @@ function ContractForm({ signerId /* 로그인 유저 ID */ }) {
   useEffect(() => {
     if (contractIdFromUrl) {
       setLoadingData(true);
-      fetch(`/api/service-contracts/${contractIdFromUrl}`)
+      fetch(process.env.REACT_APP_ABASE_URL+`/api/service-contracts/${contractIdFromUrl}`)
         .then((res) => {
           if (!res.ok) throw new Error("계약서 데이터를 불러오는 데 실패했습니다.");
           return res.json();
@@ -97,7 +97,7 @@ function ContractForm({ signerId /* 로그인 유저 ID */ }) {
       const base64 = await toBase64(signatureFile);
       const signatureHash = btoa(signatureFile.name + Date.now());
 
-      const response = await fetch("/api/signatures", {
+      const response = await fetch(process.env.REACT_APP_ABASE_URL+`/api/signatures`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -142,8 +142,8 @@ function ContractForm({ signerId /* 로그인 유저 ID */ }) {
     try {
       const method = formData.id ? "PUT" : "POST";
       const url = formData.id
-        ? `/api/service-contracts/${contractIdFromUrl}`
-        : "/api/service-contracts";
+        ? +process.env.REACT_APP_ABASE_URL`/api/service-contracts/${contractIdFromUrl}`
+        : process.env.REACT_APP_ABASE_URL+"/api/service-contracts";
 
       const payload = {
         contractId: contractIdFromUrl ? Number(contractIdFromUrl) : formData.contractId || formData.id,

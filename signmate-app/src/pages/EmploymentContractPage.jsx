@@ -153,7 +153,7 @@ export default function EmploymentContractPage() {
 
     const fetchContract = async () => {
       try {
-        const res = await fetch(`/api/employment/${contractId}`, {
+        const res = await fetch(process.env.REACT_APP_ABASE_URL+`/api/employment/${contractId}`, {
           headers: { Authorization: "Bearer " + localStorage.getItem("accessToken") },
         });
         if (!res.ok) throw new Error("계약서 로딩 실패");
@@ -221,7 +221,7 @@ export default function EmploymentContractPage() {
 };
 
       const method = contractId ? "PUT" : "POST";
-      const url = contractId ? `/api/employment/${contractId}` : `/api/employment`;
+      const url = contractId ? process.env.REACT_APP_ABASE_URL+`/api/employment/${contractId}` : `/api/employment`;
 
       const res = await fetch(url, {
         method,
