@@ -111,7 +111,7 @@ export default function App() {
                 <Route path="/notifications" element={<Mailbox />} />
                 <Route path="*" element={<SecretPage signerId="" />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/notice" element={<NoticePage />} />
+                <Route path="/notice" element={<NoticePage isLoggedIn={isLoggedIn} loginUser={loginUser} />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/lawcomponent" element={<LawComponent />} />
                 <Route path="/uploadnotice" element={<UploadNotice />} />

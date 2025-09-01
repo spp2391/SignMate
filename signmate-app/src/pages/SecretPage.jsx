@@ -51,7 +51,7 @@ const ndaTemplate = {
     { type: "text", name: "receiverAddress", label: "을 주소" },
 
     { type: "section", label: "기간/목적" },
-    // { type: "date", name: "effectiveDate",   label: "발효일" },
+    { type: "date", name: "effectiveDate",   label: "발효일" },
     { type: "textarea", name: "purpose", label: "정보 제공 목적" },
     { type: "text", name: "contractDurationMonths",    label: "계약기간(개월)" },
     { type: "text", name: "confidentialityDurationYears", label: "비밀유지 존속기간(년)" },
@@ -72,7 +72,7 @@ const ndaTemplate = {
 3. 비밀정보의 범위: 서면·구두·전자적 형태의 모든 정보 및 그 복제물
 4. 비밀유지 의무: 수신자는 목적 외 사용 금지, 제3자 제공 금지, 필요한 보호조치 이행
 5. 예외: 공지 정보, 제3자로부터 적법 취득, 독자적 개발, 법령·법원·기관 요구
-6. 계약기간: 발효일({{effective}})부터 {{contractDurationMonths}}개월
+6. 계약기간: 발효일({{effectiveDate}})부터 {{contractDurationMonths}}개월
 7. 존속기간: 계약 종료 후 {{confidentialityDurationYears}}년간 비밀유지 의무 존속
 8. 자료의 반환/파기: 공개자의 요구 시 지체 없이 반환 또는 파기
 9. 손해배상 및 금지명령: 위반 시 손해배상 및 가처분 등 법적 구제 가능
@@ -154,6 +154,9 @@ export default function SecretPage() {
         setFormData(prev => ({
           ...prev,
           ...data,
+           effectiveDate: data.effectiveDate 
+    ? data.effectiveDate.split("T")[0]  
+    : "",
           sign: {
             discloser: data.writerSignature || prev.sign.discloser,
             recipient: data.receiverSignature || prev.sign.recipient
@@ -193,9 +196,9 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-    //     effectiveDate: formData.effectiveDate 
-    // ? formData.effectiveDate + "T00:00:00"
-    // : null,
+        effectiveDate: formData.effectiveDate 
+    ? formData.effectiveDate + "T00:00:00"
+    : null,
 
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
@@ -222,7 +225,7 @@ export default function SecretPage() {
       setFormData(prev => ({
         ...prev,
         ...data,
-        // effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : prev.effectiveDate,
+      effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : "",
         sign: {
           discloser: data.writerSignature || prev.sign.discloser,
           recipient: data.receiverSignature || prev.sign.recipient

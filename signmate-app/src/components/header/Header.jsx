@@ -92,6 +92,13 @@ const Header = ({isLoggedIn, loginUser}) => {
                                         <Link className="header-gnblink" to="/mypage"><span>마이페이지</span></Link>
                                     </li> : ""
                                 }
+                                 {isLoggedIn && loginUser?.userType === "ADMIN" && (
+                        <li className="auth-menu">
+                            <Link className="header-gnblink" to="/admin">
+                                <span>관리자 페이지</span>
+                            </Link>
+                        </li>
+                    )}
                                 {isLoggedIn ? 
                                     <li className="auth-menu" >
                                         <Link className="header-gnblink" onClick={() => {
@@ -120,13 +127,13 @@ const Header = ({isLoggedIn, loginUser}) => {
                                 <li className="auth-menu">
                                     <NotificationBell />
                                 </li>
-                                <li className="allmenu">
+                                {/* <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                     </button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <button className="btn-momenu">

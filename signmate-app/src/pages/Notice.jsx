@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { ko } from "date-fns/locale";
 
-export default function NoticePage() {
+export default function NoticePage({ isLoggedIn, loginUser }) {
   const [notices, setNotices] = useState([]);
   const [keyword, setKeyword] = useState("");
   const [expandedIds, setExpandedIds] = useState([]);
@@ -66,12 +66,14 @@ export default function NoticePage() {
           onChange={(e) => setKeyword(e.target.value)}
           className="w-full sm:w-80 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-[20px]"
         />
+        {isLoggedIn && loginUser?.userType === "ADMIN" && (
         <a
           href="/uploadnotice"
           className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition text-[20px]"
         >
           공지사항 글쓰기
         </a>
+      )}
       </div>
 
       {/* 공지 그리드 */}
