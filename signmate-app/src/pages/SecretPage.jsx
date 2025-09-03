@@ -208,7 +208,7 @@ export default function SecretPage() {
       };
 
       const method = contractId ? "PUT" : "POST";
-      const url = contractId ? process.env.REACT_APP_ABASE_URL+`/api/secret/${contractId}` : `/api/secret`;
+      const url = contractId ? process.env.REACT_APP_ABASE_URL+`/api/secret/${contractId}` : process.env.REACT_APP_ABASE_URL+`/api/secret`;
 
       const res = await fetch(url, {
         method,

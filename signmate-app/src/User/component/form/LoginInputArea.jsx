@@ -95,7 +95,7 @@ const LoginInputArea = () => {
         {/* 소셜 로그인 */}
         <div className="mt-8 space-y-4">
           <a
-            href="http://localhost:8080/oauth2/authorization/kakao"
+            href={`${process.env.REACT_APP_ABASE_URL}/oauth2/authorization/kakao`}
             className="w-full flex items-center justify-center gap-2 bg-yellow-400 text-black text-lg py-3 rounded-lg shadow hover:bg-yellow-500 transition"
           >
             <MessageCircle size={28} />
