@@ -8,6 +8,7 @@ import org.zerock.signmate.Contract.domain.enums;
 import org.zerock.signmate.user.domain.User;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -42,7 +43,7 @@ public class Secret {
     private String purpose;
 
     // 6. 계약기간 - 발효일 (#8), 계약기간 개월수 (#9)
-    private LocalDate effectiveDate;
+    private LocalDateTime effectiveDate;
     private Integer contractDurationMonths;
 
     // 7. 존속기간 (계약 종료 후 유지 기간, 년 단위) (#10)
@@ -53,11 +54,11 @@ public class Secret {
 
     // 서명 이미지나 서명 텍스트
     @Lob
-    @Column(name = "writer_signature")
+    @Column(name = "writer_signature",columnDefinition = "TEXT")
     private String writerSignature;  // base64
 
     @Lob
-    @Column(name = "receiver_signature")
+    @Column(name = "receiver_signature",columnDefinition = "TEXT")
     private String receiverSignature; // base64
 
 //    @ManyToOne(fetch = FetchType.LAZY)

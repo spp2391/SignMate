@@ -1,22 +1,31 @@
-import { CheckCircle2, Clock, Pencil, Tag } from "lucide-react";
+// inboxUtils.js
+// ContractStatus : 계약 상태(enum)
+// ContractType : 계약 종류(enum)
+// CONTRACT_TYPE_LABEL : 한글 라벨 매핑
+// STATUS_META : 상태별 색상/아이콘 정의
+// formatLocalDateTime : 날짜 포맷 함수
+// useContracts : 실제 API용 계약 데이터 훅
 
+import { CheckCircle2, Clock, Pencil } from "lucide-react";
+
+// 1) 상태(enum) & 계약서 종류(enum)
 export const ContractStatus = {
   DRAFT: "DRAFT",
-  PENDING: "PENDING",
-  IN_PROGRESS: "IN_PROGRESS",
   COMPLETED: "COMPLETED",
+  IN_PROGRESS: "IN_PROGRESS",
 };
 
 export const ContractType = {
-  STANDARD: "STANDARD",
+  EMPLOYMENT: "EMPLOYMENT",
   OUTSOURCING: "OUTSOURCING",
   SECRET: "SECRET",
   SERVICE: "SERVICE",
   SUPPLY: "SUPPLY",
 };
 
+// 2) 한글 라벨 매핑
 export const CONTRACT_TYPE_LABEL = {
-  [ContractType.STANDARD]: "근로 계약서",
+  [ContractType.EMPLOYMENT]: "근로 계약서",
   [ContractType.OUTSOURCING]: "업무위탁 계약서",
   [ContractType.SECRET]: "비밀유지계약서",
   [ContractType.SERVICE]: "용역 계약서",
@@ -37,11 +46,6 @@ export const STATUS_META = {
     Icon: Pencil,
     className: "bg-slate-50 text-slate-700 border-slate-200",
   },
-  [ContractStatus.PENDING]: {
-    label: "서명 대기",
-    Icon: Tag,
-    className: "bg-blue-50 text-blue-700 border-blue-200",
-  },
   [ContractStatus.IN_PROGRESS]: {
     label: "진행 중",
     Icon: Clock,
@@ -56,7 +60,18 @@ export const STATUS_META = {
 
 export const formatLocalDateTime = (iso) => {
   if (!iso) return "-";
-  const d = new Date(iso);
+  let d = new Date(iso);
+  if (isNaN(d.getTime()) && /^\d{4}-\d{2}-\d{2}$/.test(iso)) {
+    d = new Date(iso + "T00:00:00");
+  }
   if (isNaN(d.getTime())) return "-";
-  return d.toLocaleString();
+  return d.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
 };

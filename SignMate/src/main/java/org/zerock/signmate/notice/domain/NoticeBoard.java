@@ -36,4 +36,9 @@ public class NoticeBoard {
         this.title = title;
         this.content = content;
     }
+
+    @ElementCollection
+    @CollectionTable(name = "NOTICEBOARD_IMAGES", joinColumns = @JoinColumn(name = "nbno"))
+    @Column(name = "image_url")
+    private java.util.List<String> imageUrls = new java.util.ArrayList<>();
 }

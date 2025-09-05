@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../../assets/css/style.css";
 import "../../assets/css/plugin.css";
 import "../../assets/css/setting.css";
@@ -6,9 +6,22 @@ import "../../assets/css/templatehouse.css";
 import logo from "../../assets/images/logo.png";
 import logo2 from "../..//assets/icons/ico_s20_close_white.svg";
 import NotificationBell from "../../pages/NotificationBell";
+import { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFaceSmile } from "@fortawesome/free-regular-svg-icons"; 
+import { faHandshake } from "@fortawesome/free-solid-svg-icons";
 
 
-const Header = () => {
+const Header = ({isLoggedIn, loginUser}) => {
+    const [requireLoggedIn, setRequireLoggedIn] = useState(false);
+    const navigate = useNavigate();
+    useEffect(() => {
+        setRequireLoggedIn(false);
+        if (requireLoggedIn && !isLoggedIn) {
+            alert("로그인.");
+            navigate("/login");
+        }
+    },[])
     return (
         <header className="th-layout-header">
             <div className="temhabank-N1" id="LKMdzPpn9D">
@@ -16,7 +29,7 @@ const Header = () => {
                     <div className="header-left">
                         <h2 className="header-title">
                             <Link to="/">
-                                {/* <img height="1" src={logo} alt="SIGN MATE" /> */}
+                                <img height="1" src={logo} alt="SIGN MATE" />
                             </Link>
                         </h2>
                     </div>
@@ -24,22 +37,22 @@ const Header = () => {
                         <div className="header-gnb">
                             <ul className="header-gnblist">
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/contracts">
                                         <span>서비스</span>
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/guide">
                                         <span>이용안내</span>
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/lawcomponent">
                                         <span>법적효력</span>
                                     </Link>
                                 </li>
                                 <li className="header-gnbitem">
-                                    <Link className="header-gnblink" to="javascript:void(0)">
+                                    <Link className="header-gnblink" to="/notice">
                                         <span>공지사항</span>
                                     </Link>
                                 </li>
@@ -62,34 +75,65 @@ const Header = () => {
                                     </button>
                                     </li> */}
                                 {/* 로그인 상태일 때 */}
-                                {/* <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/member/profile"><span>마이페이지</span></Link>
-                                </li> */}
-                                {/* style="padding-right: 30px;" */}
-                                {/* <li className="auth-menu" >
-                                    <Link className="header-gnblink" to="@{/member/logout}"><span>로그아웃</span></Link>
-                                </li> */}
-                                {/* <li className="auth-menu">
-                                    <Link className="header-gnblink" to="@{/admin/panel}"><span>관리자 페이지</span></Link>
-                                </li> */}
-                                {/* 비로그인 상태일 때 */}
-                                <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
-                                </li>
-                                 {/* style="padding-right: 30px;" */}
-                                <li className="auth-menu">
-                                    <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
-                                </li>
+                                {isLoggedIn ? 
+                                    <li className="auth-menu" >
+                                        <Link className="header-gnblink" to="/">
+                                            <span>
+                                            {/* <FontAwesomeIcon icon={faHandshake} style={{ marginRight: "8px", color: "#ebd725ff" }} /> */}
+                                            <FontAwesomeIcon icon={faFaceSmile} style={{ marginRight: "8px", color: "#259cebff" }} size={40} />
+                                            {loginUser.name} 님 환영합니다.
+                                            
+                                            </span>
+                                        </Link>
+                                    </li> : ""
+                                }
+                                {isLoggedIn ?
                                     <li className="auth-menu">
-                                    <NotificationBell />
+                                        <Link className="header-gnblink" to="/mypage"><span>마이페이지</span></Link>
+                                    </li> : ""
+                                }
+                                 {isLoggedIn && loginUser?.userType === "ADMIN" && (
+                        <li className="auth-menu">
+                            <Link className="header-gnblink" to="/admin">
+                                <span>관리자 페이지</span>
+                            </Link>
+                        </li>
+                    )}
+                                {isLoggedIn ? 
+                                    <li className="auth-menu" >
+                                        <Link className="header-gnblink" onClick={() => {
+                                                                                            localStorage.removeItem("accessToken");
+                                                                                            cookieStore.delete("refresh_token");
+                                                                                            // fetch("http://localhost:8080/api/user/logout");
+                                                                                            alert("로그아웃 되었습니다.");
+                                                                                        }}><span>로그아웃</span></Link>
+                                    </li> : ""
+                                }
+                                {/* {loginUser.userType==="ADMIN" ?
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/admin/panel"><span>관리자 페이지</span></Link>
+                                    </li> : ""
+                                } */}
+                                {isLoggedIn ? "" : 
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/login"><span>로그인</span></Link>
                                     </li>
-                                <li className="allmenu">
+                                }
+                                {isLoggedIn ? "" : 
+                                    <li className="auth-menu">
+                                        <Link className="header-gnblink" to="/join"><span>회원가입</span></Link>
+                                    </li>
+                                }
+                                <li className="auth-menu">
+                                    <NotificationBell />
+                                </li>
+                                {/* <li className="allmenu">
                                     <button className="btn-allmenu">
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                         <i className="ico-hamburger"></i>
                                     </button>
-                                </li>
+                                </li> */}
                             </ul>
                         </div>
                         <button className="btn-momenu">
@@ -108,15 +152,15 @@ const Header = () => {
                     <div className="fullmenu-wrapper">
                         <div className="fullmenu-head">
                             <h4 className="fullmenu-title">
-                                <Link to="javascript:void(0)">
+                                <Link to="/">
                                      <img height="82" src={logo} alt="SIGN MATE" />
                                 </Link>
                             </h4>
                         </div>
                         <ul className="fullmenu-gnblist">
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>개인뱅킹</span>
+                                <Link className="h5 fullmenu-gnblink" to="/contracts">
+                                    <span>서비스</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -127,8 +171,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>기업뱅킹</span>
+                                <Link className="h5 fullmenu-gnblink" to="/guide">
+                                    <span>이용안내</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -139,8 +183,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>금융상품</span>
+                                <Link className="h5 fullmenu-gnblink" to="/lawcomponent">
+                                    <span>법적효력</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -151,8 +195,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink" to="javascript:void(0)">
-                                    <span>외환</span>
+                                <Link className="h5 fullmenu-gnblink" to="/notice">
+                                    <span>공지사항</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">
@@ -163,8 +207,8 @@ const Header = () => {
                                 </ul>
                             </li>
                             <li className="fullmenu-gnbitem">
-                                <Link className="h5 fullmenu-gnblink"  to="javascript:void(0)">
-                                    <span>오픈뱅킹</span>
+                                <Link className="h5 fullmenu-gnblink"  to="/inbox">
+                                    <span>내 문서 조회</span>
                                 </Link>
                                 <ul className="fullmenu-sublist">
                                     <li className="fullmenu-subitem">

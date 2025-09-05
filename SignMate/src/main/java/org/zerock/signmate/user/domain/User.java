@@ -2,10 +2,11 @@ package org.zerock.signmate.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -18,6 +19,8 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Where(clause = "deleted = false")
+@SQLDelete(sql = "UPDATE user SET deleted = true, deleted_at = NOW() WHERE user_id = ?")
 public class User implements UserDetails {
 
     @Id
@@ -50,7 +53,6 @@ public class User implements UserDetails {
     @Column(name = "company_name", length = 200)
     private String companyName;
 
-    // USER, ADMIN
     @Column(name = "user_type", length = 10)
     private String userType;
 
@@ -71,42 +73,22 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private boolean deleted = false;
 
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
 
     // ===== UserDetails 구현 =====
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        // ⚠️ 기존 로직 유지 (user_type 사용) — 요청대로 추가 부분에서 user_type 사용하지 않음
         return List.of(new SimpleGrantedAuthority("ROLE_" + userType));
     }
 
-    @Override
-    public String getUsername() {
-        return email;
-    }
-
-    @Override
-    public String getPassword() {
-        return password;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return !deleted;
-    }
+    @Override public String getUsername() { return email; }
+    @Override public String getPassword() { return password; }
+    @Override public boolean isAccountNonExpired() { return true; }
+    @Override public boolean isAccountNonLocked() { return true; }
+    @Override public boolean isCredentialsNonExpired() { return true; }
+    @Override public boolean isEnabled() { return !deleted; }
 
     @PrePersist
     public void prePersist() {
@@ -123,15 +105,4 @@ public class User implements UserDetails {
         this.name = name;
         return this;
     }
-
-
-//    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    public List<Secret> secrets = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    public List<ServiceContract> services = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "user",fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-//    public List<Standard> standards = new ArrayList<>();
-
 }

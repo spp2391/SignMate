@@ -1,13 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { CONTRACT_TYPE_LABEL, STATUS_META, ContractStatus } from "../component/inbox/inboxUtils";
-
-export default function Dashboard({ userId = 1, contracts: contractsProp }) {
+function decodeUserIdFromToken() {
+  try {
+    const token = localStorage.getItem("accessToken");
+    if (!token) return null;
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+export default function Dashboard({ userId:userIdProp , contracts: contractsProp }) {
   const [contracts, setContracts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+ const userId = userIdProp ?? decodeUserIdFromToken() ?? 1;
 
   // 부모에서 contracts를 넘겨주면 그걸 사용, 없으면 fetch
   useEffect(() => {
+    console.log("대시보드유저아이디"+userId);
     if (Array.isArray(contractsProp)) {
       setContracts(contractsProp);
       setIsLoading(false);
@@ -56,7 +67,7 @@ export default function Dashboard({ userId = 1, contracts: contractsProp }) {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-3  gap-4">
         {Object.values(ContractStatus).map((status) => {
           const meta = STATUS_META[status];
           return (
@@ -69,7 +80,7 @@ export default function Dashboard({ userId = 1, contracts: contractsProp }) {
         })}
       </div>
 
-      <div className="rounded-xl border p-6">
+      <div className="rounded-xl border p-6" style={{ width: "400px" }}>
         <h2 className="text-lg font-semibold mb-4">계약서 유형 분포</h2>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
@@ -84,4 +95,6 @@ export default function Dashboard({ userId = 1, contracts: contractsProp }) {
       </div>
     </div>
   );
+  
 }
+

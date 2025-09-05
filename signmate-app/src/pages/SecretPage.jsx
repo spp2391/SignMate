@@ -1,7 +1,7 @@
 // SecretPage.jsx
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 
@@ -72,17 +72,17 @@ const ndaTemplate = {
 3. 비밀정보의 범위: 서면·구두·전자적 형태의 모든 정보 및 그 복제물
 4. 비밀유지 의무: 수신자는 목적 외 사용 금지, 제3자 제공 금지, 필요한 보호조치 이행
 5. 예외: 공지 정보, 제3자로부터 적법 취득, 독자적 개발, 법령·법원·기관 요구
-6. 계약기간: 발효일({{effective}})부터 {{contractDurationMonths}}개월
+6. 계약기간: 발효일({{effectiveDate}})부터 {{contractDurationMonths}}개월
 7. 존속기간: 계약 종료 후 {{confidentialityDurationYears}}년간 비밀유지 의무 존속
 8. 자료의 반환/파기: 공개자의 요구 시 지체 없이 반환 또는 파기
 9. 손해배상 및 금지명령: 위반 시 손해배상 및 가처분 등 법적 구제 가능
 10. 준거법 및 관할: {{governingLaw}}
 
 [서명]
-갑: {{discloser.name}} (서명)
+갑: {{writerName}} (서명){{writerSignature}}
 {{sign.discloser}}
 
-을: {{recipient.name}} (서명)
+을: {{receiverName}} (서명){{receiverSignature}}
 {{sign.recipient}}
   `,
 
@@ -102,7 +102,7 @@ export default function SecretPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
   }, []);
@@ -154,6 +154,9 @@ export default function SecretPage() {
         setFormData(prev => ({
           ...prev,
           ...data,
+           effectiveDate: data.effectiveDate 
+    ? data.effectiveDate.split("T")[0]  
+    : "",
           sign: {
             discloser: data.writerSignature || prev.sign.discloser,
             recipient: data.receiverSignature || prev.sign.recipient
@@ -193,7 +196,10 @@ export default function SecretPage() {
         writerName: formData.writerName,
         receiverName: formData.receiverName,
         purpose: formData.purpose,
-        effectiveDate: formData.effectiveDate || null,
+        effectiveDate: formData.effectiveDate 
+    ? formData.effectiveDate + "T00:00:00"
+    : null,
+
         contractDurationMonths: formData.contractDurationMonths ? Number(formData.contractDurationMonths) : null,
         confidentialityDurationYears: formData.confidentialityDurationYears ? Number(formData.confidentialityDurationYears) : null,
         governingLaw: formData.governingLaw,
@@ -219,6 +225,7 @@ export default function SecretPage() {
       setFormData(prev => ({
         ...prev,
         ...data,
+      effectiveDate: data.effectiveDate ? data.effectiveDate.split("T")[0] : "",
         sign: {
           discloser: data.writerSignature || prev.sign.discloser,
           recipient: data.receiverSignature || prev.sign.recipient
@@ -226,6 +233,7 @@ export default function SecretPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.writerSignature) writerSigRef.current?.fromDataURL(data.writerSignature);
       if (data.receiverSignature) receiverSigRef.current?.fromDataURL(data.receiverSignature);
     } catch (err) {
@@ -237,8 +245,8 @@ export default function SecretPage() {
 
   return (
     <div style={{ padding: 20 }}>
-      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} />
-      <button
+      <ContractBase template={ndaTemplate} data={formData} handleChange={handleChange} role={currentUserRole} onSubmit={handleSave} submitting={loadingSubmit}   />
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -253,7 +261,7 @@ export default function SecretPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }

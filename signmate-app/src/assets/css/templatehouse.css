@@ -330,9 +330,9 @@ progress { vertical-align: baseline; }
 /* ========== */
 /* 가로 Layout */
 .container-full { position: relative; max-width: 100%; margin: 0 auto; padding: 0 4rem; } 
-.container-lg { position: relative; max-width: calc(1440px + 8rem); margin: 0 auto; padding: 0 4rem; } 
-.container-md { position: relative; max-width: calc(1280px + 8rem); margin: 0 auto; padding: 0 4rem; } 
-.container-sm { position: relative; max-width: calc(1024px + 8rem); margin: 0 auto; padding: 0 4rem; } 
+.container-lg { position: relative; max-width: 700px; margin: 0 auto; padding: 0 4rem; } 
+.container-md { position: relative; max-width: 1700px; margin: 0 auto; padding: 0 4rem; } 
+.container-sm { position: relative; max-width: 700px ; margin: 0 auto; padding: 0 4rem; } 
 @media (max-width: 992px){
  .container-full { padding: 0 1.6rem; } 
  .container-lg { padding: 0 1.6rem; } 

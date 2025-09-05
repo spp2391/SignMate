@@ -54,4 +54,8 @@ public class NotificationController {
 
         notificationService.markAsRead(notificationId);
     }
+        @DeleteMapping("/contract/{contractId}")
+        public void deleteByContractId(@PathVariable Long contractId) {
+            notificationService.deleteNotificationsByContractId(contractId);
+        }
 }

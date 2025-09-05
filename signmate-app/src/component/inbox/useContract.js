@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export function useContracts(userId = 1) {
+export function useContracts(userId ) {
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 

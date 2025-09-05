@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import debounce from "lodash/debounce";
 import ContractBase from "../component/contracts/ContractBase";
 import { getLoginUserName } from "./util";
@@ -116,11 +116,12 @@ const employmentTemplate = {
  - 본 계약서 사본 각 1부씩 교부·보관한다.
 
 [서명]
-(사업주) {{employerName}} / 대표자: {{employerRepresentative}} (서명) / 주소: {{employerAddress}}
+(사업주) {{employerName}} / 대표자: {{employerRepresentative}} (서명){{writerSignature}} / 주소: {{employerAddress}}
 {{sign.employer}}
 
-(근로자) 성명: {{employeeName}} (서명) / 주소: {{employeeAddress}} / 연락처: {{employeeContact}}
+(근로자) 성명: {{employeeName}} (서명){{receiverSignature}} / 주소: {{employeeAddress}} / 연락처: {{employeeContact}}
 {{sign.employee}}
+
   `,
   footerNote: "※ 취업규칙·인사규정과 함께 운영하면 좋습니다.",
 };
@@ -132,7 +133,7 @@ export default function EmploymentContractPage() {
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
   const [currentUserRole, setCurrentUserRole] = useState("sender");
-
+  const navigate = useNavigate(); 
   // handleChange: SecretPage처럼 debounced 처리
   const handleChange = useCallback((updated) => {
     debouncedSetValue(updated);
@@ -243,6 +244,7 @@ export default function EmploymentContractPage() {
       }));
 
       alert("계약서 제출 완료! ID = " + result.id);
+      navigate("/");
     } catch (err) {
       alert("저장 실패: " + err.message);
     } finally {
@@ -257,8 +259,10 @@ export default function EmploymentContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave}
+         submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -273,7 +277,7 @@ export default function EmploymentContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "계약서 저장"}
-      </button>
+      </button> */}
     </div>
   );
 }

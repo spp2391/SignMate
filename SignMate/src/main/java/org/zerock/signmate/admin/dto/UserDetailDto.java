@@ -1,5 +1,7 @@
 package org.zerock.signmate.admin.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import org.zerock.signmate.user.domain.User;
 
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDetailDto {
     private Long userId;
     private String companyName;
@@ -15,8 +18,11 @@ public class UserDetailDto {
     private String name;
     private String nickname;
     private String role;
-    private String type;
+
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime regdate;
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime moddate;
 
     public static UserDetailDto from(User u) {
@@ -27,7 +33,6 @@ public class UserDetailDto {
                 .name(u.getName())
                 .nickname(u.getNickname())
                 .role(u.getUserRole())
-                .type(u.getUserType())
                 .regdate(u.getRegdate())
                 .moddate(u.getModdate())
                 .build();

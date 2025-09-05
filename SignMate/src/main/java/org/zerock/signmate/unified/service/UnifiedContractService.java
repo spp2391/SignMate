@@ -13,6 +13,7 @@ import org.zerock.signmate.Contract.supply.repository.SupplyContractRepository;
 import org.zerock.signmate.unified.mapper.UnifiedContractMapper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -35,21 +36,32 @@ public class UnifiedContractService {
         // Standard
         standardRepository.findByContract_Writer_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromStandard(c, c.getContract())));
+        standardRepository.findByContract_Receiver_UserId(userId)
+                        .forEach(c -> result.add(UnifiedContractMapper.fromStandard(c, c.getContract())));
+
 
         // Secret
         secretRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromSecret(c, c.getContract())));
+        secretRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSecret(c, c.getContract())));
 
         // Supply
         supplyContractRepository.findByContract_Writer_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromSupply(c, c.getContract())));
+        supplyContractRepository.findByContract_Receiver_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromSupply(c, c.getContract())));
 
         // Service
         serviceContractDocumentRepository.findByContract_Writer_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromService(c, c.getContract())));
+        serviceContractDocumentRepository.findByContract_Receiver_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromService(c, c.getContract())));
 
         // BusinessOutsourcing
         businessOutsourcingContractRepository.findByContract_Writer_UserId(userId)
+                .forEach(c -> result.add(UnifiedContractMapper.fromBusiness(c, c.getContract())));
+        businessOutsourcingContractRepository.findByContract_Receiver_UserId(userId)
                 .forEach(c -> result.add(UnifiedContractMapper.fromBusiness(c, c.getContract())));
 
         // 필요 시 Service/Outsourcing도 이어서 추가
@@ -58,7 +70,7 @@ public class UnifiedContractService {
 
     public UserDashboardDTO getUserDashboard(Long userId) {
         List<UnifiedContractDto> contracts = getAllContractsForUser(userId);
-        LocalDate today = LocalDate.now();
+        LocalDateTime today = LocalDateTime.now();
 
         long total = contracts.size();
         long active = contracts.stream()

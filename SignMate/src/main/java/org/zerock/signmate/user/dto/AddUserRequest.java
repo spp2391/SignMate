@@ -20,7 +20,6 @@ public class AddUserRequest {
     private String email;
     @NotBlank
     private String password;
-    @NotBlank
     private String companyName;
     @NotBlank
     private String userType;

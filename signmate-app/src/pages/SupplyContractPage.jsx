@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import ContractBase from "../component/contracts/ContractBase";
 import {getLoginUserName} from "./util";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { debounce } from "lodash";
 
 
@@ -80,23 +80,23 @@ const supplyTemplate = {
   body: `
 자재/물품 공급계약서
 
-공급자(갑) {{supplierName}}(대표 {{supplierRepresentative}}) 과(와) 수요자(을) {{buyer.name}}(대표 {{buyer.rep}})은 다음 조건으로 물품 공급에 합의한다.
+공급자(갑) {{supplierName}}(대표 {{supplierRepresentative}}) 과(와) 수요자(을) {{demanderName}}(대표 {{demanderRepresentative}})은 다음 조건으로 물품 공급에 합의한다.
 
-제1조(계약일자·장소) 계약일자는 {{contractDate}} 이며, 인도 장소는 {{place}} 로 한다.
+제1조(계약일자·장소) 계약일자는 {{contractDate}} 이며, 인도 장소는 {{deliveryLocation}} 로 한다.
 제2조(품목·수량·대금) 아래 표 기재 내역을 기준으로 한다.
 [품목 내역 표는 본문 하단에 표시]
 
 제3조(인도조건) {{deliveryTerms}}
-제4조(검수·하자보수) {{inspeinspectionAndWarrantyctTerms}}
+제4조(검수·하자보수) {{inspectionAndWarranty}}
 제5조(대금 및 지급) {{paymentTerms}}
 제6조(품질보증 등) {{qualityGuaranteeTerms}}
 제7조(기타) {{otherTerms}}
 
 [서명]
-(갑) {{supplierName}} (서명)
+(갑) {{supplierName}} (서명){{supplierSignature}}
 {{sign.discloser}}
 
-(을) {{demanderName}} (서명)
+(을) {{demanderName}} (서명){{demanderSignature}}
 {{sign.recipient}}
   `,
 
@@ -111,7 +111,7 @@ export default function SupplyContractPage() {
   const [currentUserRole, setCurrentUserRole] = useState("sender");
   const writerSigRef = useRef(null);
   const receiverSigRef = useRef(null);
-
+ const navigate = useNavigate(); 
   useEffect(() => {
       if (!contractId) return;
   
@@ -170,7 +170,7 @@ export default function SupplyContractPage() {
     setLoadingSubmit(true);
     try {
       const payload = {
-        contractId: formData.contractId, // 추가
+        contractId: contractId, // 추가
         supplierName: formData.supplierName,
         supplierRepresentative: formData.supplierRepresentative,
         demanderName: formData.demanderName,
@@ -196,9 +196,10 @@ export default function SupplyContractPage() {
       };
 
       console.log("payload.items:", payload.items);
-
-      const res = await fetch("/api/supply", {
-        method: "POST",
+      const url = contractId ? `/api/supply/${contractId}` : `/api/supply`;
+      const method = contractId ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json",
         "Authorization" : "Bearer " + localStorage.getItem("accessToken"),
          },
@@ -218,6 +219,7 @@ export default function SupplyContractPage() {
       }));
 
       alert("계약서 제출 완료!");
+      navigate("/");
       if (data.supplierSignature) writerSigRef.current?.fromDataURL(data.supplierSignature);
       if (data.demanderSignature) receiverSigRef.current?.fromDataURL(data.demanderSignature);
     } catch (err) {
@@ -234,8 +236,10 @@ export default function SupplyContractPage() {
         data={formData}
         handleChange={handleChange}
         role={currentUserRole}
+        onSubmit={handleSave}
+         submitting={loadingSubmit}
       />
-      <button
+      {/* <button
         onClick={handleSave}
         disabled={loadingSubmit}
         style={{
@@ -250,7 +254,7 @@ export default function SupplyContractPage() {
         }}
       >
         {loadingSubmit ? "제출 중..." : "제출하기"}
-      </button>
+      </button> */}
     </div>
   );
 }
