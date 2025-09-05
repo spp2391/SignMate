@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.zerock.signmate.user.dto.CreateAccessTokenRequest;
 import org.zerock.signmate.user.dto.CreateAccessTokenResponse;
-import org.zerock.signmate.user.sevice.TokenService;
+import org.zerock.signmate.user.service.TokenService;
 
 @RequiredArgsConstructor
 @RestController

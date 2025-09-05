@@ -34,6 +34,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+
+    implementation 'org.apache.pdfbox:pdfbox:2.0.29'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -47,6 +52,21 @@ dependencies {
     //OAuth2
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    // PDF 조작용 Apache PDFBox
+    implementation 'org.apache.pdfbox:pdfbox:2.0.27'
+
+    // Spring Boot Mail (이메일 전송)
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    // 기타 기본 Spring Boot 의존성 (이미 있겠지만)
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Lombok (선택)
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
